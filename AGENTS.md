@@ -58,6 +58,8 @@ Objectif : faire évoluer l’app **rapidement** sans dette technique, sans cass
 
 ### Front-end
 - Pas de phrase inutile dans l'application / Pas de phrase explicative.
+- Sur la home, les boutons de collections doivent rester visibles sans style encadre (pas de pill, pas de carte).
+- Sur la home, les blocs post-hero restent frameless (pas de conteneur carte/cadre autour de Piece signature, Best-sellers, Bande confiance).
 
 
 ---
@@ -70,7 +72,7 @@ Objectif : faire évoluer l’app **rapidement** sans dette technique, sans cass
 - CORS : configuration dynamique via ce mécanisme (ne pas hardcoder des ports).
 
 2) **Travail avec un workflow git propre**
-Comit à chaque changement
+- Commit à chaque changement atomique avec un message clair.
 
 5) **Avant de conclure une PR / livraison**
 - Nettoyer les fichiers inutiles.
@@ -79,4 +81,3 @@ Comit à chaque changement
 ---
 
 Mets à jour un lesson.md, que tu dois consulter. Au fil du projet, mets à jour lesson.md, sur les erreurs à ne pas faire et les reussites.
-

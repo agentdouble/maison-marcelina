@@ -1,12 +1,39 @@
-# app-template
+# Maison Marcelina
 
-Production-ready app template with a Python backend and a React frontend.
+Base web app for Maison Marcelina with a Python backend and a React frontend.
 
 ## Stack
 
 - Backend: FastAPI (Python 3.11+) managed with `uv`
-- Frontend: React + Vite
+- Frontend: React + Vite + React Router + Tailwind CSS utilities
+- UI primitives: shadcn-style structure in `src/components/ui`
+- TypeScript support enabled for UI components (`.tsx`, alias `@/*`)
 - Orchestration: `start.sh` (single entrypoint)
+
+## Current frontend scope (mock)
+
+The frontend is a multi-page brand mock focused on couture and boutique flows.
+
+- Compact sticky top band with large logo, profile icon, and mobile hamburger nav
+- Centered navigation tabs (`Accueil`, `Les collections`, `L'atelier du sur mesure`)
+- Header action icons for cart and `Login` (login kept at top-right)
+- Liquid visual design (glass surfaces, fluid highlights, soft moving blobs)
+- Full-viewport home shader slider (`lumina-interactive-list`) fed by the 3 collections
+- In-hero collection buttons remain frameless and visible (`Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
+- Home continuation after slider with:
+  - `Piece signature` spotlight block (content aligned opposite image)
+  - animated `Best-sellers` carousel (`Gallery4` + Embla)
+  - trust band (`Livraison`, `Retours`, `Paiement`, `Support`)
+- Post-hero home blocks are intentionally frameless (no card container wrappers)
+- `Piece signature` image uses a liquid morph style (organic shape + soft highlights)
+- `Piece signature` CTA `Decouvrir` is frameless (no round/pill background)
+- Scroll reveal animations and full-page web-app layout
+- Marketplace collections page
+- Boutique page with product cards
+- Sur-mesure contact form page
+- Command support contact page
+- Login page
+- Themed `Footer7` with three footer columns: `Navigation`, `Assistance`, `Informations legales`
 
 ## Project layout
 
@@ -27,9 +54,25 @@ Production-ready app template with a Python backend and a React frontend.
 ├── frontend/
 │   ├── package.json
 │   ├── vite.config.js
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   ├── tsconfig.json
+│   ├── components.json
 │   ├── index.html
+│   ├── public/
+│   │   └── logo-marcelina.svg
 │   └── src/
 │       ├── App.jsx
+│       ├── components/
+│       │   └── ui/
+│       │       ├── button.tsx
+│       │       ├── carousel.tsx
+│       │       ├── card.tsx
+│       │       ├── footer-7.tsx
+│       │       ├── gallery4.tsx
+│       │       └── lumina-interactive-list.tsx
+│       ├── lib/
+│       │   └── utils.ts
 │       ├── main.jsx
 │       └── styles.css
 ├── .env.example
@@ -73,6 +116,21 @@ Always run the app from the repository root:
 - Backend URL: `http://localhost:$BACKEND_PORT`
 - Health endpoint: `http://localhost:$BACKEND_PORT/health`
 - Frontend URL: `http://localhost:$FRONTEND_PORT`
+
+## Frontend routes
+
+- `/` home
+- `/collection` collections marketplace
+- `/sur-mesure` custom request form
+- `/contact` order issue form
+- `/boutique` boutique listing
+- `/panier` cart page
+- `/login` login form
+- `/mentions-legales` legal notice page
+- `/cgv` conditions page
+- `/politique-remboursement` refund policy page
+- `/politique-cookies` cookies policy page
+- `/accessibilite` accessibility page
 
 ## Environment variables
 

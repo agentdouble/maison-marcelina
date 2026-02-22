@@ -66,6 +66,7 @@
 - Frontend auth submit handlers should always abort in-flight requests on unmount and on resubmit to avoid duplicate login race conditions.
 - Redirecting to backend Google start endpoint from the UI keeps OAuth initiation simple while preserving PKCE state handling server-side.
 - For premium themes, a centered `max-w-sm` auth card can stay close to shadcn defaults while matching brand visuals through token-based gradients instead of extra layout complexity.
+- When Tailwind preflight is disabled, shadcn buttons should explicitly set `appearance` and border defaults, otherwise browser-native outlines can degrade premium UI.
 
 ## errors to avoid
 
@@ -108,3 +109,4 @@
 - Do not force a liquid separator when the requested direction is a straight visual cut.
 - Do not fire concurrent login submits without cancellation/locking, or UI state can desync from backend auth responses.
 - Do not add demo-only component files in production routes when they are not used; keep login integration focused on the real route component.
+- Do not rely on browser default button rendering in a no-preflight setup; it can introduce thick native borders and inconsistent visuals across browsers.

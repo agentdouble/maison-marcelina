@@ -783,6 +783,40 @@ textarea:focus-visible,
   backdrop-filter: blur(12px) saturate(130%);
 }
 
+.login1-card .login1-primary-btn {
+  min-height: 46px;
+  border-color: rgba(61, 37, 27, 0.2);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(78, 48, 36, 0.96), rgba(66, 37, 27, 0.9)),
+    rgba(78, 48, 36, 0.92);
+  color: var(--paper-soft);
+  box-shadow: 0 8px 18px rgba(44, 28, 20, 0.2);
+}
+
+.login1-card .login1-primary-btn:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(44, 28, 20, 0.24);
+}
+
+.login1-card .login1-google-btn {
+  min-height: 46px;
+  border-color: rgba(78, 48, 36, 0.18);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 251, 246, 0.9), rgba(244, 235, 218, 0.74)),
+    rgba(255, 251, 246, 0.8);
+  color: var(--liquid-chocolate);
+}
+
+.login1-card .login1-google-btn:hover {
+  border-color: rgba(78, 48, 36, 0.25);
+  background:
+    linear-gradient(180deg, rgba(255, 251, 246, 0.98), rgba(244, 235, 218, 0.82)),
+    rgba(255, 251, 246, 0.88);
+}
+
 .field-row {
   display: grid;
   grid-template-columns: 1fr;

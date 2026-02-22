@@ -136,13 +136,17 @@ const Login1 = ({
               required
             />
 
-            <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="login1-primary-btn mt-1 w-full"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Patiente..." : buttonText}
             </Button>
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="login1-google-btn w-full"
               disabled={isSubmitting}
               aria-label={googleText}
               onClick={() => startGoogleOAuth(apiBaseUrl)}

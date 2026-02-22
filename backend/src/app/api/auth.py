@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from pydantic import BaseModel, Field
-from supabase_auth.errors import AuthApiError, AuthRetryableError
+from supabase_auth.errors import AuthError, AuthRetryableError
 
 from app.core.config import Settings, get_settings
 from app.services.supabase_auth import (
@@ -85,9 +85,13 @@ def _raise_auth_error(exc: Exception) -> None:
         raise HTTPException(status_code=500, detail=str(exc))
     if isinstance(exc, AuthRetryableError):
         raise HTTPException(status_code=503, detail=exc.message)
-    if isinstance(exc, AuthApiError):
-        status_code = exc.status if 400 <= exc.status < 600 else 401
-        raise HTTPException(status_code=status_code, detail=exc.message)
+    if isinstance(exc, AuthError):
+        raw_status = getattr(exc, "status", None)
+        status_code = (
+            raw_status if isinstance(raw_status, int) and 400 <= raw_status < 600 else 500
+        )
+        detail = exc.message if exc.message else "Authentication failed"
+        raise HTTPException(status_code=status_code, detail=detail)
     raise HTTPException(status_code=500, detail="Unexpected authentication error")
 
 

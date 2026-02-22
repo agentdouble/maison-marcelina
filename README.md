@@ -35,6 +35,8 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Sur-mesure request form page (project type, name/email, free message)
 - Command support contact page
 - Login page based on `Login1` (shadcn-style) connected to backend auth
+- Professional buyer account area on `/compte` with tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
+- Account order history is read-only from backend data (no manual order creation from profile)
 - Themed `Footer7` with three footer columns: `Navigation`, `Assistance`, `Informations legales`
 
 ## Project layout
@@ -44,12 +46,15 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 ├── backend/
 │   ├── pyproject.toml
 │   ├── src/app/
+│   │   ├── api/account.py
 │   │   ├── api/auth.py
 │   │   ├── api/health.py
 │   │   ├── core/config.py
 │   │   ├── core/logging.py
+│   │   ├── services/supabase_account.py
 │   │   ├── services/supabase_auth.py
 │   │   └── main.py
+│   ├── tests/test_account.py
 │   ├── tests/test_auth.py
 │   ├── tests/test_health.py
 │   └── uv.lock
@@ -131,6 +136,7 @@ Always run the app from the repository root:
 - `/boutique` boutique listing
 - `/panier` cart page
 - `/login` login form
+- `/compte` buyer account area (overview, orders, profile data, security; requires authenticated session)
 - `/mentions-legales` legal notice page
 - `/cgv` conditions page
 - `/politique-remboursement` refund policy page
@@ -169,6 +175,7 @@ If `SUPABASE_GOOGLE_REDIRECT_URL` is empty, backend defaults to:
 - `POST /auth/signup`
   - body: `{"email":"...", "password":"..."}`
   - response: Supabase auth payload (`user`, optional session tokens depending on email confirmation policy)
+- Auth errors from Supabase are returned with their upstream HTTP status and message (for example `400`, `401`, `422`); transient/retryable errors are normalized to `503`.
 - `GET /auth/google/start`
   - starts Google OAuth (PKCE)
   - default behavior: HTTP redirect to Google
@@ -179,6 +186,24 @@ If `SUPABASE_GOOGLE_REDIRECT_URL` is empty, backend defaults to:
 
 Google login requires enabling the Google provider in Supabase Auth and adding the callback URL in your Supabase redirect URLs allow list.
 
+## Backend Account API
+
+All `/account/*` endpoints require `Authorization: Bearer <access_token>`.
+- invalid/expired bearer sessions are normalized to `401`
+
+- `GET /account/profile`
+  - returns profile fields (`full_name`, `phone`, `address`) plus account email
+- `PUT /account/profile`
+  - body: `{"full_name":"...", "phone":"...", "address":"..."}`
+  - upserts user profile
+- `GET /account/orders`
+  - returns user orders list
+
+Supabase tables used:
+
+- `public.customer_profiles` (1 row per user)
+- `public.customer_orders` (N rows per user)
+
 ## Login flow in frontend
 
 - `/login` uses `src/components/ui/login-1.tsx`
@@ -186,6 +211,11 @@ Google login requires enabling the Google provider in Supabase Auth and adding t
 - Account creation submit calls `POST {VITE_API_BASE_URL}/auth/signup`
 - Google button redirects browser to `{VITE_API_BASE_URL}/auth/google/start`
 - On password login success, response payload is stored in `localStorage` as `mm_auth_session`, then user is redirected to `/`
+- Profile icon routes to `/compte` when authenticated, otherwise `/login`
+- `/compte` is split in tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
+- `Coordonnees` can create/update profile data via backend `/account/profile`
+- `Commandes` lists account orders from backend `/account/orders` (read-only for buyers)
+- if account requests return `401/403`, frontend clears stale `mm_auth_session` and redirects to `/login`
 
 ## Commands
 

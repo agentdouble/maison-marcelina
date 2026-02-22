@@ -13,6 +13,118 @@ import { Footer7 } from "./components/ui/footer-7.tsx";
 import { Gallery4 } from "./components/ui/gallery4.tsx";
 import { Login1 } from "./components/ui/login-1.tsx";
 import { LuminaInteractiveList } from "./components/ui/lumina-interactive-list.tsx";
+import {
+  ApiRequestError,
+  getAccountProfile,
+  listAccountOrders,
+  updateAccountProfile,
+} from "./lib/auth.ts";
+
+const AUTH_SESSION_STORAGE_KEY = "mm_auth_session";
+
+function readJsonStorage(storageKey) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  const rawValue = window.localStorage.getItem(storageKey);
+  if (!rawValue) {
+    return null;
+  }
+  try {
+    return JSON.parse(rawValue);
+  } catch {
+    return null;
+  }
+}
+
+function readStoredAuthSession() {
+  const parsed = readJsonStorage(AUTH_SESSION_STORAGE_KEY);
+  if (!parsed || typeof parsed !== "object") {
+    return null;
+  }
+  if (typeof parsed.access_token !== "string" || parsed.access_token.length === 0) {
+    return null;
+  }
+  return parsed;
+}
+
+function formatAccountDate(value) {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return "-";
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "-";
+  }
+  return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(parsed);
+}
+
+function formatClientId(value) {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return "-";
+  }
+  return value.length <= 14 ? value : `${value.slice(0, 14)}...`;
+}
+
+function formatOrderTotal(totalAmount, currency) {
+  const parsed = Number(totalAmount);
+  if (!Number.isFinite(parsed)) {
+    return "-";
+  }
+  const orderCurrency =
+    typeof currency === "string" && /^[a-z]{3}$/i.test(currency.trim())
+      ? currency.trim().toUpperCase()
+      : "EUR";
+
+  try {
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: orderCurrency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(parsed);
+  } catch {
+    return `${parsed.toFixed(2)} ${orderCurrency}`;
+  }
+}
+
+function formatOrderItems(itemsCount) {
+  if (typeof itemsCount !== "number" || !Number.isInteger(itemsCount)) {
+    return "-";
+  }
+  return `${itemsCount} article${itemsCount > 1 ? "s" : ""}`;
+}
+
+function getOrderStatusTone(status) {
+  if (typeof status !== "string") {
+    return "neutral";
+  }
+  const normalized = status.trim().toLowerCase();
+  if (!normalized) {
+    return "neutral";
+  }
+  if (normalized.includes("livr")) {
+    return "success";
+  }
+  if (
+    normalized.includes("annul") ||
+    normalized.includes("retour") ||
+    normalized.includes("refus")
+  ) {
+    return "danger";
+  }
+  if (
+    normalized.includes("exped") ||
+    normalized.includes("transit") ||
+    normalized.includes("prepar")
+  ) {
+    return "progress";
+  }
+  if (normalized.includes("cours") || normalized.includes("attente")) {
+    return "pending";
+  }
+  return "neutral";
+}
 
 const navItems = [
   { to: "/", label: "Accueil" },
@@ -158,25 +270,27 @@ const legalPages = [
   },
 ];
 
-const footerSections = [
-  {
-    title: "Navigation",
-    links: [
-      { name: "Accueil", href: "/" },
-      { name: "Les collections", href: "/collection" },
-      { name: "Sur mesure", href: "/sur-mesure" },
-      { name: "Boutique", href: "/boutique" },
-    ],
-  },
-  {
-    title: "Assistance",
-    links: [
-      { name: "Contact", href: "/contact" },
-      { name: "Panier", href: "/panier" },
-      { name: "Login", href: "/login" },
-    ],
-  },
-];
+function getFooterSections(isAuthenticated) {
+  return [
+    {
+      title: "Navigation",
+      links: [
+        { name: "Accueil", href: "/" },
+        { name: "Les collections", href: "/collection" },
+        { name: "Sur mesure", href: "/sur-mesure" },
+        { name: "Boutique", href: "/boutique" },
+      ],
+    },
+    {
+      title: "Assistance",
+      links: [
+        { name: "Contact", href: "/contact" },
+        { name: "Panier", href: "/panier" },
+        { name: isAuthenticated ? "Compte" : "Login", href: isAuthenticated ? "/compte" : "/login" },
+      ],
+    },
+  ];
+}
 
 function ProfileIcon() {
   return (
@@ -241,6 +355,9 @@ function SiteHeader() {
   const location = useLocation();
   const headerRef = useRef(null);
   const menuClass = mobileMenuOpen ? "menu-tabs menu-tabs--open" : "menu-tabs";
+  const isAuthenticated = Boolean(readStoredAuthSession());
+  const authRoute = isAuthenticated ? "/compte" : "/login";
+  const authLabel = isAuthenticated ? "Compte" : "Login";
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -299,7 +416,7 @@ function SiteHeader() {
             </NavLink>
           ))}
           <NavLink
-            to="/login"
+            to={authRoute}
             onClick={() => setMobileMenuOpen(false)}
             className={({ isActive }) =>
               isActive
@@ -307,7 +424,7 @@ function SiteHeader() {
                 : "menu-tab menu-tab--mobile-only"
             }
           >
-            Login
+            {authLabel}
           </NavLink>
         </nav>
 
@@ -327,7 +444,7 @@ function SiteHeader() {
             <HamburgerIcon open={mobileMenuOpen} />
           </button>
 
-          <Link className="profile-link" to="/login" aria-label="Login">
+          <Link className="profile-link" to={authRoute} aria-label={authLabel}>
             <ProfileIcon />
           </Link>
         </div>
@@ -602,6 +719,504 @@ function LoginPage() {
   );
 }
 
+function AccountPage() {
+  const navigate = useNavigate();
+  const session = readStoredAuthSession();
+  const accessToken =
+    session && typeof session.access_token === "string" ? session.access_token : "";
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [profileForm, setProfileForm] = useState({
+    full_name: "",
+    phone: "",
+    address: "",
+  });
+  const [profileUpdatedAt, setProfileUpdatedAt] = useState("");
+  const [orders, setOrders] = useState([]);
+  const loadRequestRef = useRef(null);
+  const profileRequestRef = useRef(null);
+
+  const user = session && session.user && typeof session.user === "object" ? session.user : null;
+
+  const email =
+    user && typeof user.email === "string" && user.email.trim().length > 0
+      ? user.email.trim()
+      : "Non renseigne";
+  const clientId = user && typeof user.id === "string" ? user.id : "";
+  const createdAt = user && typeof user.created_at === "string" ? user.created_at : "";
+  const lastSignInAt =
+    user && typeof user.last_sign_in_at === "string" ? user.last_sign_in_at : "";
+  const emailConfirmedAt =
+    user && typeof user.email_confirmed_at === "string" ? user.email_confirmed_at : "";
+
+  const tabs = [
+    { id: "overview", label: "Vue d'ensemble" },
+    { id: "orders", label: "Commandes" },
+    { id: "details", label: "Coordonnees" },
+    { id: "security", label: "Securite" },
+  ];
+
+  const profileFieldCount = [profileForm.full_name, profileForm.phone, profileForm.address].filter(
+    (value) => typeof value === "string" && value.trim().length > 0,
+  ).length;
+  const profileCompletion = Math.round((profileFieldCount / 3) * 100);
+
+  const totalOrders = orders.length;
+  const totalSpent = orders.reduce((sum, order) => {
+    const amount = Number(order.total_amount);
+    return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
+  }, 0);
+  const inProgressOrders = orders.filter((order) => {
+    const status = typeof order.status === "string" ? order.status.toLowerCase() : "";
+    return (
+      status.includes("cours") ||
+      status.includes("attente") ||
+      status.includes("exped") ||
+      status.includes("prepar") ||
+      status.includes("transit")
+    );
+  }).length;
+  const latestOrderDate = totalOrders > 0 ? formatAccountDate(orders[0]?.ordered_at) : "-";
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
+    }
+    navigate("/login", { replace: true });
+  };
+
+  const handleSessionRejected = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
+    }
+    navigate("/login", { replace: true });
+  };
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      loadRequestRef.current?.abort();
+      profileRequestRef.current?.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!accessToken) {
+      setIsLoading(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    loadRequestRef.current?.abort();
+    loadRequestRef.current = controller;
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    Promise.all([
+      getAccountProfile({
+        accessToken,
+        signal: controller.signal,
+      }),
+      listAccountOrders({
+        accessToken,
+        signal: controller.signal,
+      }),
+    ])
+      .then(([profilePayload, ordersPayload]) => {
+        if (loadRequestRef.current !== controller) {
+          return;
+        }
+        setProfileForm({
+          full_name: typeof profilePayload.full_name === "string" ? profilePayload.full_name : "",
+          phone: typeof profilePayload.phone === "string" ? profilePayload.phone : "",
+          address: typeof profilePayload.address === "string" ? profilePayload.address : "",
+        });
+        setProfileUpdatedAt(
+          typeof profilePayload.updated_at === "string" ? profilePayload.updated_at : "",
+        );
+        setOrders(Array.isArray(ordersPayload) ? ordersPayload : []);
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        if (loadRequestRef.current !== controller) {
+          return;
+        }
+        if (
+          error instanceof ApiRequestError &&
+          (error.status === 401 || error.status === 403)
+        ) {
+          handleSessionRejected();
+          return;
+        }
+        setErrorMessage(error instanceof Error ? error.message : "Chargement compte impossible");
+      })
+      .finally(() => {
+        if (loadRequestRef.current !== controller) {
+          return;
+        }
+        loadRequestRef.current = null;
+        setIsLoading(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [accessToken]);
+
+  const handleProfileSubmit = async (event) => {
+    event.preventDefault();
+    if (isSavingProfile) {
+      return;
+    }
+
+    const controller = new AbortController();
+    profileRequestRef.current?.abort();
+    profileRequestRef.current = controller;
+
+    setIsSavingProfile(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const payload = await updateAccountProfile({
+        accessToken,
+        full_name: profileForm.full_name.trim() || null,
+        phone: profileForm.phone.trim() || null,
+        address: profileForm.address.trim() || null,
+        signal: controller.signal,
+      });
+
+      if (profileRequestRef.current !== controller) {
+        return;
+      }
+
+      setProfileForm({
+        full_name: typeof payload.full_name === "string" ? payload.full_name : "",
+        phone: typeof payload.phone === "string" ? payload.phone : "",
+        address: typeof payload.address === "string" ? payload.address : "",
+      });
+      setProfileUpdatedAt(typeof payload.updated_at === "string" ? payload.updated_at : "");
+      setSuccessMessage("Coordonnees enregistrees");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      if (profileRequestRef.current !== controller) {
+        return;
+      }
+      if (
+        error instanceof ApiRequestError &&
+        (error.status === 401 || error.status === 403)
+      ) {
+        handleSessionRejected();
+        return;
+      }
+      setErrorMessage(error instanceof Error ? error.message : "Enregistrement impossible");
+    } finally {
+      if (profileRequestRef.current !== controller) {
+        return;
+      }
+      profileRequestRef.current = null;
+      setIsSavingProfile(false);
+    }
+  };
+
+  if (!accessToken) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <section className="page-view account-view">
+      <div className="account-shell">
+        <div className="account-tabs" role="tablist" aria-label="Navigation compte">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`account-panel-${tab.id}`}
+              className={activeTab === tab.id ? "account-tab account-tab--active" : "account-tab"}
+              onClick={() => handleTabChange(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <Reveal
+          as="article"
+          className="account-panel"
+          delay={20}
+          role="tabpanel"
+          id={`account-panel-${activeTab}`}
+        >
+          {isLoading ? <p className="account-loading">Chargement...</p> : null}
+
+          {activeTab === "overview" ? (
+            <>
+              <div className="account-headline">
+                <span
+                  className={
+                    profileCompletion === 100 ? "account-pill account-pill--ready" : "account-pill"
+                  }
+                >
+                  {profileCompletion}% profil
+                </span>
+              </div>
+
+              <div className="account-metrics">
+                <div className="account-metric">
+                  <span>Commandes</span>
+                  <strong>{totalOrders}</strong>
+                </div>
+                <div className="account-metric">
+                  <span>Total achats</span>
+                  <strong>{formatOrderTotal(totalSpent, "EUR")}</strong>
+                </div>
+                <div className="account-metric">
+                  <span>En preparation</span>
+                  <strong>{inProgressOrders}</strong>
+                </div>
+                <div className="account-metric">
+                  <span>Derniere commande</span>
+                  <strong>{latestOrderDate}</strong>
+                </div>
+              </div>
+
+              <div className="account-grid">
+                <section className="account-card">
+                  <h3>Identite client</h3>
+                  <div className="account-kv-grid">
+                    <div className="account-kv">
+                      <span>Nom</span>
+                      <strong>{profileForm.full_name.trim() || "-"}</strong>
+                    </div>
+                    <div className="account-kv">
+                      <span>Email</span>
+                      <strong>{email}</strong>
+                    </div>
+                    <div className="account-kv">
+                      <span>Telephone</span>
+                      <strong>{profileForm.phone.trim() || "-"}</strong>
+                    </div>
+                    <div className="account-kv">
+                      <span>Adresse</span>
+                      <strong>{profileForm.address.trim() || "-"}</strong>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="account-card">
+                  <h3>Actions</h3>
+                  <div className="account-kv-grid">
+                    <div className="account-kv">
+                      <span>Client ID</span>
+                      <strong>{formatClientId(clientId)}</strong>
+                    </div>
+                    <div className="account-kv">
+                      <span>Mise a jour profil</span>
+                      <strong>{formatAccountDate(profileUpdatedAt)}</strong>
+                    </div>
+                  </div>
+                  <div className="account-actions">
+                    <button
+                      type="button"
+                      className="account-secondary-btn"
+                      onClick={() => handleTabChange("orders")}
+                    >
+                      Voir commandes
+                    </button>
+                    <button
+                      type="button"
+                      className="account-secondary-btn"
+                      onClick={() => handleTabChange("details")}
+                    >
+                      Modifier profil
+                    </button>
+                    <Link className="account-secondary-link" to="/contact">
+                      Support
+                    </Link>
+                  </div>
+                </section>
+              </div>
+            </>
+          ) : null}
+
+          {activeTab === "orders" ? (
+            <>
+              <div className="account-headline">
+                <Link className="account-secondary-link" to="/contact">
+                  Support commande
+                </Link>
+              </div>
+
+              {orders.length === 0 ? (
+                <p className="account-empty">Aucune commande</p>
+              ) : (
+                <ul className="account-orders">
+                  {orders.map((order, index) => {
+                    const orderNumber =
+                      typeof order.order_number === "string" && order.order_number.trim()
+                        ? order.order_number.trim()
+                        : "Commande";
+                    const statusLabel =
+                      typeof order.status === "string" && order.status.trim()
+                        ? order.status.trim()
+                        : "Inconnu";
+
+                    return (
+                      <li
+                        className="account-order-item"
+                        key={order.id ?? `${orderNumber}-${statusLabel}-${index}`}
+                      >
+                        <div className="account-order-top">
+                          <strong>{orderNumber}</strong>
+                          <span
+                            className={`account-status account-status--${getOrderStatusTone(statusLabel)}`}
+                          >
+                            {statusLabel}
+                          </span>
+                        </div>
+                        <div className="account-order-grid">
+                          <div className="account-order-cell">
+                            <span>Date</span>
+                            <strong>{formatAccountDate(order.ordered_at)}</strong>
+                          </div>
+                          <div className="account-order-cell">
+                            <span>Total</span>
+                            <strong>{formatOrderTotal(order.total_amount, order.currency)}</strong>
+                          </div>
+                          <div className="account-order-cell">
+                            <span>Articles</span>
+                            <strong>{formatOrderItems(order.items_count)}</strong>
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </>
+          ) : null}
+
+          {activeTab === "details" ? (
+            <>
+              <form className="account-form-grid" onSubmit={handleProfileSubmit}>
+                <label className="account-field">
+                  <span>Nom complet</span>
+                  <input
+                    type="text"
+                    value={profileForm.full_name}
+                    onChange={(event) =>
+                      setProfileForm((current) => ({
+                        ...current,
+                        full_name: event.target.value,
+                      }))
+                    }
+                    placeholder="Nom et prenom"
+                    autoComplete="name"
+                  />
+                </label>
+                <label className="account-field">
+                  <span>Email</span>
+                  <input type="email" value={email} autoComplete="email" disabled />
+                </label>
+                <label className="account-field">
+                  <span>Telephone</span>
+                  <input
+                    type="text"
+                    value={profileForm.phone}
+                    onChange={(event) =>
+                      setProfileForm((current) => ({
+                        ...current,
+                        phone: event.target.value,
+                      }))
+                    }
+                    placeholder="+33..."
+                    autoComplete="tel"
+                  />
+                </label>
+                <label className="account-field account-field--wide">
+                  <span>Adresse</span>
+                  <textarea
+                    value={profileForm.address}
+                    onChange={(event) =>
+                      setProfileForm((current) => ({
+                        ...current,
+                        address: event.target.value,
+                      }))
+                    }
+                    placeholder="Adresse"
+                    autoComplete="street-address"
+                  />
+                </label>
+                <div className="account-form-actions">
+                  <button type="submit" className="account-submit-btn" disabled={isSavingProfile}>
+                    {isSavingProfile ? "Enregistrement..." : "Enregistrer"}
+                  </button>
+                </div>
+              </form>
+            </>
+          ) : null}
+
+          {activeTab === "security" ? (
+            <>
+              <div className="account-grid">
+                <section className="account-card">
+                  <h3>Session</h3>
+                  <div className="account-kv-grid">
+                    <div className="account-kv">
+                      <span>Email</span>
+                      <strong>{email}</strong>
+                    </div>
+                    <div className="account-kv">
+                      <span>Email verifie</span>
+                      <strong>{emailConfirmedAt ? "Oui" : "Non"}</strong>
+                    </div>
+                    <div className="account-kv">
+                      <span>Derniere connexion</span>
+                      <strong>{formatAccountDate(lastSignInAt)}</strong>
+                    </div>
+                    <div className="account-kv">
+                      <span>Inscription</span>
+                      <strong>{formatAccountDate(createdAt)}</strong>
+                    </div>
+                  </div>
+                </section>
+                <section className="account-card">
+                  <h3>Acces</h3>
+                  <div className="account-actions">
+                    <button type="button" className="account-logout-btn" onClick={handleLogout}>
+                      Se deconnecter
+                    </button>
+                    <Link className="account-secondary-link" to="/contact">
+                      Assistance
+                    </Link>
+                  </div>
+                </section>
+              </div>
+            </>
+          ) : null}
+
+          {errorMessage ? <p className="account-feedback account-feedback--error">{errorMessage}</p> : null}
+          {successMessage ? <p className="account-feedback account-feedback--success">{successMessage}</p> : null}
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function PanierPage() {
   return (
     <section className="page-view form-view">
@@ -633,6 +1248,8 @@ function LegalPage({ title, lines }) {
 }
 
 function SiteFooter() {
+  const isAuthenticated = Boolean(readStoredAuthSession());
+
   return (
     <footer className="site-footer">
       <Footer7
@@ -642,7 +1259,7 @@ function SiteFooter() {
           alt: "Logo Maison Marcelina",
           title: "Maison Marcelina",
         }}
-        sections={footerSections}
+        sections={getFooterSections(isAuthenticated)}
         description="Maison Marcelina"
         legalLinks={legalPages.map((page) => ({
           name: page.label,
@@ -673,6 +1290,7 @@ export function App() {
           <Route path="/boutique" element={<BoutiquePage />} />
           <Route path="/panier" element={<PanierPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/compte" element={<AccountPage />} />
           {legalPages.map((page) => (
             <Route
               key={page.path}

@@ -6,6 +6,8 @@
 - Dynamic CORS from `.env` prevents hardcoded port regressions.
 - Keeping the frontend in Vite with a minimal file set preserves speed and readability.
 - Keeping a clean git flow (`main` as stable base, then `dev`, then feature branches) reduces integration risk.
+- Supabase Auth backend implementation is cleaner when wrapped in a dedicated service module instead of mixing SDK calls directly in routes.
+- Google OAuth PKCE is stable when `state` and `code_verifier` are validated in backend callback flow.
 - Rewriting the existing `App.jsx` and `styles.css` for the brand mock kept the codebase lean (no extra component sprawl).
 - Defining a reusable visual system (CSS variables + section patterns) speeds up future UI iterations.
 - Adding React Router directly in `main.jsx` + route mapping in `App.jsx` keeps navigation centralized and predictable.
@@ -37,6 +39,11 @@
 - Removing numeric counters from the hero slider can reduce visual clutter when title navigation is already visible.
 - Centering hero copy and bottom navigation creates stronger visual hierarchy on animation-first homepages.
 - Frameless bottom nav labels paired with centered progress lines improve readability without heavy UI chrome.
+- Keeping concise primary nav labels (e.g. `Sur mesure`) improves readability and mobile stability.
+- On phone headers, keeping `Login` inside hamburger while scaling logo/cart/menu icons improves clarity and tap comfort.
+- For small hamburger close states, two symmetric stroked diagonals produce a visually centered `X` more reliably than a filled custom path.
+- On mobile nav overlays, outside-click and `Escape` close behavior prevents sticky-open states.
+- In `Sur mesure`, removing redundant selectors keeps the form faster to scan and complete.
 - Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
 - On homepages with a strong hero, placing `Piece signature` then `Best-sellers` then a compact trust band creates a clean conversion flow.
 - A hero slider should use full viewport height when it is the primary first impression block.
@@ -89,12 +96,32 @@
 - Header navigation labels can be updated independently from route paths to keep UX wording flexible.
 - On product pages, size selection must be part of the add-to-cart payload so basket lines stay consistent per variant.
 - Product detail information works best as clean collapsible rows (description/size guide/composition/shipping-returns) instead of long static paragraphs.
+- A shadcn-style login block can be integrated into an existing handcrafted theme by adding only missing primitives (`input`) and preserving existing design tokens.
+- Frontend auth submit handlers should always abort in-flight requests on unmount and on resubmit to avoid duplicate login race conditions.
+- Redirecting to backend Google start endpoint from the UI keeps OAuth initiation simple while preserving PKCE state handling server-side.
+- For premium themes, a centered `max-w-sm` auth card can stay close to shadcn defaults while matching brand visuals through token-based gradients instead of extra layout complexity.
+- When Tailwind preflight is disabled, shadcn buttons should explicitly set `appearance` and border defaults, otherwise browser-native outlines can degrade premium UI.
+- Adding signup support is safest when frontend and backend share the same auth payload shape, so login/create-account flows can reuse one session contract.
+- In no-preflight setups, secondary text-action buttons inside auth cards need explicit `appearance: none` and transparent background, otherwise they render as default boxed controls.
+- Mapping all `supabase_auth` errors (not only `AuthApiError`) in FastAPI keeps upstream statuses like `422` for weak passwords instead of leaking `500`.
+- Signup success messages should stay concise and formal to keep a production-grade trust signal in auth flows.
+- A dedicated `/compte` route driven by the auth session keeps profile navigation stable and avoids mixing login and account responsibilities.
+- Grouping account data into explicit tabs (`Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`) improves scanability without adding route complexity.
+- Persisting account tabs through backend `/account/*` endpoints + Supabase RLS tables removes fragile local-only state and keeps multi-device consistency.
+- A buyer-facing account page is more credible when order history is read-only and clearly separated from profile editing and security actions.
+- Using account summary metrics (`total commandes`, `total achats`, `en preparation`) improves scanability without adding extra backend endpoints.
+- Removing `POST /account/orders` from the public account surface prevents fake self-created orders and aligns with real boutique flows.
+- On `/compte`, a flatter layout (separators and hierarchy) reads more premium than stacked framed cards.
+- Mapping Supabase `401/403` auth rejections to a clear account `401` response prevents ambiguous profile-save failures.
+- Clearing stale `mm_auth_session` and redirecting to `/login` on account auth rejection keeps buyer UX recoverable.
 
 ## errors to avoid
 
 - Do not commit machine artifacts (`.DS_Store`, virtual env folders, `node_modules`, local `.env`).
 - Do not bypass `uv` for backend dependency management or execution.
 - Do not hardcode backend/frontend ports in app code.
+- Do not trigger frontend API requests without cancellation on unmount.
+- Do not rely on a shared in-memory OAuth verifier across requests; it creates race conditions during concurrent login attempts.
 - Do not ship placeholder UI copy unrelated to brand content.
 - Do not keep empty scratch files in git history.
 - Do not overload top navigation when only a few tabs are needed.
@@ -148,3 +175,19 @@
 - Do not leave desktop catalog column count ambiguous when a strict merchandising layout (e.g. 5-up) is requested.
 - Do not apply staggered reveal wrappers on every catalog card when users expect all rows visible on initial render.
 - Do not merge cart lines only by product id once sizes are selectable, or different variants will overwrite each other.
+- Do not keep a separate login icon visible on phone when auth is already in the hamburger menu; it clutters the header.
+- Do not use an asymmetric filled `X` glyph for hamburger close icons; it can look off-center inside circular buttons.
+- Do not rely only on route-change to close a mobile menu; outside-click dismissal is expected interaction.
+- Do not keep a `Point de contact` selector when `Email` is already required; it adds friction without value.
+- Do not fire concurrent login submits without cancellation/locking, or UI state can desync from backend auth responses.
+- Do not add demo-only component files in production routes when they are not used; keep login integration focused on the real route component.
+- Do not rely on browser default button rendering in a no-preflight setup; it can introduce thick native borders and inconsistent visuals across browsers.
+- Do not create separate ad-hoc auth response schemas per endpoint; inconsistent payloads make frontend auth mode switches brittle.
+- Do not handle only `AuthApiError` in auth routes; `CustomAuthError` variants (like weak password) otherwise become false `500 Internal Server Error`.
+- Do not keep profile icon hard-linked to `/login` after authentication; route it to account settings to prevent broken signed-in UX.
+- Do not stack all account information in one long block once sections grow; switch to tabs to keep the account page readable.
+- Do not store account orders only in browser localStorage once real account features exist; persist to Supabase with user-scoped RLS policies.
+- Do not expose manual order creation controls to buyer accounts in `/compte`; order records must come from checkout/backoffice flows.
+- Do not keep write-capable order endpoints on customer account APIs when the UI is meant to be read-only; it creates trust and data integrity issues.
+- Do not nest framed containers in `/compte` (`cadres dans cadres`); keep one visual level and rely on spacing/lines.
+- Do not keep stale local sessions after backend auth rejection on `/account/*`; force re-auth to avoid endless `403` loops.

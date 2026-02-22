@@ -209,12 +209,14 @@ textarea {
 .menu-toggle svg {
   width: 18px;
   height: 18px;
+  display: block;
 }
 
 .profile-link svg,
 .cart-link svg {
   width: 20px;
   height: 20px;
+  display: block;
 }
 
 .menu-tab--mobile-only {

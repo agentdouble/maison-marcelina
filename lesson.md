@@ -42,6 +42,7 @@
 - Keeping concise primary nav labels (e.g. `Sur mesure`) improves readability and mobile stability.
 - On phone headers, keeping `Login` inside hamburger while scaling logo/cart/menu icons improves clarity and tap comfort.
 - For small hamburger close states, two symmetric stroked diagonals produce a visually centered `X` more reliably than a filled custom path.
+- On mobile nav overlays, outside-click and `Escape` close behavior prevents sticky-open states.
 - Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
 - On homepages with a strong hero, placing `Piece signature` then `Best-sellers` then a compact trust band creates a clean conversion flow.
 - A hero slider should use full viewport height when it is the primary first impression block.
@@ -107,3 +108,4 @@
 - Do not force a liquid separator when the requested direction is a straight visual cut.
 - Do not keep a separate login icon visible on phone when auth is already in the hamburger menu; it clutters the header.
 - Do not use an asymmetric filled `X` glyph for hamburger close icons; it can look off-center inside circular buttons.
+- Do not rely only on route-change to close a mobile menu; outside-click dismissal is expected interaction.

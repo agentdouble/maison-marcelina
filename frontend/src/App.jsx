@@ -217,12 +217,12 @@ function HamburgerIcon({ open }) {
         <g
           fill="none"
           stroke="currentColor"
-          strokeWidth="2.2"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <path d="M7 7 17 17" />
-          <path d="M17 7 7 17" />
+          <path d="M7.25 7.25 16.75 16.75" />
+          <path d="M16.75 7.25 7.25 16.75" />
         </g>
       ) : (
         <path
@@ -237,14 +237,46 @@ function HamburgerIcon({ open }) {
 function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const headerRef = useRef(null);
   const menuClass = mobileMenuOpen ? "menu-tabs menu-tabs--open" : "menu-tabs";
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event) => {
+      const headerNode = headerRef.current;
+      if (!headerNode) {
+        return;
+      }
+
+      if (!headerNode.contains(event.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [mobileMenuOpen]);
+
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef}>
       <div className="brand-row">
         <Link className="brand-link" to="/" aria-label="Accueil Maison Marcelina">
           <img src="/logo-marcelina.svg" alt="Logo Maison Marcelina" />

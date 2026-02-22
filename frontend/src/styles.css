@@ -542,7 +542,7 @@ textarea:focus-visible,
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 14px;
+  bottom: clamp(62px, 8svh, 96px);
   z-index: 5;
   display: grid;
   width: min(94vw, 980px);
@@ -962,7 +962,7 @@ textarea:focus {
   .slides-navigation {
     left: 50%;
     transform: translateX(-50%);
-    bottom: 22px;
+    bottom: clamp(64px, 7svh, 92px);
     width: min(88vw, 980px);
   }
 
@@ -1070,6 +1070,7 @@ textarea:focus {
 
   .slides-navigation {
     width: min(78vw, 1080px);
+    bottom: clamp(54px, 6svh, 84px);
   }
 }
 

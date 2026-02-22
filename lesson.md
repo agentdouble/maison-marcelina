@@ -40,6 +40,7 @@
 - Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
 - On homepages with a strong hero, placing `Piece signature` then `Best-sellers` then a compact trust band creates a clean conversion flow.
 - A hero slider should use full viewport height when it is the primary first impression block.
+- Keeping home collection buttons frameless (text + line) preserves the premium direction better than boxed controls.
 
 ## errors to avoid
 
@@ -61,3 +62,4 @@
 - Do not batch unrelated edits into a single commit; keep commits scoped to one clear change.
 - Do not place dense descriptive paragraphs under the hero; keep post-hero blocks short and action-oriented.
 - Do not subtract header height from a hero meant to feel fully immersive; it breaks the full-screen impact.
+- Do not style home collection buttons as boxed pills/cards when the visual direction is frameless.

@@ -58,6 +58,7 @@ Objectif : faire évoluer l’app **rapidement** sans dette technique, sans cass
 
 ### Front-end
 - Pas de phrase inutile dans l'application / Pas de phrase explicative.
+- Sur la home, les boutons de collections doivent rester visibles sans style encadre (pas de pill, pas de carte).
 
 
 ---

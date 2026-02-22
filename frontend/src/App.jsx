@@ -498,7 +498,7 @@ function NotreHistoirePage() {
           />
         </figure>
 
-        <article className="cgv-panel story-panel">
+        <article className="story-panel">
           <p className="story-lead">{storyParagraphs[0]}</p>
           {storyParagraphs.slice(1).map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>

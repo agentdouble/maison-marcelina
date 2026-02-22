@@ -957,9 +957,15 @@ textarea:focus {
 }
 
 .story-panel {
+  display: grid;
   width: 100%;
   margin: 0;
   gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .story-panel p {
@@ -976,8 +982,6 @@ textarea:focus {
 
 .story-signature {
   margin-top: 2px;
-  padding-left: 10px;
-  border-left: 1px solid rgba(78, 48, 36, 0.28);
   display: grid;
   gap: 4px;
 }

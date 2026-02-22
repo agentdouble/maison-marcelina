@@ -2,6 +2,7 @@
 
 ## successes
 
+- On split editorial layouts, keeping the narrative column frameless avoids the "card inside card" effect.
 - On story pages, a split layout (image left, narrative right) improves hierarchy while staying mobile-safe by collapsing to one column.
 - Building `Notre Histoire` directly from `ressources/maison-marcelina.md` keeps editorial tone aligned without inventing new copy.
 - A single `start.sh` entrypoint keeps backend and frontend startup aligned.
@@ -79,6 +80,7 @@
 
 ## errors to avoid
 
+- Do not wrap a story text block in a card when it already sits beside a framed visual.
 - Do not keep story visuals and narrative in a single long column on desktop when the requested direction is image-left/text-right.
 - Do not invent brand-story wording when `ressources/maison-marcelina.md` already defines the source narrative.
 - Do not commit machine artifacts (`.DS_Store`, virtual env folders, `node_modules`, local `.env`).

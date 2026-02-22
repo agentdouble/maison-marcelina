@@ -110,13 +110,8 @@ const storyParagraphs = [
   "Choisir le nom Maison Marcelina, c'est rendre hommage aux femmes qui nous inspirent.",
 ];
 
-const storySignature = [
-  "Toujours chic.",
-  "Toujours appretee.",
-  "Un brushing impeccable.",
-  "Un rouge a levres precis.",
-  "Une signature assumee.",
-];
+const storySignature =
+  "Toujours chic. Toujours appretee. Un brushing impeccable. Un rouge a levres precis. Une signature assumee.";
 
 const storyPillars = [
   "Des creations cousues main avec soin",
@@ -500,15 +495,17 @@ function NotreHistoirePage() {
 
         <article className="story-panel">
           <p className="story-lead">{storyParagraphs[0]}</p>
-          {storyParagraphs.slice(1).map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-
-          <div className="story-signature" aria-label="Signature Marceline">
-            {storySignature.map((line) => (
-              <p key={line}>{line}</p>
+          <div className="story-body">
+            {storyParagraphs.slice(1).map((paragraph) => (
+              <p className="story-body-line" key={paragraph}>
+                {paragraph}
+              </p>
             ))}
           </div>
+
+          <p className="story-signature" aria-label="Signature Marceline">
+            {storySignature}
+          </p>
 
           <p className="story-claim">
             Maison Marcelina n'est pas seulement une marque, c'est une elegance

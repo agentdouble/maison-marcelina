@@ -1,12 +1,10 @@
+import { useRef } from "react";
 import { Link, NavLink, Navigate, Route, Routes } from "react-router-dom";
 
 const navItems = [
   { to: "/", label: "Accueil" },
   { to: "/collection", label: "Collection" },
   { to: "/sur-mesure", label: "Sur mesure" },
-  { to: "/contact", label: "Contact" },
-  { to: "/boutique", label: "Boutique" },
-  { to: "/login", label: "Login" },
 ];
 
 const collections = [
@@ -60,12 +58,29 @@ const products = [
   },
 ];
 
+function ProfileIcon() {
+  return (
+    <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+      <path
+        d="M12 12.2A4.1 4.1 0 1 0 12 4a4.1 4.1 0 0 0 0 8.2Zm0 2.2c-4.6 0-8 2.5-8 5.6v.8h16V20c0-3.1-3.4-5.6-8-5.6Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function SiteHeader() {
   return (
     <header className="site-header">
-      <Link className="brand-link" to="/" aria-label="Maison Marcelina">
-        <img src="/logo-marcelina.png" alt="Logo Maison Marcelina" />
-      </Link>
+      <div className="brand-row">
+        <Link className="brand-link" to="/" aria-label="Accueil Maison Marcelina">
+          <img src="/logo-marcelina.png" alt="Logo Maison Marcelina" />
+        </Link>
+
+        <Link className="profile-link" to="/login" aria-label="Login">
+          <ProfileIcon />
+        </Link>
+      </div>
 
       <nav className="menu-tabs" aria-label="Navigation principale">
         {navItems.map((item) => (
@@ -86,19 +101,70 @@ function SiteHeader() {
 }
 
 function HomePage() {
-  const hero = collections[0];
+  const trackRef = useRef(null);
+
+  const scrollBySlide = (direction) => {
+    const track = trackRef.current;
+    if (!track) {
+      return;
+    }
+
+    track.scrollBy({
+      left: track.clientWidth * direction,
+      behavior: "smooth",
+    });
+  };
+
+  const scrollToIndex = (index) => {
+    const track = trackRef.current;
+    if (!track) {
+      return;
+    }
+
+    track.scrollTo({
+      left: track.clientWidth * index,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <section className="page-view home-view">
-      <Link className="hero-collection" to="/collection">
-        <img src={hero.image} alt={hero.title} loading="eager" />
-        <div className="hero-overlay">
-          <p>{hero.season}</p>
-          <h1>{hero.title}</h1>
-          <span>{hero.palette.join(" / ")}</span>
-          <strong>Entrer</strong>
+      <div className="carousel-shell">
+        <div className="carousel-controls" aria-hidden="true">
+          <button type="button" onClick={() => scrollBySlide(-1)}>
+            {"<"}
+          </button>
+          <button type="button" onClick={() => scrollBySlide(1)}>
+            {">"}
+          </button>
         </div>
-      </Link>
+
+        <div className="hero-track" ref={trackRef}>
+          {collections.map((collection) => (
+            <article className="hero-slide" key={collection.title}>
+              <Link className="hero-collection" to="/collection">
+                <img src={collection.image} alt={collection.title} loading="lazy" />
+                <div className="hero-overlay">
+                  <p>{collection.season}</p>
+                  <h1>{collection.title}</h1>
+                  <span>{collection.palette.join(" / ")}</span>
+                </div>
+              </Link>
+            </article>
+          ))}
+        </div>
+
+        <div className="carousel-dots">
+          {collections.map((collection, index) => (
+            <button
+              key={collection.title}
+              type="button"
+              aria-label={`Aller a ${collection.title}`}
+              onClick={() => scrollToIndex(index)}
+            />
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -275,22 +341,63 @@ function LoginPage() {
   );
 }
 
+function CgvPage() {
+  return (
+    <section className="page-view form-view">
+      <header className="section-head">
+        <h1>Conditions generales</h1>
+      </header>
+
+      <div className="cgv-panel">
+        <p>Vente en ligne d'articles couture.</p>
+        <p>Paiement securise.</p>
+        <p>Retours selon conditions de commande.</p>
+        <p>Contact commande: page Contact.</p>
+      </div>
+    </section>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <Link to="/cgv">Conditions generales</Link>
+      <div className="social-links">
+        <a href="https://www.instagram.com" target="_blank" rel="noreferrer">
+          Instagram
+        </a>
+        <a href="https://www.tiktok.com" target="_blank" rel="noreferrer">
+          TikTok
+        </a>
+        <a href="https://www.pinterest.com" target="_blank" rel="noreferrer">
+          Pinterest
+        </a>
+      </div>
+    </footer>
+  );
+}
+
 export function App() {
   return (
     <main className="app-shell">
       <SiteHeader />
 
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/collection" element={<CollectionPage />} />
-        <Route path="/collections" element={<Navigate to="/collection" replace />} />
-        <Route path="/marketplace" element={<Navigate to="/collection" replace />} />
-        <Route path="/sur-mesure" element={<SurMesurePage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/boutique" element={<BoutiquePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <div className="app-content">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/collection" element={<CollectionPage />} />
+          <Route path="/collections" element={<Navigate to="/collection" replace />} />
+          <Route path="/marketplace" element={<Navigate to="/collection" replace />} />
+          <Route path="/sur-mesure" element={<SurMesurePage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/boutique" element={<BoutiquePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/cgv" element={<CgvPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+
+      <SiteFooter />
     </main>
   );
 }

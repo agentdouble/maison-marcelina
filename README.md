@@ -12,13 +12,14 @@ Base web app for Maison Marcelina with a Python backend and a React frontend.
 
 The frontend is a multi-page brand mock focused on couture and boutique flows.
 
-- Sticky top band with logo and navigation tabs
-- Full-screen home hero with collection photo
+- Compact sticky top band with large logo, 3 tabs, and a profile icon
+- Swipeable full-screen home hero for the 3 collections
 - Marketplace collections page
 - Boutique page with product cards
 - Sur-mesure contact form page
 - Command support contact page
 - Login page
+- Footer with conditions and social links
 
 ## Project layout
 
@@ -93,6 +94,7 @@ Always run the app from the repository root:
 - `/contact` order issue form
 - `/boutique` boutique listing
 - `/login` login form
+- `/cgv` conditions page
 
 ## Environment variables
 

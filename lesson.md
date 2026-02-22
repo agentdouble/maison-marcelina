@@ -11,6 +11,9 @@
 - Adding React Router directly in `main.jsx` + route mapping in `App.jsx` keeps navigation centralized and predictable.
 - Reusing one durable logo asset in `frontend/public/` avoids brittle cross-folder imports.
 - Building all requested pages without backend coupling keeps the front refactor safe to ship.
+- Building the header mobile-first first (logo row + horizontal tab scroll) prevents desktop-first regressions.
+- Using CSS scroll snap for collection slides gives natural mobile swipe without heavy dependencies.
+- Keeping legal/social footer global avoids duplicating links across pages.
 
 ## errors to avoid
 
@@ -19,3 +22,4 @@
 - Do not hardcode backend/frontend ports in app code.
 - Do not ship placeholder UI copy unrelated to brand content.
 - Do not keep empty scratch files in git history.
+- Do not overload top navigation when only a few tabs are needed.

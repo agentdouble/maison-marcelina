@@ -547,17 +547,15 @@ function LoginPage() {
   return (
     <section className="page-view login-view">
       <Login1
-        heading="Connexion"
         logo={{
           url: "/",
           src: "/logo-marcelina.svg",
           alt: "Logo Maison Marcelina",
           title: "Maison Marcelina",
         }}
-        buttonText="Connexion"
         googleText="Continuer avec Google"
-        signupText="Creation sur mesure ?"
-        signupUrl="/sur-mesure"
+        signupText="Mot de passe oublie ?"
+        signupUrl="/contact"
         onLoginSuccess={() => navigate("/", { replace: true })}
       />
     </section>
@@ -617,6 +615,9 @@ function SiteFooter() {
 }
 
 export function App() {
+  const location = useLocation();
+  const hideFooter = location.pathname === "/login";
+
   return (
     <main className="app-shell">
       <SiteHeader />
@@ -644,7 +645,7 @@ export function App() {
         </Routes>
       </div>
 
-      <SiteFooter />
+      {!hideFooter ? <SiteFooter /> : null}
     </main>
   );
 }

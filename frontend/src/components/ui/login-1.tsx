@@ -24,17 +24,17 @@ interface Login1Props {
 }
 
 const Login1 = ({
-  heading = "Connexion",
+  heading,
   logo = {
     url: "/",
     src: "/logo-marcelina.svg",
     alt: "Maison Marcelina",
     title: "Maison Marcelina",
   },
-  buttonText = "Connexion",
+  buttonText = "Entrer",
   googleText = "Continuer avec Google",
-  signupText = "Creation sur mesure ?",
-  signupUrl = "/sur-mesure",
+  signupText = "Mot de passe oublie ?",
+  signupUrl = "/contact",
   apiBaseUrl,
   onLoginSuccess,
 }: Login1Props) => {
@@ -120,7 +120,11 @@ const Login1 = ({
                 className="h-11 w-auto max-w-[220px] object-contain"
               />
             </a>
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground">{heading}</h1>
+            {heading ? (
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+                {heading}
+              </h1>
+            ) : null}
           </div>
 
           <form className="flex w-full flex-col gap-4" onSubmit={handleSubmit}>
@@ -143,17 +147,17 @@ const Login1 = ({
 
             <Button type="submit" className="mt-1 w-full gap-2" disabled={isSubmitting}>
               <LogIn className="size-4" />
-              {isSubmitting ? "Connexion..." : buttonText}
+              {isSubmitting ? "Patiente..." : buttonText}
             </Button>
             <Button
               type="button"
               variant="outline"
               className="w-full"
               disabled={isSubmitting}
+              aria-label={googleText}
               onClick={() => startGoogleOAuth(apiBaseUrl)}
             >
-              <FcGoogle className="mr-2 size-5" />
-              {googleText}
+              <FcGoogle className="size-5" />
             </Button>
           </form>
 
@@ -168,10 +172,9 @@ const Login1 = ({
             </p>
           )}
 
-          <div className="text-muted-foreground flex items-center justify-center gap-1 text-sm">
-            <p>{signupText}</p>
+          <div className="text-muted-foreground flex items-center justify-center text-sm">
             <a href={signupUrl} className="text-primary font-medium hover:underline">
-              Decouvrir
+              {signupText}
             </a>
           </div>
         </div>

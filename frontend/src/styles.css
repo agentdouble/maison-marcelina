@@ -474,7 +474,8 @@ textarea:focus-visible,
 .slider-wrapper {
   position: relative;
   isolation: isolate;
-  min-height: calc(100svh - 152px);
+  min-height: 100svh;
+  height: 100svh;
   border-radius: 0;
   overflow: hidden;
   border: 0;
@@ -950,7 +951,8 @@ textarea:focus {
   }
 
   .slider-wrapper {
-    min-height: calc(100svh - 146px);
+    min-height: 100svh;
+    height: 100svh;
   }
 
   .slide-content {
@@ -1054,7 +1056,8 @@ textarea:focus {
   }
 
   .slider-wrapper {
-    min-height: calc(100svh - 144px);
+    min-height: 100svh;
+    height: 100svh;
   }
 
   .slide-content {

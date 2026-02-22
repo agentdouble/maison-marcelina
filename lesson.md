@@ -39,6 +39,7 @@
 - Frameless bottom nav labels paired with centered progress lines improve readability without heavy UI chrome.
 - Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
 - On homepages with a strong hero, placing `Piece signature` then `Best-sellers` then a compact trust band creates a clean conversion flow.
+- A hero slider should use full viewport height when it is the primary first impression block.
 
 ## errors to avoid
 
@@ -59,3 +60,4 @@
 - Do not recreate slide arrays inside render for WebGL-heavy components, or effects can reinitialize unnecessarily.
 - Do not batch unrelated edits into a single commit; keep commits scoped to one clear change.
 - Do not place dense descriptive paragraphs under the hero; keep post-hero blocks short and action-oriented.
+- Do not subtract header height from a hero meant to feel fully immersive; it breaks the full-screen impact.

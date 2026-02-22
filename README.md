@@ -16,7 +16,7 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Centered navigation tabs (`Accueil`, `Les collections`, `L'atelier du sur mesure`)
 - Header action icons for cart and `Login` (login kept at top-right)
 - Liquid visual design (glass surfaces, fluid highlights, soft moving blobs)
-- Full-screen home shader slider (`lumina-interactive-list`) fed by the 3 collections
+- Full-viewport home shader slider (`lumina-interactive-list`) fed by the 3 collections
 - Home continuation after slider with:
   - `Piece signature` spotlight block
   - `Best-sellers` grid

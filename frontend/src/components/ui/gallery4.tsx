@@ -117,13 +117,9 @@ const Gallery4 = ({ title = "Best-sellers", description, items }: Gallery4Props)
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#20130d]/85 via-[#20130d]/35 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-2 p-5 text-[#fbf6ed] md:p-6">
+                <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1.5 p-5 text-center text-[#fbf6ed] md:p-6">
                   <h3 className="m-0 text-[30px] leading-[0.9]">{item.title}</h3>
                   <p className="m-0 text-xs uppercase tracking-[0.08em]">{item.description}</p>
-                  <span className="inline-flex items-center text-[11px] uppercase tracking-[0.1em]">
-                    Voir
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
                 </div>
               </Link>
             </CarouselItem>

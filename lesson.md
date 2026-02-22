@@ -67,6 +67,13 @@
 - For hero animated titles on mobile, split/animate by words (not characters) to prevent mid-word line breaks.
 - Header tuning works best by reducing logo size slightly while increasing nav/icon sizes for clearer hierarchy.
 - For separator styling, keep it configurable because direction can switch between liquid and straight cut quickly.
+- A shadcn-style login block can be integrated into an existing handcrafted theme by adding only missing primitives (`input`) and preserving existing design tokens.
+- Frontend auth submit handlers should always abort in-flight requests on unmount and on resubmit to avoid duplicate login race conditions.
+- Redirecting to backend Google start endpoint from the UI keeps OAuth initiation simple while preserving PKCE state handling server-side.
+- For premium themes, a centered `max-w-sm` auth card can stay close to shadcn defaults while matching brand visuals through token-based gradients instead of extra layout complexity.
+- When Tailwind preflight is disabled, shadcn buttons should explicitly set `appearance` and border defaults, otherwise browser-native outlines can degrade premium UI.
+- Adding signup support is safest when frontend and backend share the same auth payload shape, so login/create-account flows can reuse one session contract.
+- In no-preflight setups, secondary text-action buttons inside auth cards need explicit `appearance: none` and transparent background, otherwise they render as default boxed controls.
 
 ## errors to avoid
 
@@ -111,3 +118,7 @@
 - Do not use an asymmetric filled `X` glyph for hamburger close icons; it can look off-center inside circular buttons.
 - Do not rely only on route-change to close a mobile menu; outside-click dismissal is expected interaction.
 - Do not keep a `Point de contact` selector when `Email` is already required; it adds friction without value.
+- Do not fire concurrent login submits without cancellation/locking, or UI state can desync from backend auth responses.
+- Do not add demo-only component files in production routes when they are not used; keep login integration focused on the real route component.
+- Do not rely on browser default button rendering in a no-preflight setup; it can introduce thick native borders and inconsistent visuals across browsers.
+- Do not create separate ad-hoc auth response schemas per endpoint; inconsistent payloads make frontend auth mode switches brittle.

@@ -57,6 +57,19 @@ def sign_in_with_password(
     return serialize_auth_response(auth_response)
 
 
+def sign_up_with_password(
+    settings: Settings, *, email: str, password: str
+) -> dict[str, Any]:
+    client = create_supabase_client(settings)
+    auth_response = client.auth.sign_up(
+        {
+            "email": email,
+            "password": password,
+        }
+    )
+    return serialize_auth_response(auth_response)
+
+
 def start_google_oauth(settings: Settings, *, state: str) -> tuple[str, str]:
     client = create_supabase_client(settings)
     oauth_response = client.auth.sign_in_with_oauth(

@@ -6,10 +6,12 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 import { Footer7 } from "./components/ui/footer-7.tsx";
 import { Gallery4 } from "./components/ui/gallery4.tsx";
+import { Login1 } from "./components/ui/login-1.tsx";
 import { LuminaInteractiveList } from "./components/ui/lumina-interactive-list.tsx";
 
 const navItems = [
@@ -580,29 +582,22 @@ function BoutiquePage() {
 }
 
 function LoginPage() {
+  const navigate = useNavigate();
+
   return (
     <section className="page-view login-view">
-      <Reveal
-        as="form"
-        className="form-panel form-panel--small"
-        onSubmit={(event) => event.preventDefault()}
-      >
-        <header className="section-head section-head--compact">
-          <h1>Login</h1>
-        </header>
-
-        <label>
-          <span>Email</span>
-          <input type="email" name="email" placeholder="email@exemple.com" required />
-        </label>
-
-        <label>
-          <span>Mot de passe</span>
-          <input type="password" name="password" placeholder="Mot de passe" required />
-        </label>
-
-        <button type="submit">Connexion</button>
-      </Reveal>
+      <Login1
+        logo={{
+          url: "/",
+          src: "/logo-marcelina.svg",
+          alt: "Logo Maison Marcelina",
+          title: "Maison Marcelina",
+        }}
+        googleText="Continuer avec Google"
+        signupText="Mot de passe oublié ?"
+        signupUrl="/contact"
+        onLoginSuccess={() => navigate("/", { replace: true })}
+      />
     </section>
   );
 }
@@ -660,6 +655,9 @@ function SiteFooter() {
 }
 
 export function App() {
+  const location = useLocation();
+  const hideFooter = location.pathname === "/login";
+
   return (
     <main className="app-shell">
       <SiteHeader />
@@ -687,7 +685,7 @@ export function App() {
         </Routes>
       </div>
 
-      <SiteFooter />
+      {!hideFooter ? <SiteFooter /> : null}
     </main>
   );
 }

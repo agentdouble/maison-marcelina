@@ -66,6 +66,61 @@ def test_password_login_auth_error(client: TestClient, monkeypatch: pytest.Monke
     assert response.json() == {"detail": "Invalid login credentials"}
 
 
+def test_password_signup_success(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    def fake_sign_up_with_password(
+        settings: object, *, email: str, password: str
+    ) -> dict[str, object]:
+        assert email == "new-user@example.com"
+        assert password == "strong-password"
+        return {
+            "access_token": None,
+            "refresh_token": None,
+            "token_type": None,
+            "expires_in": None,
+            "expires_at": None,
+            "user": {"id": "user-id"},
+        }
+
+    monkeypatch.setattr(
+        "app.api.auth.sign_up_with_password",
+        fake_sign_up_with_password,
+    )
+
+    response = client.post(
+        "/auth/signup",
+        json={
+            "email": "new-user@example.com",
+            "password": "strong-password",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["user"]["id"] == "user-id"
+
+
+def test_password_signup_auth_error(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    def fake_sign_up_with_password(
+        settings: object, *, email: str, password: str
+    ) -> dict[str, object]:
+        raise AuthApiError("User already registered", 400, None)
+
+    monkeypatch.setattr(
+        "app.api.auth.sign_up_with_password",
+        fake_sign_up_with_password,
+    )
+
+    response = client.post(
+        "/auth/signup",
+        json={
+            "email": "new-user@example.com",
+            "password": "strong-password",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "User already registered"}
+
+
 def test_google_start_sets_oauth_cookie(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:

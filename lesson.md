@@ -2,6 +2,8 @@
 
 ## successes
 
+- Removing a dropped feature should include route, nav, footer, and CSS cleanup in one pass to avoid dead code.
+- Setting `.page-view` to full-bleed at the layout root is simpler and safer than page-by-page padding overrides.
 - For split story layouts, a straight full-height image panel (without blob radius/shadow) creates a cleaner edge against the text column.
 - Compacting line-height and vertical gaps on editorial content improves density without sacrificing readability.
 - On editorial blocks, separating lead, body, signature, and closing claim styles gives a more coherent reading flow.
@@ -83,6 +85,8 @@
 
 ## errors to avoid
 
+- Do not leave orphaned docs/routes/nav entries after removing a page.
+- Do not keep feature-specific CSS blocks once the feature is removed.
 - Do not keep organic liquid clipping on the story image when the requested direction is a straight full-height panel.
 - Do not over-space editorial paragraphs when a compact reading layout is requested.
 - Do not mix uppercase micro-typography with long narrative paragraphs on the same block; it breaks reading coherence.

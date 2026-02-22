@@ -2,6 +2,14 @@
 
 ## successes
 
+- When a request targets copy inside a page, keep route/nav structure and only remove the targeted text element.
+- Making the story view full-bleed at the view class level keeps the edge-to-edge behavior scoped and predictable.
+- For split story layouts, a straight full-height image panel (without blob radius/shadow) creates a cleaner edge against the text column.
+- Compacting line-height and vertical gaps on editorial content improves density without sacrificing readability.
+- On editorial blocks, separating lead, body, signature, and closing claim styles gives a more coherent reading flow.
+- On split editorial layouts, keeping the narrative column frameless avoids the "card inside card" effect.
+- On story pages, a split layout (image left, narrative right) improves hierarchy while staying mobile-safe by collapsing to one column.
+- Building `Notre Histoire` directly from `ressources/maison-marcelina.md` keeps editorial tone aligned without inventing new copy.
 - A single `start.sh` entrypoint keeps backend and frontend startup aligned.
 - Dynamic CORS from `.env` prevents hardcoded port regressions.
 - Keeping the frontend in Vite with a minimal file set preserves speed and readability.
@@ -125,6 +133,13 @@
 
 ## errors to avoid
 
+- Do not interpret "remove text in a tab" as "delete the whole tab/page feature".
+- Do not keep organic liquid clipping on the story image when the requested direction is a straight full-height panel.
+- Do not over-space editorial paragraphs when a compact reading layout is requested.
+- Do not mix uppercase micro-typography with long narrative paragraphs on the same block; it breaks reading coherence.
+- Do not wrap a story text block in a card when it already sits beside a framed visual.
+- Do not keep story visuals and narrative in a single long column on desktop when the requested direction is image-left/text-right.
+- Do not invent brand-story wording when `ressources/maison-marcelina.md` already defines the source narrative.
 - Do not commit machine artifacts (`.DS_Store`, virtual env folders, `node_modules`, local `.env`).
 - Do not bypass `uv` for backend dependency management or execution.
 - Do not hardcode backend/frontend ports in app code.

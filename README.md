@@ -15,10 +15,13 @@ Production-ready app template with a Python backend and a React frontend.
 ├── backend/
 │   ├── pyproject.toml
 │   ├── src/app/
+│   │   ├── api/auth.py
 │   │   ├── api/health.py
 │   │   ├── core/config.py
 │   │   ├── core/logging.py
+│   │   ├── services/supabase_auth.py
 │   │   └── main.py
+│   ├── tests/test_auth.py
 │   ├── tests/test_health.py
 │   └── uv.lock
 ├── frontend/
@@ -83,10 +86,32 @@ Defined in `.env`:
 - `FRONTEND_PORT`
 - `CORS_ORIGINS`
 - `VITE_API_BASE_URL`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_GOOGLE_REDIRECT_URL`
+- `AUTH_COOKIE_SECURE`
 
 If `CORS_ORIGINS` is empty, it is built dynamically from `FRONTEND_HOST` and `FRONTEND_PORT`.
 
 If `VITE_API_BASE_URL` is empty, `start.sh` sets it to `http://127.0.0.1:$BACKEND_PORT`.
+
+If `SUPABASE_GOOGLE_REDIRECT_URL` is empty, backend defaults to:
+`http://localhost:$BACKEND_PORT/auth/google/callback`.
+
+## Backend Auth API
+
+- `POST /auth/login`
+  - body: `{"email":"...", "password":"..."}`
+  - response: Supabase session payload (`access_token`, `refresh_token`, `user`, ...)
+- `GET /auth/google/start`
+  - starts Google OAuth (PKCE)
+  - default behavior: HTTP redirect to Google
+  - optional: `?redirect=false` to receive JSON `{"authorization_url":"..."}`
+- `GET /auth/google/callback`
+  - exchanges Google auth code for a Supabase session
+  - expects `code` and `state` query params
+
+Google login requires enabling the Google provider in Supabase Auth and adding the callback URL in your Supabase redirect URLs allow list.
 
 ## Commands
 

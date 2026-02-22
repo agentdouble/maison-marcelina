@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Link,
   NavLink,
@@ -73,6 +73,119 @@ const products = [
     image:
       "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1080&q=80",
   },
+];
+
+const collectionMarketplaceProducts = [
+  {
+    id: "heritage-ivoire",
+    name: "Robe Ivoire",
+    price: 189,
+    line: "Marceline Heritage",
+    image:
+      "https://images.unsplash.com/photo-1467632499275-7a693a761056?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "heritage-sauge",
+    name: "Veste Sauge",
+    price: 164,
+    line: "Marceline Heritage",
+    image:
+      "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "heritage-taupe",
+    name: "Jupe Taupe",
+    price: 132,
+    line: "Marceline Heritage",
+    image:
+      "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "heritage-sable",
+    name: "Chemise Sable",
+    price: 118,
+    line: "Marceline Heritage",
+    image:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "riviera-azur",
+    name: "Robe Azur",
+    price: 176,
+    line: "Marceline Riviera",
+    image:
+      "https://images.unsplash.com/photo-1503341338985-b35f5a53c6f2?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "riviera-ecume",
+    name: "Top Ecume",
+    price: 96,
+    line: "Marceline Riviera",
+    image:
+      "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "riviera-vichy",
+    name: "Jupe Vichy",
+    price: 128,
+    line: "Marceline Riviera",
+    image:
+      "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "riviera-ligne",
+    name: "Pantalon Ligne",
+    price: 142,
+    line: "Marceline Riviera",
+    image:
+      "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "audacieuse-noir",
+    name: "Robe Noir Atelier",
+    price: 212,
+    line: "Marceline Audacieuse",
+    image:
+      "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "audacieuse-rouge",
+    name: "Top Rouge",
+    price: 102,
+    line: "Marceline Audacieuse",
+    image:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "audacieuse-leopard",
+    name: "Jupe Leopard",
+    price: 158,
+    line: "Marceline Audacieuse",
+    image:
+      "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "audacieuse-corset",
+    name: "Corset Nuit",
+    price: 184,
+    line: "Marceline Audacieuse",
+    image:
+      "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80",
+  },
+];
+
+const marketplacePriceFilters = [
+  { value: "all", label: "Tous les prix", min: 0, max: Infinity },
+  { value: "under-130", label: "Jusqu'a 130 EUR", min: 0, max: 130 },
+  { value: "130-180", label: "130 a 180 EUR", min: 130, max: 180 },
+  { value: "over-180", label: "180 EUR et +", min: 180, max: Infinity },
+];
+
+const marketplaceSortOptions = [
+  { value: "featured", label: "Selection" },
+  { value: "price-asc", label: "Prix croissant" },
+  { value: "price-desc", label: "Prix decroissant" },
+  { value: "name-asc", label: "Nom A-Z" },
 ];
 
 const signaturePiece = {
@@ -328,31 +441,8 @@ function Reveal({ as: Tag = "div", className = "", delay = 0, children, ...rest 
   );
 }
 
-function CollectionsGrid() {
-  return (
-    <div className="collection-grid">
-      {collections.map((collection, index) => (
-        <Reveal
-          as="article"
-          className="collection-card"
-          key={collection.title}
-          delay={index * 80}
-        >
-          <img src={collection.image} alt={collection.title} loading="lazy" />
-          <div className="collection-content">
-            <p>{collection.season}</p>
-            <h2>{collection.title}</h2>
-            <div className="tag-list">
-              {collection.palette.map((tag) => (
-                <span key={tag}>{tag}</span>
-              ))}
-            </div>
-            <Link to="/boutique">Voir en boutique</Link>
-          </div>
-        </Reveal>
-      ))}
-    </div>
-  );
+function formatMarketplacePrice(price) {
+  return `${price} EUR`;
 }
 
 function HomePage() {
@@ -403,13 +493,142 @@ function HomePage() {
 }
 
 function CollectionPage() {
-  return (
-    <section className="page-view">
-      <header className="section-head">
-        <h1>Les collections</h1>
-      </header>
+  const [query, setQuery] = useState("");
+  const [activeCollection, setActiveCollection] = useState("Toutes");
+  const [activePriceFilter, setActivePriceFilter] = useState("all");
+  const [activeSort, setActiveSort] = useState("featured");
 
-      <CollectionsGrid />
+  const collectionChips = useMemo(
+    () => ["Toutes", ...new Set(collectionMarketplaceProducts.map((product) => product.line))],
+    []
+  );
+
+  const visibleProducts = useMemo(() => {
+    const selectedPrice =
+      marketplacePriceFilters.find((filter) => filter.value === activePriceFilter) ??
+      marketplacePriceFilters[0];
+    const normalizedQuery = query.trim().toLowerCase();
+
+    const filtered = collectionMarketplaceProducts.filter((product) => {
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        product.name.toLowerCase().includes(normalizedQuery) ||
+        product.line.toLowerCase().includes(normalizedQuery);
+      const matchesCollection =
+        activeCollection === "Toutes" || product.line === activeCollection;
+      const matchesPrice =
+        product.price >= selectedPrice.min &&
+        (selectedPrice.max === Infinity || product.price <= selectedPrice.max);
+
+      return matchesQuery && matchesCollection && matchesPrice;
+    });
+
+    if (activeSort === "price-asc") {
+      return [...filtered].sort((first, second) => first.price - second.price);
+    }
+
+    if (activeSort === "price-desc") {
+      return [...filtered].sort((first, second) => second.price - first.price);
+    }
+
+    if (activeSort === "name-asc") {
+      return [...filtered].sort((first, second) => first.name.localeCompare(second.name));
+    }
+
+    return filtered;
+  }, [activeCollection, activePriceFilter, activeSort, query]);
+
+  return (
+    <section className="page-view collection-marketplace-view">
+      <Reveal as="header" className="collection-marketplace-hero">
+        <p className="collection-marketplace-kicker">Les collections</p>
+        <h1>Boutique marketplace</h1>
+
+        <div className="collection-marketplace-toolbar">
+          <label className="collection-toolbar-field" htmlFor="collection-search">
+            Recherche
+            <input
+              id="collection-search"
+              type="search"
+              name="collection-search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Nom ou collection"
+              autoComplete="off"
+            />
+          </label>
+
+          <label className="collection-toolbar-field" htmlFor="collection-price">
+            Prix
+            <select
+              id="collection-price"
+              name="collection-price"
+              value={activePriceFilter}
+              onChange={(event) => setActivePriceFilter(event.target.value)}
+            >
+              {marketplacePriceFilters.map((filter) => (
+                <option key={filter.value} value={filter.value}>
+                  {filter.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="collection-toolbar-field" htmlFor="collection-sort">
+            Tri
+            <select
+              id="collection-sort"
+              name="collection-sort"
+              value={activeSort}
+              onChange={(event) => setActiveSort(event.target.value)}
+            >
+              {marketplaceSortOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </Reveal>
+
+      <div className="collection-chip-scroller" role="tablist" aria-label="Collections">
+        {collectionChips.map((collectionName) => (
+          <button
+            key={collectionName}
+            type="button"
+            role="tab"
+            aria-selected={activeCollection === collectionName}
+            className={
+              activeCollection === collectionName
+                ? "collection-chip collection-chip--active"
+                : "collection-chip"
+            }
+            onClick={() => setActiveCollection(collectionName)}
+          >
+            {collectionName}
+          </button>
+        ))}
+      </div>
+
+      <p className="collection-result-count">{visibleProducts.length} pieces</p>
+
+      <div className="collection-marketplace-grid">
+        {visibleProducts.map((product, index) => (
+          <Reveal
+            as="article"
+            className="collection-marketplace-card"
+            key={product.id}
+            delay={index * 50}
+          >
+            <img src={product.image} alt={product.name} loading="lazy" />
+            <div className="collection-marketplace-card-body">
+              <h2>{product.name}</h2>
+              <p>{formatMarketplacePrice(product.price)}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
     </section>
   );
 }

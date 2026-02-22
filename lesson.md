@@ -114,6 +114,7 @@
 - On `/compte`, a flatter layout (separators and hierarchy) reads more premium than stacked framed cards.
 - Mapping Supabase `401/403` auth rejections to a clear account `401` response prevents ambiguous profile-save failures.
 - Clearing stale `mm_auth_session` and redirecting to `/login` on account auth rejection keeps buyer UX recoverable.
+- On `/sur-mesure`, replacing manual email capture with a login gate keeps request identity tied to the authenticated account.
 
 ## errors to avoid
 
@@ -191,3 +192,4 @@
 - Do not keep write-capable order endpoints on customer account APIs when the UI is meant to be read-only; it creates trust and data integrity issues.
 - Do not nest framed containers in `/compte` (`cadres dans cadres`); keep one visual level and rely on spacing/lines.
 - Do not keep stale local sessions after backend auth rejection on `/account/*`; force re-auth to avoid endless `403` loops.
+- Do not ask for contact email on `/sur-mesure` when auth is available; gate with login and use account identity instead.

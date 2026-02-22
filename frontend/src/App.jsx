@@ -1267,47 +1267,60 @@ function ProductDetailPage({ onAddToCart }) {
 }
 
 function SurMesurePage() {
+  const session = readStoredAuthSession();
+  const user = session && session.user && typeof session.user === "object" ? session.user : null;
+  const email =
+    user && typeof user.email === "string" && user.email.trim().length > 0 ? user.email.trim() : "";
+  const isAuthenticated = Boolean(session && session.access_token);
+  const conceptSteps = [
+    {
+      title: "Brief atelier",
+      detail: "Intentions, silhouette, matieres et delai.",
+    },
+    {
+      title: "Prototype",
+      detail: "Essayage, ajustements et validation des volumes.",
+    },
+    {
+      title: "Confection finale",
+      detail: "Finitions, controles et remise de la piece.",
+    },
+  ];
+
   return (
     <section className="page-view form-view">
       <header className="section-head">
         <h1>Sur mesure</h1>
       </header>
 
-      <Reveal as="form" className="form-panel" onSubmit={(event) => event.preventDefault()}>
-        <div className="field-row">
-          <label>
-            <span>Projet souhaite</span>
-            <select name="projectType" defaultValue="robe" required>
-              <option value="robe">Robe</option>
-              <option value="ensemble">Ensemble</option>
-              <option value="jupe">Jupe</option>
-              <option value="autre">Autre</option>
-            </select>
-          </label>
+      <Reveal className="form-panel sur-mesure-panel">
+        <div className="sur-mesure-concept" aria-label="Processus sur mesure">
+          {conceptSteps.map((step) => (
+            <article key={step.title} className="sur-mesure-step">
+              <h2>{step.title}</h2>
+              <p>{step.detail}</p>
+            </article>
+          ))}
         </div>
 
-        <div className="field-row">
-          <label>
-            <span>Nom</span>
-            <input type="text" name="name" placeholder="Nom" required />
-          </label>
-
-          <label>
-            <span>Email</span>
-            <input type="email" name="email" placeholder="email@exemple.com" required />
-          </label>
+        <div className="sur-mesure-access">
+          {isAuthenticated ? (
+            <>
+              <p>Compte connecte</p>
+              {email ? <strong>{email}</strong> : null}
+              <Link className="sur-mesure-action" to="/compte">
+                Acceder au compte
+              </Link>
+            </>
+          ) : (
+            <>
+              <p>Connectez-vous pour lancer votre projet.</p>
+              <Link className="sur-mesure-action" to="/login">
+                Se connecter
+              </Link>
+            </>
+          )}
         </div>
-
-        <label>
-          <span>Ecriture libre</span>
-          <textarea
-            name="projectMessage"
-            placeholder="Silhouette, matiere, delai..."
-            required
-          />
-        </label>
-
-        <button type="submit">Envoyer</button>
       </Reveal>
     </section>
   );

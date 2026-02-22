@@ -8,6 +8,7 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import { Footer7 } from "./components/ui/footer-7.tsx";
 import { Gallery4 } from "./components/ui/gallery4.tsx";
 import { LuminaInteractiveList } from "./components/ui/lumina-interactive-list.tsx";
 
@@ -151,6 +152,26 @@ const legalPages = [
       "Contrastes lisibles et focus visibles.",
       "Support mobile et ecrans standards.",
       "Signalement des blocages via Contact.",
+    ],
+  },
+];
+
+const footerSections = [
+  {
+    title: "Navigation",
+    links: [
+      { name: "Accueil", href: "/" },
+      { name: "Les collections", href: "/collection" },
+      { name: "Sur mesure", href: "/sur-mesure" },
+      { name: "Boutique", href: "/boutique" },
+    ],
+  },
+  {
+    title: "Assistance",
+    links: [
+      { name: "Contact", href: "/contact" },
+      { name: "Panier", href: "/panier" },
+      { name: "Login", href: "/login" },
     ],
   },
 ];
@@ -579,13 +600,21 @@ function LegalPage({ title, lines }) {
 function SiteFooter() {
   return (
     <footer className="site-footer">
-      <nav className="legal-strip" aria-label="Informations legales">
-        {legalPages.map((page) => (
-          <Link key={page.path} to={page.path}>
-            {page.label}
-          </Link>
-        ))}
-      </nav>
+      <Footer7
+        logo={{
+          url: "/",
+          src: "/logo-marcelina.svg",
+          alt: "Logo Maison Marcelina",
+          title: "Maison Marcelina",
+        }}
+        sections={footerSections}
+        description="Maison Marcelina"
+        legalLinks={legalPages.map((page) => ({
+          name: page.label,
+          href: page.path,
+        }))}
+        copyright="© 2026 Maison Marcelina."
+      />
     </footer>
   );
 }

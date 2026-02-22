@@ -33,7 +33,7 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Sur-mesure contact form page
 - Command support contact page
 - Login page
-- Legal bottom band (mentions, CGV, remboursement, cookies, accessibilite)
+- Themed `Footer7` with navigation, assistance, social icons, and legal links
 
 ## Project layout
 
@@ -65,6 +65,7 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 │       │       ├── button.tsx
 │       │       ├── carousel.tsx
 │       │       ├── card.tsx
+│       │       ├── footer-7.tsx
 │       │       ├── gallery4.tsx
 │       │       └── lumina-interactive-list.tsx
 │       ├── lib/

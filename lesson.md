@@ -48,6 +48,8 @@
 - A shadcn-compatible setup can be added incrementally in a Vite JS app by enabling TS support and alias `@/*` without rewriting all pages.
 - Disabling Tailwind preflight avoids regressions when a mature handcrafted CSS theme already exists.
 - Moving best-sellers to an Embla-based carousel gives richer interaction than a static grid while keeping routing and data simple.
+- Replacing a minimal legal strip with a themed, data-driven footer component improves consistency while reusing existing route contracts.
+- Keeping footer copy concise preserves the brand tone and avoids explanatory text bloat.
 
 ## errors to avoid
 
@@ -75,3 +77,4 @@
 - Do not reuse generic pill button styles for signature CTAs when frameless controls are required.
 - Do not use `@/components/ui/*` imports without configuring Vite alias `@`, or builds will fail.
 - Do not integrate shadcn snippets in JS projects without adding TS/Tailwind support first.
+- Do not duplicate legal route definitions in footer data; map from existing legal page source of truth.

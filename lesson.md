@@ -6,6 +6,7 @@
 - Dynamic CORS from `.env` prevents hardcoded port regressions.
 - React frontend wired to backend health with request cancellation avoids stale state updates.
 - Keeping the frontend in Vite with a minimal file set preserves speed and readability.
+- Keeping a clean git flow (`main` as stable base, then `dev`, then feature branches) reduces integration risk.
 
 ## errors to avoid
 

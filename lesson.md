@@ -56,6 +56,8 @@
 - On mobile, centering signature visual + copy improves balance before switching to split left/right layout on larger screens.
 - Centering carousel card copy (title/price) improves visual balance on portrait product crops.
 - Footer copyright rows should use tight `mt/py` and reset paragraph margins to avoid artificial empty space.
+- Increasing header logo, nav labels, and utility icon sizes together preserves visual balance better than scaling only one element.
+- For hero animated titles on mobile, split/animate by words (not characters) to prevent mid-word line breaks.
 
 ## errors to avoid
 
@@ -90,3 +92,5 @@
 - Do not keep desktop-left alignment rules on mobile for hero-adjacent split blocks; center first, then branch at tablet.
 - Do not leave carousel overlay copy left-aligned when the requested direction is centered emphasis.
 - Do not rely on default paragraph margins in compact footer rows; it creates unwanted bottom gap.
+- Do not enlarge header logo without scaling nav/icon sizes, or hierarchy becomes inconsistent.
+- Do not animate hero titles per character on narrow screens when readable word wrapping is required.

@@ -370,10 +370,11 @@ export function Component({ slides = defaultSlides }: LuminaInteractiveListProps
 
     const splitText = (text: string) =>
       text
-        .split("")
+        .trim()
+        .split(/\s+/)
         .map(
-          (char) =>
-            `<span style="display:inline-block;opacity:0;">${char === " " ? "&nbsp;" : char}</span>`
+          (word) =>
+            `<span class="word-fragment" style="display:inline-block;opacity:0;white-space:nowrap;margin-right:0.24em;">${word}</span>`
         )
         .join("");
 

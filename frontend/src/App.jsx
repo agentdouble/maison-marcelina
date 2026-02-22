@@ -1283,10 +1283,6 @@ function SurMesurePage() {
 
   return (
     <section className="page-view form-view">
-      <header className="section-head">
-        <h1>Sur mesure</h1>
-      </header>
-
       <Reveal className="form-panel sur-mesure-panel">
         <p className="sur-mesure-intro">
           Le sur mesure permet d'adapter la coupe, les matieres, les couleurs et les finitions selon

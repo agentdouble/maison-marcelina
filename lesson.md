@@ -74,6 +74,17 @@
 - When Tailwind preflight is disabled, shadcn buttons should explicitly set `appearance` and border defaults, otherwise browser-native outlines can degrade premium UI.
 - Adding signup support is safest when frontend and backend share the same auth payload shape, so login/create-account flows can reuse one session contract.
 - In no-preflight setups, secondary text-action buttons inside auth cards need explicit `appearance: none` and transparent background, otherwise they render as default boxed controls.
+- Mapping all `supabase_auth` errors (not only `AuthApiError`) in FastAPI keeps upstream statuses like `422` for weak passwords instead of leaking `500`.
+- Signup success messages should stay concise and formal to keep a production-grade trust signal in auth flows.
+- A dedicated `/compte` route driven by the auth session keeps profile navigation stable and avoids mixing login and account responsibilities.
+- Grouping account data into explicit tabs (`Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`) improves scanability without adding route complexity.
+- Persisting account tabs through backend `/account/*` endpoints + Supabase RLS tables removes fragile local-only state and keeps multi-device consistency.
+- A buyer-facing account page is more credible when order history is read-only and clearly separated from profile editing and security actions.
+- Using account summary metrics (`total commandes`, `total achats`, `en preparation`) improves scanability without adding extra backend endpoints.
+- Removing `POST /account/orders` from the public account surface prevents fake self-created orders and aligns with real boutique flows.
+- On `/compte`, a flatter layout (separators and hierarchy) reads more premium than stacked framed cards.
+- Mapping Supabase `401/403` auth rejections to a clear account `401` response prevents ambiguous profile-save failures.
+- Clearing stale `mm_auth_session` and redirecting to `/login` on account auth rejection keeps buyer UX recoverable.
 
 ## errors to avoid
 
@@ -122,3 +133,11 @@
 - Do not add demo-only component files in production routes when they are not used; keep login integration focused on the real route component.
 - Do not rely on browser default button rendering in a no-preflight setup; it can introduce thick native borders and inconsistent visuals across browsers.
 - Do not create separate ad-hoc auth response schemas per endpoint; inconsistent payloads make frontend auth mode switches brittle.
+- Do not handle only `AuthApiError` in auth routes; `CustomAuthError` variants (like weak password) otherwise become false `500 Internal Server Error`.
+- Do not keep profile icon hard-linked to `/login` after authentication; route it to account settings to prevent broken signed-in UX.
+- Do not stack all account information in one long block once sections grow; switch to tabs to keep the account page readable.
+- Do not store account orders only in browser localStorage once real account features exist; persist to Supabase with user-scoped RLS policies.
+- Do not expose manual order creation controls to buyer accounts in `/compte`; order records must come from checkout/backoffice flows.
+- Do not keep write-capable order endpoints on customer account APIs when the UI is meant to be read-only; it creates trust and data integrity issues.
+- Do not nest framed containers in `/compte` (`cadres dans cadres`); keep one visual level and rely on spacing/lines.
+- Do not keep stale local sessions after backend auth rejection on `/account/*`; force re-auth to avoid endless `403` loops.

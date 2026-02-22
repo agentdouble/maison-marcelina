@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from supabase_auth.errors import AuthApiError
+from supabase_auth.errors import AuthApiError, AuthWeakPasswordError
 
 from app.api.auth import GOOGLE_OAUTH_COOKIE_NAME
 from app.main import app
@@ -119,6 +119,35 @@ def test_password_signup_auth_error(client: TestClient, monkeypatch: pytest.Monk
 
     assert response.status_code == 400
     assert response.json() == {"detail": "User already registered"}
+
+
+def test_password_signup_weak_password_error(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_sign_up_with_password(
+        settings: object, *, email: str, password: str
+    ) -> dict[str, object]:
+        raise AuthWeakPasswordError(
+            "Password should be at least 6 characters",
+            422,
+            ["length"],
+        )
+
+    monkeypatch.setattr(
+        "app.api.auth.sign_up_with_password",
+        fake_sign_up_with_password,
+    )
+
+    response = client.post(
+        "/auth/signup",
+        json={
+            "email": "new-user@example.com",
+            "password": "123",
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {"detail": "Password should be at least 6 characters"}
 
 
 def test_google_start_sets_oauth_cookie(

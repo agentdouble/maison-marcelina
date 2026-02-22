@@ -45,6 +45,9 @@
 - A liquid morph treatment works best on the image wrapper (not a card container) to keep the section frameless.
 - In split layouts, centering signature text vertically opposite the visual improves balance and readability.
 - For premium direction, `Decouvrir` works better as a frameless text CTA than as a pill button.
+- A shadcn-compatible setup can be added incrementally in a Vite JS app by enabling TS support and alias `@/*` without rewriting all pages.
+- Disabling Tailwind preflight avoids regressions when a mature handcrafted CSS theme already exists.
+- Moving best-sellers to an Embla-based carousel gives richer interaction than a static grid while keeping routing and data simple.
 
 ## errors to avoid
 
@@ -70,3 +73,5 @@
 - Do not wrap the post-hero home modules in card containers when the requested direction is edge-to-edge.
 - Do not apply liquid styling through added outer frames; apply it directly on the media shape.
 - Do not reuse generic pill button styles for signature CTAs when frameless controls are required.
+- Do not use `@/components/ui/*` imports without configuring Vite alias `@`, or builds will fail.
+- Do not integrate shadcn snippets in JS projects without adding TS/Tailwind support first.

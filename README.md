@@ -5,7 +5,9 @@ Base web app for Maison Marcelina with a Python backend and a React frontend.
 ## Stack
 
 - Backend: FastAPI (Python 3.11+) managed with `uv`
-- Frontend: React + Vite + React Router
+- Frontend: React + Vite + React Router + Tailwind CSS utilities
+- UI primitives: shadcn-style structure in `src/components/ui`
+- TypeScript support enabled for UI components (`.tsx`, alias `@/*`)
 - Orchestration: `start.sh` (single entrypoint)
 
 ## Current frontend scope (mock)
@@ -20,7 +22,7 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - In-hero collection buttons remain frameless and visible (`Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
 - Home continuation after slider with:
   - `Piece signature` spotlight block (content aligned opposite image)
-  - `Best-sellers` grid
+  - animated `Best-sellers` carousel (`Gallery4` + Embla)
   - trust band (`Livraison`, `Retours`, `Paiement`, `Support`)
 - Post-hero home blocks are intentionally frameless (no card container wrappers)
 - `Piece signature` image uses a liquid morph style (organic shape + soft highlights)
@@ -49,6 +51,10 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 ├── frontend/
 │   ├── package.json
 │   ├── vite.config.js
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   ├── tsconfig.json
+│   ├── components.json
 │   ├── index.html
 │   ├── public/
 │   │   └── logo-marcelina.svg
@@ -56,7 +62,13 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 │       ├── App.jsx
 │       ├── components/
 │       │   └── ui/
+│       │       ├── button.tsx
+│       │       ├── carousel.tsx
+│       │       ├── card.tsx
+│       │       ├── gallery4.tsx
 │       │       └── lumina-interactive-list.tsx
+│       ├── lib/
+│       │   └── utils.ts
 │       ├── main.jsx
 │       └── styles.css
 ├── .env.example

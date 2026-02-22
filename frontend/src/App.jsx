@@ -8,6 +8,7 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import { Gallery4 } from "./components/ui/gallery4.tsx";
 import { LuminaInteractiveList } from "./components/ui/lumina-interactive-list.tsx";
 
 const navItems = [
@@ -81,7 +82,13 @@ const signaturePiece = {
     "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80",
 };
 
-const bestSellers = products.slice(0, 4);
+const bestSellerGalleryItems = products.slice(0, 4).map((product) => ({
+  id: product.name.toLowerCase().replace(/\s+/g, "-"),
+  title: product.name,
+  description: product.price,
+  href: "/boutique",
+  image: product.image,
+}));
 
 const trustHighlights = [
   { title: "Livraison offerte", value: "Des 120 EUR" },
@@ -352,32 +359,9 @@ function HomePage() {
           </div>
         </Reveal>
 
-        <section className="best-sellers-block" aria-labelledby="best-sellers-title">
-          <Reveal as="header" className="home-block-head" delay={70}>
-            <p>Selection</p>
-            <h2 id="best-sellers-title">Best-sellers</h2>
-          </Reveal>
-
-          <div className="best-sellers-grid">
-            {bestSellers.map((product, index) => (
-              <Reveal
-                as="article"
-                className="best-seller-card"
-                key={`best-${product.name}`}
-                delay={110 + index * 70}
-              >
-                <img src={product.image} alt={product.name} loading="lazy" />
-                <div className="best-seller-content">
-                  <h3>{product.name}</h3>
-                  <p>{product.price}</p>
-                </div>
-                <Link className="home-cta" to="/boutique">
-                  Voir
-                </Link>
-              </Reveal>
-            ))}
-          </div>
-        </section>
+        <Reveal as="section" className="best-sellers-block" delay={70}>
+          <Gallery4 title="Best-sellers" items={bestSellerGalleryItems} />
+        </Reveal>
 
         <Reveal
           as="section"

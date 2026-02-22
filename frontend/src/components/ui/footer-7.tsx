@@ -95,6 +95,14 @@ export const Footer7 = ({
   copyright = "© 2026 Maison Marcelina.",
   legalLinks = defaultLegalLinks,
 }: Footer7Props) => {
+  const footerColumns = [
+    ...sections,
+    {
+      title: "Informations legales",
+      links: legalLinks,
+    },
+  ];
+
   return (
     <section className="py-12 md:py-16">
       <div className="mx-auto w-full max-w-[1300px] px-3 md:px-5">
@@ -115,7 +123,7 @@ export const Footer7 = ({
               {description}
             </p>
 
-            <ul className="flex items-center space-x-5 text-[#6a4d3f]">
+            <ul className="m-0 flex list-none items-center space-x-5 p-0 text-[#6a4d3f]">
               {socialLinks.map((social) => (
                 <li key={social.label} className="font-medium transition hover:text-[#4e3024]">
                   <FooterNavLink href={social.href} className="inline-flex" aria-label={social.label}>
@@ -126,13 +134,13 @@ export const Footer7 = ({
             </ul>
           </div>
 
-          <div className="grid w-full gap-8 sm:grid-cols-2 lg:max-w-[560px] lg:gap-16">
-            {sections.map((section) => (
+          <div className="grid w-full gap-8 sm:grid-cols-2 lg:max-w-[760px] lg:grid-cols-3 lg:gap-16">
+            {footerColumns.map((section) => (
               <div key={section.title}>
                 <h3 className="mb-4 text-xs uppercase tracking-[0.12em] text-[#4e3024]">
                   {section.title}
                 </h3>
-                <ul className="space-y-3 text-sm text-[#6a4d3f]">
+                <ul className="m-0 list-none space-y-3 p-0 text-sm text-[#6a4d3f]">
                   {section.links.map((link) => (
                     <li key={link.name} className="font-medium transition hover:text-[#4e3024]">
                       <FooterNavLink href={link.href}>{link.name}</FooterNavLink>
@@ -146,18 +154,6 @@ export const Footer7 = ({
 
         <div className="mt-8 flex flex-col justify-between gap-4 border-t border-[#6a4d3f24] py-6 text-xs uppercase tracking-[0.08em] text-[#6a4d3f] md:flex-row md:items-start">
           <p>{copyright}</p>
-          <details className="group md:text-right">
-            <summary className="cursor-pointer list-none text-[11px] tracking-[0.12em] text-[#4e3024]">
-              Informations legales
-            </summary>
-            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 md:justify-end">
-              {legalLinks.map((link) => (
-                <li key={link.name} className="transition hover:text-[#4e3024]">
-                  <FooterNavLink href={link.href}>{link.name}</FooterNavLink>
-                </li>
-              ))}
-            </ul>
-          </details>
         </div>
       </div>
     </section>

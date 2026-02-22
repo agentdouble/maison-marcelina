@@ -51,6 +51,7 @@
 - Replacing a minimal legal strip with a themed, data-driven footer component improves consistency while reusing existing route contracts.
 - Keeping footer copy concise preserves the brand tone and avoids explanatory text bloat.
 - Grouping legal links under one footer block (`Informations legales`) reduces visual noise on mobile.
+- Aligning `Informations legales` as a third footer column (same pattern as `Navigation`/`Assistance`) improves scanability.
 
 ## errors to avoid
 
@@ -80,3 +81,4 @@
 - Do not integrate shadcn snippets in JS projects without adding TS/Tailwind support first.
 - Do not duplicate legal route definitions in footer data; map from existing legal page source of truth.
 - Do not spread legal links across multiple footer zones when a single grouped legal block is requested.
+- Do not hide legal links behind a separate bottom interaction when the request is a visible column list.

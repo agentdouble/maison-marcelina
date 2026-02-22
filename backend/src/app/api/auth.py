@@ -16,6 +16,7 @@ from app.services.supabase_auth import (
     SupabaseOAuthStartError,
     exchange_google_code,
     sign_in_with_password,
+    sign_up_with_password,
     start_google_oauth,
 )
 
@@ -28,6 +29,11 @@ GOOGLE_OAUTH_COOKIE_PATH = "/auth/google/callback"
 
 
 class PasswordLoginRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=1)
+
+
+class PasswordSignUpRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=1)
 
@@ -98,6 +104,22 @@ def password_login(
         )
     except Exception as exc:
         logger.warning("Password login failed")
+        _raise_auth_error(exc)
+
+
+@router.post("/signup")
+def password_signup(
+    payload: PasswordSignUpRequest,
+    settings: Settings = Depends(get_settings),
+) -> dict[str, Any]:
+    try:
+        return sign_up_with_password(
+            settings,
+            email=payload.email,
+            password=payload.password,
+        )
+    except Exception as exc:
+        logger.warning("Password signup failed")
         _raise_auth_error(exc)
 
 

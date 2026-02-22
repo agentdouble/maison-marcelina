@@ -164,6 +164,9 @@ If `SUPABASE_GOOGLE_REDIRECT_URL` is empty, backend defaults to:
 - `POST /auth/login`
   - body: `{"email":"...", "password":"..."}`
   - response: Supabase session payload (`access_token`, `refresh_token`, `user`, ...)
+- `POST /auth/signup`
+  - body: `{"email":"...", "password":"..."}`
+  - response: Supabase auth payload (`user`, optional session tokens depending on email confirmation policy)
 - `GET /auth/google/start`
   - starts Google OAuth (PKCE)
   - default behavior: HTTP redirect to Google
@@ -178,6 +181,7 @@ Google login requires enabling the Google provider in Supabase Auth and adding t
 
 - `/login` uses `src/components/ui/login-1.tsx`
 - Email/password submit calls `POST {VITE_API_BASE_URL}/auth/login`
+- Account creation submit calls `POST {VITE_API_BASE_URL}/auth/signup`
 - Google button redirects browser to `{VITE_API_BASE_URL}/auth/google/start`
 - On password login success, response payload is stored in `localStorage` as `mm_auth_session`, then user is redirected to `/`
 

@@ -14,6 +14,13 @@ interface LoginWithPasswordOptions {
   signal?: AbortSignal;
 }
 
+interface SignUpWithPasswordOptions {
+  apiBaseUrl?: string;
+  email: string;
+  password: string;
+  signal?: AbortSignal;
+}
+
 function resolveApiBaseUrl(apiBaseUrl?: string): string {
   const rawBaseUrl =
     apiBaseUrl?.trim() ??
@@ -56,6 +63,38 @@ export async function loginWithPassword({
       typeof (payload as { detail?: unknown }).detail === "string"
         ? (payload as { detail: string }).detail
         : "Connexion impossible";
+    throw new Error(detail);
+  }
+
+  return payload as AuthSessionPayload;
+}
+
+export async function signUpWithPassword({
+  apiBaseUrl,
+  email,
+  password,
+  signal,
+}: SignUpWithPasswordOptions): Promise<AuthSessionPayload> {
+  const response = await fetch(`${resolveApiBaseUrl(apiBaseUrl)}/auth/signup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+    signal,
+  });
+
+  const payload = await parseResponseBody(response);
+
+  if (!response.ok) {
+    const detail =
+      typeof payload === "object" &&
+      payload !== null &&
+      "detail" in payload &&
+      typeof (payload as { detail?: unknown }).detail === "string"
+        ? (payload as { detail: string }).detail
+        : "Creation impossible";
     throw new Error(detail);
   }
 

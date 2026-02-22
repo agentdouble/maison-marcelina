@@ -1,7 +1,12 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 
-import { loginWithPassword, startGoogleOAuth, type AuthSessionPayload } from "@/lib/auth";
+import {
+  loginWithPassword,
+  signUpWithPassword,
+  startGoogleOAuth,
+  type AuthSessionPayload,
+} from "@/lib/auth";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,8 +42,10 @@ const Login1 = ({
   apiBaseUrl,
   onLoginSuccess,
 }: Login1Props) => {
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -57,6 +64,10 @@ const Login1 = ({
     if (isSubmitting) {
       return;
     }
+    if (isSignUp && password !== confirmPassword) {
+      setErrorMessage("Mots de passe differents");
+      return;
+    }
 
     const controller = new AbortController();
     requestRef.current?.abort();
@@ -67,20 +78,42 @@ const Login1 = ({
     setIsSubmitting(true);
 
     try {
-      const payload = await loginWithPassword({
-        apiBaseUrl,
-        email: email.trim(),
-        password,
-        signal: controller.signal,
-      });
+      const payload = isSignUp
+        ? await signUpWithPassword({
+            apiBaseUrl,
+            email: email.trim(),
+            password,
+            signal: controller.signal,
+          })
+        : await loginWithPassword({
+            apiBaseUrl,
+            email: email.trim(),
+            password,
+            signal: controller.signal,
+          });
 
       if (!mountedRef.current) {
         return;
       }
 
-      localStorage.setItem("mm_auth_session", JSON.stringify(payload));
-      setSuccessMessage("Connecte");
-      onLoginSuccess?.(payload);
+      if (payload.access_token) {
+        localStorage.setItem("mm_auth_session", JSON.stringify(payload));
+      }
+
+      if (isSignUp) {
+        setSuccessMessage(
+          payload.access_token ? "Compte cree" : "Compte cree. Verifie ton email"
+        );
+        setPassword("");
+        setConfirmPassword("");
+        setIsSignUp(false);
+        if (payload.access_token) {
+          onLoginSuccess?.(payload);
+        }
+      } else {
+        setSuccessMessage("Bienvenue");
+        onLoginSuccess?.(payload);
+      }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;
@@ -135,13 +168,23 @@ const Login1 = ({
               autoComplete="current-password"
               required
             />
+            {isSignUp ? (
+              <Input
+                type="password"
+                placeholder="Confirmer mot de passe"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            ) : null}
 
             <Button
               type="submit"
               className="login1-primary-btn mt-1 w-full"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Patiente..." : buttonText}
+              {isSubmitting ? (isSignUp ? "Creation..." : "Patiente...") : isSignUp ? "Creer un compte" : buttonText}
             </Button>
             <Button
               type="button"
@@ -167,10 +210,27 @@ const Login1 = ({
             </p>
           )}
 
+          {!isSignUp ? (
+            <div className="text-muted-foreground flex items-center justify-center text-sm">
+              <a href={signupUrl} className="text-primary font-medium hover:underline">
+                {signupText}
+              </a>
+            </div>
+          ) : null}
           <div className="text-muted-foreground flex items-center justify-center text-sm">
-            <a href={signupUrl} className="text-primary font-medium hover:underline">
-              {signupText}
-            </a>
+            <button
+              type="button"
+              className="text-primary font-medium hover:underline"
+              onClick={() => {
+                setErrorMessage(null);
+                setSuccessMessage(null);
+                setPassword("");
+                setConfirmPassword("");
+                setIsSignUp((current) => !current);
+              }}
+            >
+              {isSignUp ? "J'ai deja un compte" : "Creer un compte"}
+            </button>
           </div>
         </div>
       </div>

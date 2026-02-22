@@ -67,6 +67,7 @@
 - Redirecting to backend Google start endpoint from the UI keeps OAuth initiation simple while preserving PKCE state handling server-side.
 - For premium themes, a centered `max-w-sm` auth card can stay close to shadcn defaults while matching brand visuals through token-based gradients instead of extra layout complexity.
 - When Tailwind preflight is disabled, shadcn buttons should explicitly set `appearance` and border defaults, otherwise browser-native outlines can degrade premium UI.
+- Adding signup support is safest when frontend and backend share the same auth payload shape, so login/create-account flows can reuse one session contract.
 
 ## errors to avoid
 
@@ -110,3 +111,4 @@
 - Do not fire concurrent login submits without cancellation/locking, or UI state can desync from backend auth responses.
 - Do not add demo-only component files in production routes when they are not used; keep login integration focused on the real route component.
 - Do not rely on browser default button rendering in a no-preflight setup; it can introduce thick native borders and inconsistent visuals across browsers.
+- Do not create separate ad-hoc auth response schemas per endpoint; inconsistent payloads make frontend auth mode switches brittle.

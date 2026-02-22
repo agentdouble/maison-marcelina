@@ -40,6 +40,7 @@
 - Centering hero copy and bottom navigation creates stronger visual hierarchy on animation-first homepages.
 - Frameless bottom nav labels paired with centered progress lines improve readability without heavy UI chrome.
 - Keeping concise primary nav labels (e.g. `Sur mesure`) improves readability and mobile stability.
+- On phone headers, keeping `Login` inside hamburger while scaling logo/cart/menu icons improves clarity and tap comfort.
 - Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
 - On homepages with a strong hero, placing `Piece signature` then `Best-sellers` then a compact trust band creates a clean conversion flow.
 - A hero slider should use full viewport height when it is the primary first impression block.
@@ -103,3 +104,4 @@
 - Do not animate hero titles per character on narrow screens when readable word wrapping is required.
 - Do not upscale logo and nav/icons in the same direction blindly; tune them inversely for balance.
 - Do not force a liquid separator when the requested direction is a straight visual cut.
+- Do not keep a separate login icon visible on phone when auth is already in the hamburger menu; it clutters the header.

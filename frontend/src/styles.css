@@ -217,6 +217,10 @@ textarea {
   height: 20px;
 }
 
+.menu-tab--mobile-only {
+  display: inline-flex;
+}
+
 .menu-toggle--open {
   background:
     linear-gradient(145deg, rgba(78, 48, 36, 0.92), rgba(66, 37, 27, 0.86)),
@@ -900,9 +904,17 @@ textarea:focus {
     font-size: 13px;
   }
 
+  .menu-tab--mobile-only {
+    display: none;
+  }
+
   .brand-link img {
     max-width: 292px;
     height: clamp(45px, 4vw, 56px);
+  }
+
+  .profile-link {
+    display: inline-flex;
   }
 
   .page-view {
@@ -982,6 +994,32 @@ textarea:focus {
 
   .site-footer {
     padding: 0;
+  }
+}
+
+@media (max-width: 739px) {
+  .brand-link img {
+    max-width: 70vw;
+    height: clamp(42px, 10vw, 52px);
+  }
+
+  .menu-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .menu-toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .cart-link svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .profile-link {
+    display: none;
   }
 }
 

@@ -258,6 +258,17 @@ function SiteHeader() {
               {item.label}
             </NavLink>
           ))}
+          <NavLink
+            to="/login"
+            onClick={() => setMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              isActive
+                ? "menu-tab menu-tab--mobile-only menu-tab--active"
+                : "menu-tab menu-tab--mobile-only"
+            }
+          >
+            Login
+          </NavLink>
         </nav>
 
         <div className="header-actions">

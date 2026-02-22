@@ -16,7 +16,8 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 
 - Compact sticky top band with large logo, profile icon, and mobile hamburger nav
 - Centered navigation tabs (`Accueil`, `Les collections`, `Sur mesure`)
-- Header action icons for cart and `Login` (login kept at top-right)
+- Header actions keep cart visible; `Login` moves into the hamburger on mobile and stays as profile icon on desktop
+- Mobile header controls (logo, hamburger, cart) are intentionally scaled up for readability
 - Liquid visual design (glass surfaces, fluid highlights, soft moving blobs)
 - Full-viewport home shader slider (`lumina-interactive-list`) fed by the 3 collections
 - In-hero collection buttons remain frameless and visible (`Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)

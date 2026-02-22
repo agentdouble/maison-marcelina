@@ -341,6 +341,20 @@ function HamburgerIcon({ open }) {
   );
 }
 
+function FilterIcon() {
+  return (
+    <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+      <path
+        d="M4 7h16M7.5 12h9M10.5 17h3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -551,8 +565,9 @@ function CollectionPage() {
           aria-expanded={filtersOpen}
           aria-controls="collection-filters-panel"
           onClick={() => setFiltersOpen((current) => !current)}
+          aria-label={filtersOpen ? "Fermer les filtres" : "Ouvrir les filtres"}
         >
-          Filtres
+          <FilterIcon />
         </button>
       </Reveal>
 
@@ -576,54 +591,46 @@ function CollectionPage() {
       </div>
 
       {filtersOpen ? (
-        <Reveal as="div" className="collection-filters-panel" id="collection-filters-panel">
-          <div className="collection-marketplace-toolbar">
-            <label className="collection-toolbar-field" htmlFor="collection-search">
-              Recherche
-              <input
-                id="collection-search"
-                type="search"
-                name="collection-search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Nom ou collection"
-                autoComplete="off"
-              />
-            </label>
+        <div className="collection-marketplace-toolbar" id="collection-filters-panel">
+          <input
+            id="collection-search"
+            type="search"
+            name="collection-search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Recherche"
+            autoComplete="off"
+            aria-label="Recherche"
+          />
 
-            <label className="collection-toolbar-field" htmlFor="collection-price">
-              Prix
-              <select
-                id="collection-price"
-                name="collection-price"
-                value={activePriceFilter}
-                onChange={(event) => setActivePriceFilter(event.target.value)}
-              >
-                {marketplacePriceFilters.map((filter) => (
-                  <option key={filter.value} value={filter.value}>
-                    {filter.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <select
+            id="collection-price"
+            name="collection-price"
+            value={activePriceFilter}
+            onChange={(event) => setActivePriceFilter(event.target.value)}
+            aria-label="Prix"
+          >
+            {marketplacePriceFilters.map((filter) => (
+              <option key={filter.value} value={filter.value}>
+                {filter.label}
+              </option>
+            ))}
+          </select>
 
-            <label className="collection-toolbar-field" htmlFor="collection-sort">
-              Tri
-              <select
-                id="collection-sort"
-                name="collection-sort"
-                value={activeSort}
-                onChange={(event) => setActiveSort(event.target.value)}
-              >
-                {marketplaceSortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-        </Reveal>
+          <select
+            id="collection-sort"
+            name="collection-sort"
+            value={activeSort}
+            onChange={(event) => setActiveSort(event.target.value)}
+            aria-label="Tri"
+          >
+            {marketplaceSortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
       ) : null}
 
       <p className="collection-result-count">{visibleProducts.length} pieces</p>

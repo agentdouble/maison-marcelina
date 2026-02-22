@@ -29,8 +29,8 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - `Piece signature` CTA `Decouvrir` is frameless (no round/pill background)
 - Scroll reveal animations and full-page web-app layout
 - Collections page rebuilt as a mobile-first luxe marketplace:
-  - hero allégé avec bouton `Filtres`
-  - panneau de filtres repliable (`Recherche`, `Prix`, `Tri`)
+  - hero allégé avec icône filtre (sans bouton texte)
+  - filtres repliables en mode frameless (`Recherche`, `Prix`, `Tri`)
   - horizontal scroll collection chips (`Toutes`, `Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
   - local front-only filtering/sorting over mock catalog data
   - product grid cards reduced to image + name + price

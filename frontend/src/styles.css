@@ -701,77 +701,62 @@ textarea:focus-visible,
 .collection-filter-toggle {
   position: relative;
   z-index: 1;
-  width: fit-content;
-  border: 1px solid rgba(251, 246, 237, 0.35);
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  width: 34px;
+  height: 34px;
+  justify-self: end;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
   color: rgba(251, 246, 237, 0.98);
-  background: rgba(33, 20, 14, 0.4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  background: transparent;
   cursor: pointer;
   transition:
     transform 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+.collection-filter-toggle svg {
+  width: 19px;
+  height: 19px;
 }
 
 .collection-filter-toggle:hover {
+  opacity: 0.78;
   transform: translateY(-1px);
 }
 
 .collection-filter-toggle--open {
-  border-color: rgba(212, 175, 55, 0.72);
-  background: rgba(212, 175, 55, 0.2);
-}
-
-.collection-filters-panel {
-  border-radius: 16px;
-  border: 1px solid rgba(78, 48, 36, 0.14);
-  padding: 10px;
-  background:
-    linear-gradient(170deg, rgba(251, 246, 237, 0.72), rgba(238, 225, 201, 0.44)),
-    rgba(251, 246, 237, 0.7);
-  box-shadow: 0 9px 20px rgba(41, 27, 20, 0.12);
+  color: rgba(212, 175, 55, 0.96);
 }
 
 .collection-marketplace-toolbar {
   display: grid;
   gap: 8px;
+  margin-top: -2px;
 }
 
-.collection-toolbar-field {
-  display: grid;
-  gap: 5px;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-}
-
-.collection-toolbar-field input,
-.collection-toolbar-field select {
+.collection-marketplace-toolbar input,
+.collection-marketplace-toolbar select {
   width: 100%;
-  min-height: 42px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(78, 48, 36, 0.2);
-  background:
-    linear-gradient(160deg, rgba(255, 251, 246, 0.86), rgba(239, 228, 205, 0.54)),
-    rgba(255, 251, 246, 0.74);
+  min-height: 40px;
+  padding: 8px 2px;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(78, 48, 36, 0.22);
+  background: transparent;
   color: var(--ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  box-shadow: none;
 }
 
-.collection-toolbar-field input::placeholder {
+.collection-marketplace-toolbar input::placeholder {
   color: rgba(78, 48, 36, 0.58);
 }
 
-.collection-toolbar-field input:focus,
-.collection-toolbar-field select:focus {
-  border-color: rgba(111, 131, 106, 0.48);
-  box-shadow: 0 0 0 3px rgba(111, 131, 106, 0.16);
+.collection-marketplace-toolbar input:focus,
+.collection-marketplace-toolbar select:focus {
+  border-color: rgba(111, 131, 106, 0.74);
+  box-shadow: none;
 }
 
 .collection-chip-scroller {

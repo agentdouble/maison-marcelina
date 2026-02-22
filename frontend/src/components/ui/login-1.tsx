@@ -35,7 +35,7 @@ const Login1 = ({
     alt: "Maison Marcelina",
     title: "Maison Marcelina",
   },
-  buttonText = "Entrer",
+  buttonText = "Se connecter",
   googleText = "Continuer avec Google",
   signupText = "Mot de passe oublie ?",
   signupUrl = "/contact",
@@ -223,7 +223,7 @@ const Login1 = ({
           <div className="text-muted-foreground flex items-center justify-center text-sm">
             <button
               type="button"
-              className="text-primary font-medium hover:underline"
+              className="login1-mode-btn"
               onClick={() => {
                 setErrorMessage(null);
                 setSuccessMessage(null);

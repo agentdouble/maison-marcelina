@@ -68,6 +68,7 @@
 - For premium themes, a centered `max-w-sm` auth card can stay close to shadcn defaults while matching brand visuals through token-based gradients instead of extra layout complexity.
 - When Tailwind preflight is disabled, shadcn buttons should explicitly set `appearance` and border defaults, otherwise browser-native outlines can degrade premium UI.
 - Adding signup support is safest when frontend and backend share the same auth payload shape, so login/create-account flows can reuse one session contract.
+- In no-preflight setups, secondary text-action buttons inside auth cards need explicit `appearance: none` and transparent background, otherwise they render as default boxed controls.
 
 ## errors to avoid
 

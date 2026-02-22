@@ -70,6 +70,7 @@ Objectif : faire évoluer l’app **rapidement** sans dette technique, sans cass
 - CORS : configuration dynamique via ce mécanisme (ne pas hardcoder des ports).
 
 2) **Travail avec un workflow git propre**
+- Commit à chaque changement atomique avec un message clair.
 
 5) **Avant de conclure une PR / livraison**
 - Nettoyer les fichiers inutiles.
@@ -78,4 +79,3 @@ Objectif : faire évoluer l’app **rapidement** sans dette technique, sans cass
 ---
 
 Mets à jour un lesson.md, que tu dois consulter. Au fil du projet, mets à jour lesson.md, sur les erreurs à ne pas faire et les reussites.
-

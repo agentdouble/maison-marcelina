@@ -37,6 +37,7 @@
 - Removing numeric counters from the hero slider can reduce visual clutter when title navigation is already visible.
 - Centering hero copy and bottom navigation creates stronger visual hierarchy on animation-first homepages.
 - Frameless bottom nav labels paired with centered progress lines improve readability without heavy UI chrome.
+- Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
 
 ## errors to avoid
 
@@ -55,3 +56,4 @@
 - Do not run home autoplay timers without proper cleanup logic, or multiple intervals can desync active state and UI.
 - Do not assume shadcn/Tailwind/TypeScript conventions already exist in a plain React project; verify structure before integrating shared components.
 - Do not recreate slide arrays inside render for WebGL-heavy components, or effects can reinitialize unnecessarily.
+- Do not batch unrelated edits into a single commit; keep commits scoped to one clear change.

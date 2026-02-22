@@ -64,6 +64,9 @@
 - For front-only catalog interactions, deriving visible products with `useMemo` keeps filtering/sorting predictable without side effects.
 - On dense collection pages, replacing always-visible controls with a single `Filtres` toggle reduces visual noise while keeping interactions available.
 - For premium pages, an icon-only filter trigger plus frameless controls keeps UI cleaner than pill buttons and nested panels.
+- A reusable swipe media component per card keeps product galleries consistent between `/collection` and `/boutique`.
+- For front-only cart flows, functional `setState` updates (`current => ...`) keep quantity/add/remove operations race-safe.
+- Keeping collection hero frameless avoids the boxed look and aligns with the premium direction.
 
 ## errors to avoid
 
@@ -106,3 +109,5 @@
 - Do not expect `npm run build` to work on a fresh clone before `npm install`.
 - Do not keep filter/search controls permanently exposed in the hero when the requested direction is a cleaner, premium layout.
 - Do not stack framed filter containers under an already framed hero; it creates a heavy "cadre dans cadre" effect.
+- Do not style card internals with broad selectors like `.product-card div` when adding swipe wrappers; target explicit classes to avoid layout regressions.
+- Do not assume every product has multiple photos; swipe UI must gracefully fallback to a single static image.

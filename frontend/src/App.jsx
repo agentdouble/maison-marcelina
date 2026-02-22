@@ -50,30 +50,53 @@ const luminaHomeSlides = collections.map((collection) => ({
 
 const products = [
   {
+    id: "robe-heritage",
     name: "Robe Heritage",
-    price: "149 EUR",
+    priceValue: 149,
     image:
       "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1080&q=80",
   },
   {
+    id: "top-riviera",
     name: "Top Riviera",
-    price: "89 EUR",
+    priceValue: 89,
     image:
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1080&q=80",
   },
   {
+    id: "jupe-audacieuse",
     name: "Jupe Audacieuse",
-    price: "119 EUR",
+    priceValue: 119,
     image:
       "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1080&q=80",
   },
   {
+    id: "ensemble-atelier",
     name: "Ensemble Atelier",
-    price: "179 EUR",
+    priceValue: 179,
     image:
       "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1080&q=80",
   },
 ];
+
+const boutiqueProductMedia = {
+  "robe-heritage": [
+    "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1080&q=80",
+    "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1080&q=80",
+  ],
+  "top-riviera": [
+    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1080&q=80",
+    "https://images.unsplash.com/photo-1503341338985-b35f5a53c6f2?auto=format&fit=crop&w=1080&q=80",
+  ],
+  "jupe-audacieuse": [
+    "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1080&q=80",
+    "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1080&q=80",
+  ],
+  "ensemble-atelier": [
+    "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1080&q=80",
+    "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1080&q=80",
+  ],
+};
 
 const collectionMarketplaceProducts = [
   {
@@ -174,6 +197,57 @@ const collectionMarketplaceProducts = [
   },
 ];
 
+const marketplaceProductMedia = {
+  "heritage-ivoire": [
+    "https://images.unsplash.com/photo-1467632499275-7a693a761056?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "heritage-sauge": [
+    "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "heritage-taupe": [
+    "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "heritage-sable": [
+    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "riviera-azur": [
+    "https://images.unsplash.com/photo-1503341338985-b35f5a53c6f2?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "riviera-ecume": [
+    "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1467632499275-7a693a761056?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "riviera-vichy": [
+    "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "riviera-ligne": [
+    "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "audacieuse-noir": [
+    "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1503341338985-b35f5a53c6f2?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "audacieuse-rouge": [
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "audacieuse-leopard": [
+    "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1200&q=80",
+  ],
+  "audacieuse-corset": [
+    "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1200&q=80",
+  ],
+};
+
 const marketplacePriceFilters = [
   { value: "all", label: "Tous les prix", min: 0, max: Infinity },
   { value: "under-130", label: "Jusqu'a 130 EUR", min: 0, max: 130 },
@@ -199,9 +273,9 @@ const signaturePiece = {
 const bestSellerGalleryItems = products.slice(0, 4).map((product) => ({
   id: product.name.toLowerCase().replace(/\s+/g, "-"),
   title: product.name,
-  description: product.price,
+  description: formatMarketplacePrice(product.priceValue),
   href: "/boutique",
-  image: product.image,
+  image: boutiqueProductMedia[product.id]?.[0] ?? product.image,
 }));
 
 const trustHighlights = [
@@ -355,7 +429,7 @@ function FilterIcon() {
   );
 }
 
-function SiteHeader() {
+function SiteHeader({ cartCount = 0, cartOpen = false, onToggleCart }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const menuClass = mobileMenuOpen ? "menu-tabs menu-tabs--open" : "menu-tabs";
@@ -388,9 +462,16 @@ function SiteHeader() {
         </nav>
 
         <div className="header-actions">
-          <Link className="cart-link" to="/panier" aria-label="Panier">
+          <button
+            type="button"
+            className={cartOpen ? "cart-link cart-link--active" : "cart-link"}
+            onClick={onToggleCart}
+            aria-label={cartOpen ? "Fermer le panier" : "Ouvrir le panier"}
+            aria-expanded={cartOpen}
+          >
             <CartIcon />
-          </Link>
+            {cartCount > 0 ? <span className="cart-count">{cartCount}</span> : null}
+          </button>
 
           <button
             type="button"
@@ -459,6 +540,190 @@ function formatMarketplacePrice(price) {
   return `${price} EUR`;
 }
 
+function getBoutiqueImages(product) {
+  return boutiqueProductMedia[product.id] ?? [product.image];
+}
+
+function getMarketplaceImages(product) {
+  return marketplaceProductMedia[product.id] ?? [product.image];
+}
+
+function ProductImageSwiper({ images, alt }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const dragStartRef = useRef(0);
+  const draggingRef = useRef(false);
+  const hasMultipleImages = images.length > 1;
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [images]);
+
+  const goNext = () => {
+    setActiveIndex((current) => (current + 1) % images.length);
+  };
+
+  const goPrevious = () => {
+    setActiveIndex((current) => (current - 1 + images.length) % images.length);
+  };
+
+  const handlePointerDown = (event) => {
+    if (!hasMultipleImages) {
+      return;
+    }
+
+    draggingRef.current = true;
+    dragStartRef.current = event.clientX;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerUp = (event) => {
+    if (!hasMultipleImages || !draggingRef.current) {
+      return;
+    }
+
+    draggingRef.current = false;
+    const delta = event.clientX - dragStartRef.current;
+
+    if (Math.abs(delta) < 32) {
+      return;
+    }
+
+    if (delta < 0) {
+      goNext();
+      return;
+    }
+
+    goPrevious();
+  };
+
+  return (
+    <div className={hasMultipleImages ? "media-swiper media-swiper--interactive" : "media-swiper"}>
+      <div
+        className="media-swiper-track"
+        style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={() => {
+          draggingRef.current = false;
+        }}
+      >
+        {images.map((source, index) => (
+          <div className="media-swiper-slide" key={`${source}-${index}`}>
+            <img
+              src={source}
+              alt={`${alt} ${index + 1}`}
+              loading="lazy"
+              draggable="false"
+            />
+          </div>
+        ))}
+      </div>
+
+      {hasMultipleImages ? (
+        <div className="media-swiper-dots" aria-hidden="true">
+          {images.map((_, index) => (
+            <button
+              type="button"
+              key={`${alt}-${index}`}
+              className={index === activeIndex ? "media-swiper-dot media-swiper-dot--active" : "media-swiper-dot"}
+              onClick={() => setActiveIndex(index)}
+              tabIndex={-1}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function CartItemsList({ items, onQuantityChange, onRemoveItem }) {
+  if (items.length === 0) {
+    return <p className="cart-empty">Panier vide</p>;
+  }
+
+  return (
+    <div className="cart-items-list">
+      {items.map((item) => (
+        <article className="cart-item-row" key={item.id}>
+          <img src={item.image} alt={item.name} loading="lazy" />
+
+          <div className="cart-item-meta">
+            <h2>{item.name}</h2>
+            <p>{formatMarketplacePrice(item.price)}</p>
+          </div>
+
+          <div className="cart-item-actions">
+            <div className="cart-qty">
+              <button
+                type="button"
+                aria-label={`Retirer une unite de ${item.name}`}
+                onClick={() => onQuantityChange(item.id, -1)}
+              >
+                -
+              </button>
+              <span>{item.quantity}</span>
+              <button
+                type="button"
+                aria-label={`Ajouter une unite de ${item.name}`}
+                onClick={() => onQuantityChange(item.id, 1)}
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="cart-remove"
+              onClick={() => onRemoveItem(item.id)}
+            >
+              Supprimer
+            </button>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function CartPanel({ open, items, total, onClose, onQuantityChange, onRemoveItem }) {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div className="cart-panel-root">
+      <button
+        type="button"
+        className="cart-panel-overlay"
+        onClick={onClose}
+        aria-label="Fermer le panneau panier"
+      />
+
+      <aside className="cart-panel" role="dialog" aria-modal="true" aria-label="Panier">
+        <header className="cart-panel-head">
+          <h2>Panier</h2>
+          <button type="button" onClick={onClose} aria-label="Fermer">
+            Fermer
+          </button>
+        </header>
+
+        <div className="cart-panel-body">
+          <CartItemsList
+            items={items}
+            onQuantityChange={onQuantityChange}
+            onRemoveItem={onRemoveItem}
+          />
+        </div>
+
+        <footer className="cart-panel-foot">
+          <p>Total</p>
+          <strong>{formatMarketplacePrice(total)}</strong>
+        </footer>
+      </aside>
+    </div>
+  );
+}
+
 function HomePage() {
   return (
     <section className="page-view home-view">
@@ -506,7 +771,7 @@ function HomePage() {
   );
 }
 
-function CollectionPage() {
+function CollectionPage({ onAddToCart }) {
   const [query, setQuery] = useState("");
   const [activeCollection, setActiveCollection] = useState("Toutes");
   const [activePriceFilter, setActivePriceFilter] = useState("all");
@@ -643,10 +908,27 @@ function CollectionPage() {
             key={product.id}
             delay={index * 50}
           >
-            <img src={product.image} alt={product.name} loading="lazy" />
+            <ProductImageSwiper
+              images={getMarketplaceImages(product)}
+              alt={product.name}
+            />
             <div className="collection-marketplace-card-body">
               <h2>{product.name}</h2>
               <p>{formatMarketplacePrice(product.price)}</p>
+              <button
+                type="button"
+                className="collection-add-button"
+                onClick={() =>
+                  onAddToCart({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: getMarketplaceImages(product)[0] ?? product.image,
+                  })
+                }
+              >
+                Ajouter
+              </button>
             </div>
           </Reveal>
         ))}
@@ -752,7 +1034,7 @@ function ContactPage() {
   );
 }
 
-function BoutiquePage() {
+function BoutiquePage({ onAddToCart }) {
   return (
     <section className="page-view">
       <header className="section-head">
@@ -764,15 +1046,30 @@ function BoutiquePage() {
           <Reveal
             as="article"
             className="product-card"
-            key={product.name}
+            key={product.id}
             delay={index * 80}
           >
-            <img src={product.image} alt={product.name} loading="lazy" />
-            <div>
+            <ProductImageSwiper
+              images={getBoutiqueImages(product)}
+              alt={product.name}
+            />
+            <div className="product-card-body">
               <h2>{product.name}</h2>
-              <p>{product.price}</p>
+              <p>{formatMarketplacePrice(product.priceValue)}</p>
             </div>
-            <button type="button">Ajouter</button>
+            <button
+              type="button"
+              onClick={() =>
+                onAddToCart({
+                  id: product.id,
+                  name: product.name,
+                  price: product.priceValue,
+                  image: getBoutiqueImages(product)[0] ?? product.image,
+                })
+              }
+            >
+              Ajouter
+            </button>
           </Reveal>
         ))}
       </div>
@@ -808,15 +1105,23 @@ function LoginPage() {
   );
 }
 
-function PanierPage() {
+function PanierPage({ cartItems, cartTotal, onQuantityChange, onRemoveItem }) {
   return (
     <section className="page-view form-view">
       <header className="section-head">
         <h1>Panier</h1>
       </header>
 
-      <Reveal className="cgv-panel">
-        <p>0 article</p>
+      <Reveal className="cgv-panel cart-page-panel">
+        <CartItemsList
+          items={cartItems}
+          onQuantityChange={onQuantityChange}
+          onRemoveItem={onRemoveItem}
+        />
+        <div className="cart-page-total">
+          <p>Total</p>
+          <strong>{formatMarketplacePrice(cartTotal)}</strong>
+        </div>
       </Reveal>
     </section>
   );
@@ -861,20 +1166,123 @@ function SiteFooter() {
 }
 
 export function App() {
+  const [cartItems, setCartItems] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const location = useLocation();
+
+  const cartCount = useMemo(
+    () => cartItems.reduce((total, item) => total + item.quantity, 0),
+    [cartItems]
+  );
+
+  const cartTotal = useMemo(
+    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
+    [cartItems]
+  );
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") {
+        setCartOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEsc);
+
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!cartOpen) {
+      document.body.style.removeProperty("overflow");
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.removeProperty("overflow");
+    };
+  }, [cartOpen]);
+
+  useEffect(() => {
+    setCartOpen(false);
+  }, [location.pathname]);
+
+  const handleAddToCart = (product) => {
+    setCartItems((current) => {
+      const existingItem = current.find((item) => item.id === product.id);
+
+      if (!existingItem) {
+        return [...current, { ...product, quantity: 1 }];
+      }
+
+      return current.map((item) =>
+        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    });
+
+    setCartOpen(true);
+  };
+
+  const handleQuantityChange = (productId, change) => {
+    setCartItems((current) =>
+      current.flatMap((item) => {
+        if (item.id !== productId) {
+          return [item];
+        }
+
+        const nextQuantity = item.quantity + change;
+
+        if (nextQuantity <= 0) {
+          return [];
+        }
+
+        return [{ ...item, quantity: nextQuantity }];
+      })
+    );
+  };
+
+  const handleRemoveItem = (productId) => {
+    setCartItems((current) => current.filter((item) => item.id !== productId));
+  };
+
   return (
     <main className="app-shell">
-      <SiteHeader />
+      <SiteHeader
+        cartCount={cartCount}
+        cartOpen={cartOpen}
+        onToggleCart={() => setCartOpen((current) => !current)}
+      />
 
       <div className="app-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/collection" element={<CollectionPage />} />
+          <Route
+            path="/collection"
+            element={<CollectionPage onAddToCart={handleAddToCart} />}
+          />
           <Route path="/collections" element={<Navigate to="/collection" replace />} />
           <Route path="/marketplace" element={<Navigate to="/collection" replace />} />
           <Route path="/sur-mesure" element={<SurMesurePage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/boutique" element={<BoutiquePage />} />
-          <Route path="/panier" element={<PanierPage />} />
+          <Route
+            path="/boutique"
+            element={<BoutiquePage onAddToCart={handleAddToCart} />}
+          />
+          <Route
+            path="/panier"
+            element={
+              <PanierPage
+                cartItems={cartItems}
+                cartTotal={cartTotal}
+                onQuantityChange={handleQuantityChange}
+                onRemoveItem={handleRemoveItem}
+              />
+            }
+          />
           <Route path="/login" element={<LoginPage />} />
           {legalPages.map((page) => (
             <Route
@@ -887,6 +1295,15 @@ export function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+
+      <CartPanel
+        open={cartOpen}
+        items={cartItems}
+        total={cartTotal}
+        onClose={() => setCartOpen(false)}
+        onQuantityChange={handleQuantityChange}
+        onRemoveItem={handleRemoveItem}
+      />
 
       <SiteFooter />
     </main>

@@ -6,6 +6,8 @@
 - Dynamic CORS from `.env` prevents hardcoded port regressions.
 - Keeping the frontend in Vite with a minimal file set preserves speed and readability.
 - Keeping a clean git flow (`main` as stable base, then `dev`, then feature branches) reduces integration risk.
+- Supabase Auth backend implementation is cleaner when wrapped in a dedicated service module instead of mixing SDK calls directly in routes.
+- Google OAuth PKCE is stable when `state` and `code_verifier` are validated in backend callback flow.
 - Rewriting the existing `App.jsx` and `styles.css` for the brand mock kept the codebase lean (no extra component sprawl).
 - Defining a reusable visual system (CSS variables + section patterns) speeds up future UI iterations.
 - Adding React Router directly in `main.jsx` + route mapping in `App.jsx` keeps navigation centralized and predictable.
@@ -66,6 +68,8 @@
 - Do not commit machine artifacts (`.DS_Store`, virtual env folders, `node_modules`, local `.env`).
 - Do not bypass `uv` for backend dependency management or execution.
 - Do not hardcode backend/frontend ports in app code.
+- Do not trigger frontend API requests without cancellation on unmount.
+- Do not rely on a shared in-memory OAuth verifier across requests; it creates race conditions during concurrent login attempts.
 - Do not ship placeholder UI copy unrelated to brand content.
 - Do not keep empty scratch files in git history.
 - Do not overload top navigation when only a few tabs are needed.

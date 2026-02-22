@@ -497,6 +497,7 @@ function CollectionPage() {
   const [activeCollection, setActiveCollection] = useState("Toutes");
   const [activePriceFilter, setActivePriceFilter] = useState("all");
   const [activeSort, setActiveSort] = useState("featured");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const collectionChips = useMemo(
     () => ["Toutes", ...new Set(collectionMarketplaceProducts.map((product) => product.line))],
@@ -544,52 +545,15 @@ function CollectionPage() {
         <p className="collection-marketplace-kicker">Les collections</p>
         <h1>Boutique marketplace</h1>
 
-        <div className="collection-marketplace-toolbar">
-          <label className="collection-toolbar-field" htmlFor="collection-search">
-            Recherche
-            <input
-              id="collection-search"
-              type="search"
-              name="collection-search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Nom ou collection"
-              autoComplete="off"
-            />
-          </label>
-
-          <label className="collection-toolbar-field" htmlFor="collection-price">
-            Prix
-            <select
-              id="collection-price"
-              name="collection-price"
-              value={activePriceFilter}
-              onChange={(event) => setActivePriceFilter(event.target.value)}
-            >
-              {marketplacePriceFilters.map((filter) => (
-                <option key={filter.value} value={filter.value}>
-                  {filter.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="collection-toolbar-field" htmlFor="collection-sort">
-            Tri
-            <select
-              id="collection-sort"
-              name="collection-sort"
-              value={activeSort}
-              onChange={(event) => setActiveSort(event.target.value)}
-            >
-              {marketplaceSortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <button
+          type="button"
+          className={filtersOpen ? "collection-filter-toggle collection-filter-toggle--open" : "collection-filter-toggle"}
+          aria-expanded={filtersOpen}
+          aria-controls="collection-filters-panel"
+          onClick={() => setFiltersOpen((current) => !current)}
+        >
+          Filtres
+        </button>
       </Reveal>
 
       <div className="collection-chip-scroller" role="tablist" aria-label="Collections">
@@ -610,6 +574,57 @@ function CollectionPage() {
           </button>
         ))}
       </div>
+
+      {filtersOpen ? (
+        <Reveal as="div" className="collection-filters-panel" id="collection-filters-panel">
+          <div className="collection-marketplace-toolbar">
+            <label className="collection-toolbar-field" htmlFor="collection-search">
+              Recherche
+              <input
+                id="collection-search"
+                type="search"
+                name="collection-search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Nom ou collection"
+                autoComplete="off"
+              />
+            </label>
+
+            <label className="collection-toolbar-field" htmlFor="collection-price">
+              Prix
+              <select
+                id="collection-price"
+                name="collection-price"
+                value={activePriceFilter}
+                onChange={(event) => setActivePriceFilter(event.target.value)}
+              >
+                {marketplacePriceFilters.map((filter) => (
+                  <option key={filter.value} value={filter.value}>
+                    {filter.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="collection-toolbar-field" htmlFor="collection-sort">
+              Tri
+              <select
+                id="collection-sort"
+                name="collection-sort"
+                value={activeSort}
+                onChange={(event) => setActiveSort(event.target.value)}
+              >
+                {marketplaceSortOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </Reveal>
+      ) : null}
 
       <p className="collection-result-count">{visibleProducts.length} pieces</p>
 

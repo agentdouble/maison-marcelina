@@ -62,6 +62,7 @@
 - For separator styling, keep it configurable because direction can switch between liquid and straight cut quickly.
 - For a luxe marketplace page, keep product cards minimal (image/name/price) and move search/filter/tri controls into the hero + chips area.
 - For front-only catalog interactions, deriving visible products with `useMemo` keeps filtering/sorting predictable without side effects.
+- On dense collection pages, replacing always-visible controls with a single `Filtres` toggle reduces visual noise while keeping interactions available.
 
 ## errors to avoid
 
@@ -102,3 +103,4 @@
 - Do not force a liquid separator when the requested direction is a straight visual cut.
 - Do not keep obsolete collection components/styles after a page rewrite, or old selectors can create hard-to-debug UI regressions.
 - Do not expect `npm run build` to work on a fresh clone before `npm install`.
+- Do not keep filter/search controls permanently exposed in the hero when the requested direction is a cleaner, premium layout.

@@ -1271,16 +1271,16 @@ function SurMesurePage() {
   const [requestSent, setRequestSent] = useState(false);
   const conceptSteps = [
     {
-      title: "Brief atelier",
-      detail: "Intentions, silhouette, matieres et delai.",
+      title: "Coupe personnalisee",
+      detail: "Longueur, encolure, manches, volume et tombes adaptes a votre silhouette.",
     },
     {
-      title: "Prototype",
-      detail: "Essayage, ajustements et validation des volumes.",
+      title: "Matieres et couleurs",
+      detail: "Selection de tissus, doublures, transparences, couleurs et associations de textures.",
     },
     {
-      title: "Confection finale",
-      detail: "Finitions, controles et remise de la piece.",
+      title: "Finitions et usage",
+      detail: "Broderies, details, confort et niveau de formalite selon l'occasion visee.",
     },
   ];
   const handleRequestSubmit = (event) => {
@@ -1302,7 +1302,7 @@ function SurMesurePage() {
       </header>
 
       <Reveal className="form-panel sur-mesure-panel">
-        <div className="sur-mesure-concept" aria-label="Processus sur mesure">
+        <div className="sur-mesure-concept" aria-label="Possibilites sur mesure">
           {conceptSteps.map((step) => (
             <article key={step.title} className="sur-mesure-step">
               <h2>{step.title}</h2>

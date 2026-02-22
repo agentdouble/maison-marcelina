@@ -764,6 +764,82 @@ textarea:focus-visible,
   max-width: 480px;
 }
 
+.login-view {
+  align-content: center;
+}
+
+.login1-shell {
+  width: 100%;
+  min-height: calc(100svh - 170px);
+}
+
+.login1-card {
+  border-color: rgba(78, 48, 36, 0.16);
+  background:
+    radial-gradient(circle at 10% 12%, rgba(142, 160, 138, 0.18), transparent 45%),
+    linear-gradient(170deg, rgba(251, 246, 237, 0.86), rgba(239, 228, 205, 0.58)),
+    rgba(251, 246, 237, 0.76);
+  box-shadow: 0 20px 42px rgba(40, 25, 18, 0.16);
+  backdrop-filter: blur(12px) saturate(130%);
+}
+
+.login1-card .login1-primary-btn {
+  min-height: 46px;
+  border-color: rgba(61, 37, 27, 0.2);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(78, 48, 36, 0.96), rgba(66, 37, 27, 0.9)),
+    rgba(78, 48, 36, 0.92);
+  color: var(--paper-soft);
+  box-shadow: 0 8px 18px rgba(44, 28, 20, 0.2);
+}
+
+.login1-card .login1-primary-btn:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(44, 28, 20, 0.24);
+}
+
+.login1-card .login1-google-btn {
+  min-height: 46px;
+  border-color: rgba(78, 48, 36, 0.18);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 251, 246, 0.9), rgba(244, 235, 218, 0.74)),
+    rgba(255, 251, 246, 0.8);
+  color: var(--liquid-chocolate);
+}
+
+.login1-card .login1-google-btn:hover {
+  border-color: rgba(78, 48, 36, 0.25);
+  background:
+    linear-gradient(180deg, rgba(255, 251, 246, 0.98), rgba(244, 235, 218, 0.82)),
+    rgba(255, 251, 246, 0.88);
+}
+
+.login1-card .login1-mode-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  color: hsl(var(--primary));
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.login1-card .login1-mode-btn:hover {
+  opacity: 0.82;
+  transform: translateY(-1px);
+}
+
 .field-row {
   display: grid;
   grid-template-columns: 1fr;
@@ -974,6 +1050,10 @@ textarea:focus {
   .form-panel {
     max-width: 880px;
     padding: 20px;
+  }
+
+  .login1-shell {
+    min-height: calc(100svh - 178px);
   }
 
   .cgv-panel {

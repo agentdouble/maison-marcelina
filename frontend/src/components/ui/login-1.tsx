@@ -131,6 +131,9 @@ const Login1 = ({
     }
   };
 
+  const submitLabel = isSignUp ? "Creer un compte" : buttonText;
+  const loadingLabel = isSignUp ? "Creation..." : "Patiente...";
+
   return (
     <section className="login1-shell">
       <div className="flex h-full items-center justify-center">
@@ -165,7 +168,7 @@ const Login1 = ({
               placeholder="Mot de passe"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              autoComplete="current-password"
+              autoComplete={isSignUp ? "new-password" : "current-password"}
               required
             />
             {isSignUp ? (
@@ -184,7 +187,7 @@ const Login1 = ({
               className="login1-primary-btn mt-1 w-full"
               disabled={isSubmitting}
             >
-              {isSubmitting ? (isSignUp ? "Creation..." : "Patiente...") : isSignUp ? "Creer un compte" : buttonText}
+              {isSubmitting ? loadingLabel : submitLabel}
             </Button>
             <Button
               type="button"

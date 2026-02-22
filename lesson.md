@@ -120,6 +120,7 @@
 - On `/sur-mesure`, a single compact paragraph explains possibilities faster than segmented step blocks.
 - On `/sur-mesure`, removing a redundant page title can keep focus on the compact value copy and request action.
 - On `/sur-mesure`, a frameless layout (without `form-panel`) avoids the `cadre dans cadre` effect and keeps the page cleaner.
+- On French-facing pages, accented UI copy improves readability and perceived quality.
 
 ## errors to avoid
 
@@ -203,3 +204,4 @@
 - Do not fragment short value copy into multiple cards/steps when one compact text block communicates better.
 - Do not stack a redundant `Sur mesure` page heading above already explicit intro copy when the page should stay concise.
 - Do not nest framed wrappers (`form-panel` + internal separated blocks) on `/sur-mesure`; keep one visual level.
+- Do not ship French interface text without accents when final copy is user-visible.

@@ -1285,38 +1285,38 @@ function SurMesurePage() {
     <section className="page-view form-view">
       <Reveal className="sur-mesure-panel">
         <p className="sur-mesure-intro">
-          Le sur mesure permet de definir une piece vraiment personnelle: coupe, longueur, encolure,
-          manches, matieres, couleurs et finitions. Nous adaptons chaque demande a votre silhouette,
-          a votre usage et au niveau de formalite recherche, qu'il s'agisse d'une tenue du quotidien,
-          d'une occasion speciale ou d'une piece ceremonie.
+          Le sur mesure permet de définir une pièce vraiment personnelle : coupe, longueur, encolure,
+          manches, matières, couleurs et finitions. Nous adaptons chaque demande à votre silhouette,
+          à votre usage et au niveau de formalité recherché, qu'il s'agisse d'une tenue du quotidien,
+          d'une occasion spéciale ou d'une pièce de cérémonie.
         </p>
 
         {isAuthenticated ? (
           <form className="sur-mesure-request-form" onSubmit={handleRequestSubmit} onInput={handleRequestEdit}>
             <div className="field-row">
               <label>
-                <span>Projet souhaite</span>
+                <span>Projet souhaité</span>
                 <select name="projectType" defaultValue="robe" required>
                   <option value="robe">Robe</option>
                   <option value="ensemble">Ensemble</option>
                   <option value="jupe">Jupe</option>
-                  <option value="ceremonie">Piece ceremonie</option>
+                  <option value="ceremonie">Pièce de cérémonie</option>
                   <option value="autre">Autre</option>
                 </select>
               </label>
 
               <label>
-                <span>Delai souhaite</span>
+                <span>Délai souhaité</span>
                 <input type="text" name="timeline" placeholder="Ex. Juin 2026" required />
               </label>
             </div>
 
             <label>
               <span>Demande</span>
-              <textarea name="requestMessage" placeholder="Coupe, matieres, contraintes..." required />
+              <textarea name="requestMessage" placeholder="Coupe, matières, contraintes..." required />
             </label>
 
-            {requestSent ? <p className="sur-mesure-feedback">Demande envoyee</p> : null}
+            {requestSent ? <p className="sur-mesure-feedback">Demande envoyée</p> : null}
 
             <button type="submit">Envoyer la demande</button>
           </form>

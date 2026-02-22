@@ -2,6 +2,7 @@
 
 ## successes
 
+- Compacting line-height and vertical gaps on editorial content improves density without sacrificing readability.
 - On editorial blocks, separating lead, body, signature, and closing claim styles gives a more coherent reading flow.
 - On split editorial layouts, keeping the narrative column frameless avoids the "card inside card" effect.
 - On story pages, a split layout (image left, narrative right) improves hierarchy while staying mobile-safe by collapsing to one column.
@@ -81,6 +82,7 @@
 
 ## errors to avoid
 
+- Do not over-space editorial paragraphs when a compact reading layout is requested.
 - Do not mix uppercase micro-typography with long narrative paragraphs on the same block; it breaks reading coherence.
 - Do not wrap a story text block in a card when it already sits beside a framed visual.
 - Do not keep story visuals and narrative in a single long column on desktop when the requested direction is image-left/text-right.

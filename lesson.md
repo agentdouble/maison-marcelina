@@ -42,6 +42,7 @@
 - A hero slider should use full viewport height when it is the primary first impression block.
 - Keeping home collection buttons frameless (text + line) preserves the premium direction better than boxed controls.
 - Keeping post-hero home sections frameless preserves continuity with the immersive hero.
+- A liquid morph treatment works best on the image wrapper (not a card container) to keep the section frameless.
 
 ## errors to avoid
 
@@ -65,3 +66,4 @@
 - Do not subtract header height from a hero meant to feel fully immersive; it breaks the full-screen impact.
 - Do not style home collection buttons as boxed pills/cards when the visual direction is frameless.
 - Do not wrap the post-hero home modules in card containers when the requested direction is edge-to-edge.
+- Do not apply liquid styling through added outer frames; apply it directly on the media shape.

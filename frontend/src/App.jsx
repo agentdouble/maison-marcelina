@@ -334,11 +334,13 @@ function HomePage() {
 
       <div className="home-sections">
         <Reveal as="article" className="signature-piece">
-          <img
-            src={signaturePiece.image}
-            alt={signaturePiece.name}
-            loading="lazy"
-          />
+          <div className="signature-visual">
+            <img
+              src={signaturePiece.image}
+              alt={signaturePiece.name}
+              loading="lazy"
+            />
+          </div>
           <div className="signature-content">
             <p className="signature-eyebrow">Piece signature</p>
             <h2>{signaturePiece.name}</h2>

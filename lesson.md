@@ -65,6 +65,7 @@
 - A shadcn-style login block can be integrated into an existing handcrafted theme by adding only missing primitives (`input`) and preserving existing design tokens.
 - Frontend auth submit handlers should always abort in-flight requests on unmount and on resubmit to avoid duplicate login race conditions.
 - Redirecting to backend Google start endpoint from the UI keeps OAuth initiation simple while preserving PKCE state handling server-side.
+- For premium themes, a centered `max-w-sm` auth card can stay close to shadcn defaults while matching brand visuals through token-based gradients instead of extra layout complexity.
 
 ## errors to avoid
 

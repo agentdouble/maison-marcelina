@@ -1,5 +1,4 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { LogIn } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 
 import { loginWithPassword, startGoogleOAuth, type AuthSessionPayload } from "@/lib/auth";
@@ -101,16 +100,8 @@ const Login1 = ({
 
   return (
     <section className="login1-shell">
-      <div className="login1-card">
-        <div className="login1-media" aria-hidden="true">
-          <img
-            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80"
-            alt=""
-            loading="lazy"
-          />
-        </div>
-
-        <div className="login1-panel">
+      <div className="flex h-full items-center justify-center">
+        <div className="login1-card border-muted bg-background flex w-full max-w-sm flex-col items-center gap-y-7 rounded-xl border px-6 py-10 shadow-md">
           <div className="flex flex-col items-center gap-y-3 text-center">
             <a href={logo.url} aria-label="Accueil">
               <img
@@ -145,8 +136,7 @@ const Login1 = ({
               required
             />
 
-            <Button type="submit" className="mt-1 w-full gap-2" disabled={isSubmitting}>
-              <LogIn className="size-4" />
+            <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
               {isSubmitting ? "Patiente..." : buttonText}
             </Button>
             <Button
@@ -158,6 +148,7 @@ const Login1 = ({
               onClick={() => startGoogleOAuth(apiBaseUrl)}
             >
               <FcGoogle className="size-5" />
+              <span className="sr-only">{googleText}</span>
             </Button>
           </form>
 

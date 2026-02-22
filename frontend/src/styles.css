@@ -1800,37 +1800,13 @@ textarea:focus-visible,
   gap: 18px;
 }
 
-.sur-mesure-concept {
-  display: grid;
-  gap: 12px;
-}
-
-.sur-mesure-step {
-  display: grid;
-  gap: 5px;
-  padding-bottom: 11px;
-  border-bottom: 1px solid rgba(78, 48, 36, 0.14);
-}
-
-.sur-mesure-step:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.sur-mesure-step h2 {
+.sur-mesure-intro {
   margin: 0;
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-size: clamp(27px, 5.7vw, 36px);
-  line-height: 0.9;
-  color: var(--liquid-chocolate);
-}
-
-.sur-mesure-step p {
-  margin: 0;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(78, 48, 36, 0.78);
+  max-width: 68ch;
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: rgba(58, 34, 24, 0.86);
 }
 
 .sur-mesure-access {
@@ -1847,12 +1823,6 @@ textarea:focus-visible,
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: rgba(78, 48, 36, 0.82);
-}
-
-.sur-mesure-access strong {
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  color: var(--liquid-chocolate);
 }
 
 .sur-mesure-request-form {
@@ -2339,23 +2309,6 @@ textarea:focus {
 
   .account-order-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .sur-mesure-concept {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-  }
-
-  .sur-mesure-step {
-    padding-bottom: 0;
-    border-bottom: 0;
-    padding-right: 12px;
-    border-right: 1px solid rgba(78, 48, 36, 0.14);
-  }
-
-  .sur-mesure-step:last-child {
-    padding-right: 0;
-    border-right: 0;
   }
 
   .login1-shell {

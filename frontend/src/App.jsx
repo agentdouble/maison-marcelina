@@ -1269,20 +1269,6 @@ function ProductDetailPage({ onAddToCart }) {
 function SurMesurePage() {
   const isAuthenticated = Boolean(readStoredAuthSession());
   const [requestSent, setRequestSent] = useState(false);
-  const conceptSteps = [
-    {
-      title: "Coupe personnalisee",
-      detail: "Longueur, encolure, manches, volume et tombes adaptes a votre silhouette.",
-    },
-    {
-      title: "Matieres et couleurs",
-      detail: "Selection de tissus, doublures, transparences, couleurs et associations de textures.",
-    },
-    {
-      title: "Finitions et usage",
-      detail: "Broderies, details, confort et niveau de formalite selon l'occasion visee.",
-    },
-  ];
   const handleRequestSubmit = (event) => {
     event.preventDefault();
     setRequestSent(true);
@@ -1302,14 +1288,10 @@ function SurMesurePage() {
       </header>
 
       <Reveal className="form-panel sur-mesure-panel">
-        <div className="sur-mesure-concept" aria-label="Possibilites sur mesure">
-          {conceptSteps.map((step) => (
-            <article key={step.title} className="sur-mesure-step">
-              <h2>{step.title}</h2>
-              <p>{step.detail}</p>
-            </article>
-          ))}
-        </div>
+        <p className="sur-mesure-intro">
+          Le sur mesure permet d'adapter la coupe, les matieres, les couleurs et les finitions selon
+          votre style, votre morphologie et l'occasion visee.
+        </p>
 
         {isAuthenticated ? (
           <form className="sur-mesure-request-form" onSubmit={handleRequestSubmit} onInput={handleRequestEdit}>

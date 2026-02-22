@@ -117,6 +117,7 @@
 - On `/sur-mesure`, replacing manual email capture with a login gate keeps request identity tied to the authenticated account.
 - On `/sur-mesure`, keep the request action available for authenticated users while gating anonymous users to `/login`.
 - On `/sur-mesure`, capability-focused copy (`ce que l'on peut personnaliser`) is clearer than internal process wording.
+- On `/sur-mesure`, a single compact paragraph explains possibilities faster than segmented step blocks.
 
 ## errors to avoid
 
@@ -197,3 +198,4 @@
 - Do not ask for contact email on `/sur-mesure` when auth is available; gate with login and use account identity instead.
 - Do not remove the sur-mesure request form after adding auth gating, or logged-in users lose the main action.
 - Do not describe only atelier phases on `/sur-mesure` when users need to quickly understand customization options.
+- Do not fragment short value copy into multiple cards/steps when one compact text block communicates better.

@@ -12,8 +12,31 @@
 - Reusing one durable logo asset in `frontend/public/` avoids brittle cross-folder imports.
 - Building all requested pages without backend coupling keeps the front refactor safe to ship.
 - Building the header mobile-first first (logo row + horizontal tab scroll) prevents desktop-first regressions.
-- Using CSS scroll snap for collection slides gives natural mobile swipe without heavy dependencies.
+- Showing collections directly below the hero reduces friction versus an extra swipe step.
 - Keeping legal/social footer global avoids duplicating links across pages.
+- Replacing ad-hoc footer links with a dedicated legal strip improves production readiness.
+- Prefer SVG logo assets in `public/` for cleaner scaling and lighter delivery.
+- Mobile hamburger + auto-close on route change keeps nav compact without losing access.
+- A liquid glass design can be shipped with pure CSS (no extra UI dependency) if variables stay centralized.
+- IntersectionObserver-based reveal animations keep scroll effects smooth without heavy animation libraries.
+- Full-width page sections avoid the boxed feeling in web-app mode.
+- Keep header actions ordered by priority so login stays at far right across breakpoints.
+- Creating an SVG wrapper from a PNG is a fast fallback when vector tracing tools are missing, and keeps delivery unblocked.
+- Using `magick -fuzz 5% -trim` before exporting a text visual gives a tight, reliable crop around lettering.
+- For reliable rendering in web apps, prefer self-contained SVG assets (embedded image data) over external `href` file references.
+- Keeping main nav labels centered while preserving action icons in a separate right-aligned group improves clarity without changing routing.
+- Replacing text-based utility actions (cart) with icon buttons works best when `aria-label` is explicit to preserve accessibility.
+- For premium nav styling, text links with subtle active underline read cleaner than bordered pill tabs.
+- On mobile, a framed dropdown container keeps minimalist text nav readable without reintroducing heavy tab styling.
+- Frameless utility icons (cart/login) can look cleaner than capsule buttons when the header is already visually rich.
+- For a premium home experience, an interactive list + featured visual can replace a static grid without adding new dependencies.
+- Home collection autoplay must pause on hover/focus and cleanup intervals on unmount to avoid race conditions and duplicate timers.
+- Isolating a complex WebGL/GSAP slider in `src/components/ui` keeps `App.jsx` focused on routing and page composition.
+- In a Vite React JS app, importing a `.tsx` component can work at build time, but true TypeScript safety still needs dedicated TS tooling/config.
+- For immersive hero sliders, removing card borders/radius and page padding creates a cleaner full-bleed effect.
+- Removing numeric counters from the hero slider can reduce visual clutter when title navigation is already visible.
+- Centering hero copy and bottom navigation creates stronger visual hierarchy on animation-first homepages.
+- Frameless bottom nav labels paired with centered progress lines improve readability without heavy UI chrome.
 
 ## errors to avoid
 
@@ -23,3 +46,12 @@
 - Do not ship placeholder UI copy unrelated to brand content.
 - Do not keep empty scratch files in git history.
 - Do not overload top navigation when only a few tabs are needed.
+- Do not keep decorative controls if swipe interaction already covers the use case.
+- Do not assume PNG-to-SVG vector tracing will work locally without `potrace`/equivalent tooling installed.
+- Do not use long navigation labels with forced `white-space: nowrap` on mobile dropdowns, or labels will overflow.
+- Do not mix centered nav layout with left-aligned tab text, or headers look visually misaligned.
+- Do not remove all visual separation on mobile overlays, or navigation can become hard to perceive.
+- Do not overdecorate utility icons with badges/background pills when a minimalist header is expected.
+- Do not run home autoplay timers without proper cleanup logic, or multiple intervals can desync active state and UI.
+- Do not assume shadcn/Tailwind/TypeScript conventions already exist in a plain React project; verify structure before integrating shared components.
+- Do not recreate slide arrays inside render for WebGL-heavy components, or effects can reinitialize unnecessarily.

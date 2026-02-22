@@ -12,14 +12,18 @@ Base web app for Maison Marcelina with a Python backend and a React frontend.
 
 The frontend is a multi-page brand mock focused on couture and boutique flows.
 
-- Compact sticky top band with large logo, 3 tabs, and a profile icon
-- Swipeable full-screen home hero for the 3 collections
+- Compact sticky top band with large logo, profile icon, and mobile hamburger nav
+- Centered navigation tabs (`Accueil`, `Les collections`, `L'atelier du sur mesure`)
+- Header action icons for cart and `Login` (login kept at top-right)
+- Liquid visual design (glass surfaces, fluid highlights, soft moving blobs)
+- Full-screen home shader slider (`lumina-interactive-list`) fed by the 3 collections
+- Scroll reveal animations and full-page web-app layout
 - Marketplace collections page
 - Boutique page with product cards
 - Sur-mesure contact form page
 - Command support contact page
 - Login page
-- Footer with conditions and social links
+- Legal bottom band (mentions, CGV, remboursement, cookies, accessibilite)
 
 ## Project layout
 
@@ -39,9 +43,12 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 │   ├── vite.config.js
 │   ├── index.html
 │   ├── public/
-│   │   └── logo-marcelina.png
+│   │   └── logo-marcelina.svg
 │   └── src/
 │       ├── App.jsx
+│       ├── components/
+│       │   └── ui/
+│       │       └── lumina-interactive-list.tsx
 │       ├── main.jsx
 │       └── styles.css
 ├── .env.example
@@ -93,8 +100,13 @@ Always run the app from the repository root:
 - `/sur-mesure` custom request form
 - `/contact` order issue form
 - `/boutique` boutique listing
+- `/panier` cart page
 - `/login` login form
+- `/mentions-legales` legal notice page
 - `/cgv` conditions page
+- `/politique-remboursement` refund policy page
+- `/politique-cookies` cookies policy page
+- `/accessibilite` accessibility page
 
 ## Environment variables
 

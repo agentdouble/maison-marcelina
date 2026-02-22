@@ -822,6 +822,7 @@ textarea:focus-visible,
   display: grid;
   grid-template-columns: 1fr;
   gap: 14px;
+  justify-items: center;
 }
 
 .product-card,
@@ -838,6 +839,7 @@ textarea:focus-visible,
 
 .product-card {
   overflow: hidden;
+  width: min(100%, 286px);
 }
 
 .media-swiper {
@@ -898,10 +900,12 @@ textarea:focus-visible,
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
+  justify-items: center;
 }
 
 .collection-marketplace-card {
   overflow: hidden;
+  width: min(100%, 286px);
   border-radius: 16px;
   border: 1px solid rgba(78, 48, 36, 0.14);
   background:
@@ -920,18 +924,18 @@ textarea:focus-visible,
 
 .collection-marketplace-card .media-swiper,
 .product-card .media-swiper {
-  aspect-ratio: 4 / 4.4;
+  aspect-ratio: 4 / 3.9;
 }
 
 .collection-marketplace-card-body {
-  padding: 10px 10px 12px;
+  padding: 9px 9px 10px;
   display: grid;
   gap: 3px;
 }
 
 .collection-marketplace-card h2 {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 0.9;
   font-family: "Cormorant Garamond", "Times New Roman", serif;
 }
@@ -963,7 +967,8 @@ textarea:focus-visible,
 
 @media (min-width: 560px) {
   .collection-marketplace-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 286px));
+    justify-content: center;
   }
 }
 
@@ -1058,14 +1063,14 @@ textarea:focus {
 }
 
 .product-card-body {
-  padding: 12px;
+  padding: 10px 10px 8px;
   display: grid;
   gap: 4px;
 }
 
 .product-card-body h2 {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 0.9;
   font-family: "Cormorant Garamond", "Times New Roman", serif;
 }
@@ -1078,7 +1083,7 @@ textarea:focus {
 }
 
 .product-card button {
-  margin: 0 12px 12px;
+  margin: 0 10px 10px;
   cursor: pointer;
 }
 
@@ -1370,7 +1375,8 @@ textarea:focus {
 
   .collection-marketplace-grid,
   .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 286px));
+    justify-content: center;
   }
 
   .field-row {
@@ -1433,11 +1439,13 @@ textarea:focus {
   }
 
   .collection-marketplace-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 252px));
+    justify-content: center;
   }
 
   .product-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 230px));
+    justify-content: center;
   }
 
   .slider-wrapper {

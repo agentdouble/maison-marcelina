@@ -125,6 +125,9 @@ const storyPillars = [
   "Une douceur qui n'efface jamais le caractere",
 ];
 
+const storyImage =
+  "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1400&q=80";
+
 const legalPages = [
   {
     path: "/mentions-legales",
@@ -486,31 +489,39 @@ function NotreHistoirePage() {
         <h1>Notre Histoire</h1>
       </header>
 
-      <Reveal className="cgv-panel story-panel">
-        <p className="story-lead">{storyParagraphs[0]}</p>
-        {storyParagraphs.slice(1).map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
+      <Reveal className="story-main">
+        <figure className="story-image">
+          <img
+            src={storyImage}
+            alt="Portrait inspiration Maison Marcelina"
+            loading="lazy"
+          />
+        </figure>
 
-        <div className="story-signature" aria-label="Signature Marceline">
-          {storySignature.map((line) => (
-            <p key={line}>{line}</p>
+        <article className="cgv-panel story-panel">
+          <p className="story-lead">{storyParagraphs[0]}</p>
+          {storyParagraphs.slice(1).map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
           ))}
-        </div>
 
-        <p className="story-claim">
-          Maison Marcelina n'est pas seulement une marque, c'est une elegance
-          cousue a la main.
-        </p>
-      </Reveal>
+          <div className="story-signature" aria-label="Signature Marceline">
+            {storySignature.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
 
-      <Reveal as="section" className="story-values" delay={90}>
-        <h2>Aujourd'hui, Maison Marcelina</h2>
-        <ul>
-          {storyPillars.map((pillar) => (
-            <li key={pillar}>{pillar}</li>
-          ))}
-        </ul>
+          <p className="story-claim">
+            Maison Marcelina n'est pas seulement une marque, c'est une elegance
+            cousue a la main.
+          </p>
+
+          <h2 className="story-subtitle">Aujourd'hui, Maison Marcelina</h2>
+          <ul className="story-pillar-list">
+            {storyPillars.map((pillar) => (
+              <li key={pillar}>{pillar}</li>
+            ))}
+          </ul>
+        </article>
       </Reveal>
     </section>
   );

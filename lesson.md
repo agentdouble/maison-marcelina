@@ -2,6 +2,7 @@
 
 ## successes
 
+- On story pages, a split layout (image left, narrative right) improves hierarchy while staying mobile-safe by collapsing to one column.
 - Building `Notre Histoire` directly from `ressources/maison-marcelina.md` keeps editorial tone aligned without inventing new copy.
 - A single `start.sh` entrypoint keeps backend and frontend startup aligned.
 - Dynamic CORS from `.env` prevents hardcoded port regressions.
@@ -78,6 +79,7 @@
 
 ## errors to avoid
 
+- Do not keep story visuals and narrative in a single long column on desktop when the requested direction is image-left/text-right.
 - Do not invent brand-story wording when `ressources/maison-marcelina.md` already defines the source narrative.
 - Do not commit machine artifacts (`.DS_Store`, virtual env folders, `node_modules`, local `.env`).
 - Do not bypass `uv` for backend dependency management or execution.

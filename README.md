@@ -19,11 +19,12 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Full-viewport home shader slider (`lumina-interactive-list`) fed by the 3 collections
 - In-hero collection buttons remain frameless and visible (`Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
 - Home continuation after slider with:
-  - `Piece signature` spotlight block
+  - `Piece signature` spotlight block (content aligned opposite image)
   - `Best-sellers` grid
   - trust band (`Livraison`, `Retours`, `Paiement`, `Support`)
 - Post-hero home blocks are intentionally frameless (no card container wrappers)
 - `Piece signature` image uses a liquid morph style (organic shape + soft highlights)
+- `Piece signature` CTA `Decouvrir` is frameless (no round/pill background)
 - Scroll reveal animations and full-page web-app layout
 - Marketplace collections page
 - Boutique page with product cards

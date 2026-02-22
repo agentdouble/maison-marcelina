@@ -43,6 +43,8 @@
 - Keeping home collection buttons frameless (text + line) preserves the premium direction better than boxed controls.
 - Keeping post-hero home sections frameless preserves continuity with the immersive hero.
 - A liquid morph treatment works best on the image wrapper (not a card container) to keep the section frameless.
+- In split layouts, centering signature text vertically opposite the visual improves balance and readability.
+- For premium direction, `Decouvrir` works better as a frameless text CTA than as a pill button.
 
 ## errors to avoid
 
@@ -67,3 +69,4 @@
 - Do not style home collection buttons as boxed pills/cards when the visual direction is frameless.
 - Do not wrap the post-hero home modules in card containers when the requested direction is edge-to-edge.
 - Do not apply liquid styling through added outer frames; apply it directly on the media shape.
+- Do not reuse generic pill button styles for signature CTAs when frameless controls are required.

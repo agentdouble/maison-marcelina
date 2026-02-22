@@ -346,7 +346,7 @@ function HomePage() {
             <h2>{signaturePiece.name}</h2>
             <p className="signature-meta">{signaturePiece.capsule}</p>
             <p className="signature-price">{signaturePiece.price}</p>
-            <Link className="home-cta" to="/boutique">
+            <Link className="home-cta signature-cta" to="/boutique">
               Decouvrir
             </Link>
           </div>

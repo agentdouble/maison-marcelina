@@ -364,6 +364,7 @@ textarea:focus-visible,
   display: grid;
   gap: 8px;
   align-content: start;
+  justify-items: start;
 }
 
 .signature-eyebrow {
@@ -392,6 +393,41 @@ textarea:focus-visible,
 .signature-price {
   font-size: 13px;
   color: var(--liquid-chocolate);
+}
+
+.home-cta.signature-cta {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--liquid-chocolate);
+  line-height: 1.1;
+  position: relative;
+}
+
+.home-cta.signature-cta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.home-cta.signature-cta:hover {
+  transform: none;
+  box-shadow: none;
+  filter: none;
+  opacity: 0.75;
+}
+
+.home-cta.signature-cta:hover::after {
+  transform: scaleX(0.7);
 }
 
 .best-sellers-block {
@@ -942,7 +978,7 @@ textarea:focus {
 
   .signature-piece {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    align-items: stretch;
+    align-items: center;
   }
 
   .signature-visual {
@@ -953,6 +989,8 @@ textarea:focus {
 
   .signature-content {
     padding: 18px;
+    align-content: center;
+    min-height: 420px;
   }
 
   .best-sellers-grid {
@@ -1047,6 +1085,7 @@ textarea:focus {
   .signature-content {
     padding: 22px;
     gap: 10px;
+    min-height: 460px;
   }
 
   .best-seller-content {

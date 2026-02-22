@@ -122,6 +122,14 @@
 - On `/compte`, a flatter layout (separators and hierarchy) reads more premium than stacked framed cards.
 - Mapping Supabase `401/403` auth rejections to a clear account `401` response prevents ambiguous profile-save failures.
 - Clearing stale `mm_auth_session` and redirecting to `/login` on account auth rejection keeps buyer UX recoverable.
+- On `/sur-mesure`, replacing manual email capture with a login gate keeps request identity tied to the authenticated account.
+- On `/sur-mesure`, keep the request action available for authenticated users while gating anonymous users to `/login`.
+- On `/sur-mesure`, capability-focused copy (`ce que l'on peut personnaliser`) is clearer than internal process wording.
+- On `/sur-mesure`, a single compact paragraph explains possibilities faster than segmented step blocks.
+- On `/sur-mesure`, removing a redundant page title can keep focus on the compact value copy and request action.
+- On `/sur-mesure`, a frameless layout (without `form-panel`) avoids the `cadre dans cadre` effect and keeps the page cleaner.
+- On French-facing pages, accented UI copy improves readability and perceived quality.
+- On `/sur-mesure`, centering the value paragraph and adding one editorial image improves clarity without reintroducing card containers.
 
 ## errors to avoid
 
@@ -206,3 +214,11 @@
 - Do not keep write-capable order endpoints on customer account APIs when the UI is meant to be read-only; it creates trust and data integrity issues.
 - Do not nest framed containers in `/compte` (`cadres dans cadres`); keep one visual level and rely on spacing/lines.
 - Do not keep stale local sessions after backend auth rejection on `/account/*`; force re-auth to avoid endless `403` loops.
+- Do not ask for contact email on `/sur-mesure` when auth is available; gate with login and use account identity instead.
+- Do not remove the sur-mesure request form after adding auth gating, or logged-in users lose the main action.
+- Do not describe only atelier phases on `/sur-mesure` when users need to quickly understand customization options.
+- Do not fragment short value copy into multiple cards/steps when one compact text block communicates better.
+- Do not stack a redundant `Sur mesure` page heading above already explicit intro copy when the page should stay concise.
+- Do not nest framed wrappers (`form-panel` + internal separated blocks) on `/sur-mesure`; keep one visual level.
+- Do not ship French interface text without accents when final copy is user-visible.
+- Do not add decorative image wrappers that create extra framing when the requested direction is frameless.

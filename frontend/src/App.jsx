@@ -1334,47 +1334,74 @@ function ProductDetailPage({ onAddToCart }) {
 }
 
 function SurMesurePage() {
+  const isAuthenticated = Boolean(readStoredAuthSession());
+  const [requestSent, setRequestSent] = useState(false);
+  const handleRequestSubmit = (event) => {
+    event.preventDefault();
+    setRequestSent(true);
+  };
+
+  const handleRequestEdit = () => {
+    if (!requestSent) {
+      return;
+    }
+    setRequestSent(false);
+  };
+
   return (
     <section className="page-view form-view">
-      <header className="section-head">
-        <h1>Sur mesure</h1>
-      </header>
+      <Reveal className="sur-mesure-panel">
+        <p className="sur-mesure-intro">
+          Le sur mesure permet de définir une pièce vraiment personnelle : coupe, longueur, encolure,
+          manches, matières, couleurs et finitions. Nous adaptons chaque demande à votre silhouette,
+          à votre usage et au niveau de formalité recherché, qu'il s'agisse d'une tenue du quotidien,
+          d'une occasion spéciale ou d'une pièce de cérémonie.
+        </p>
+        <img
+          className="sur-mesure-image"
+          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1800&q=80"
+          alt="Silhouette de mode en atelier sur mesure"
+          loading="lazy"
+          decoding="async"
+        />
 
-      <Reveal as="form" className="form-panel" onSubmit={(event) => event.preventDefault()}>
-        <div className="field-row">
-          <label>
-            <span>Projet souhaite</span>
-            <select name="projectType" defaultValue="robe" required>
-              <option value="robe">Robe</option>
-              <option value="ensemble">Ensemble</option>
-              <option value="jupe">Jupe</option>
-              <option value="autre">Autre</option>
-            </select>
-          </label>
-        </div>
+        {isAuthenticated ? (
+          <form className="sur-mesure-request-form" onSubmit={handleRequestSubmit} onInput={handleRequestEdit}>
+            <div className="field-row">
+              <label>
+                <span>Projet souhaité</span>
+                <select name="projectType" defaultValue="robe" required>
+                  <option value="robe">Robe</option>
+                  <option value="ensemble">Ensemble</option>
+                  <option value="jupe">Jupe</option>
+                  <option value="ceremonie">Pièce de cérémonie</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </label>
 
-        <div className="field-row">
-          <label>
-            <span>Nom</span>
-            <input type="text" name="name" placeholder="Nom" required />
-          </label>
+              <label>
+                <span>Délai souhaité</span>
+                <input type="text" name="timeline" placeholder="Ex. Juin 2026" required />
+              </label>
+            </div>
 
-          <label>
-            <span>Email</span>
-            <input type="email" name="email" placeholder="email@exemple.com" required />
-          </label>
-        </div>
+            <label>
+              <span>Demande</span>
+              <textarea name="requestMessage" placeholder="Coupe, matières, contraintes..." required />
+            </label>
 
-        <label>
-          <span>Ecriture libre</span>
-          <textarea
-            name="projectMessage"
-            placeholder="Silhouette, matiere, delai..."
-            required
-          />
-        </label>
+            {requestSent ? <p className="sur-mesure-feedback">Demande envoyée</p> : null}
 
-        <button type="submit">Envoyer</button>
+            <button type="submit">Envoyer la demande</button>
+          </form>
+        ) : (
+          <div className="sur-mesure-access">
+            <p>Connexion requise</p>
+            <Link className="sur-mesure-action" to="/login">
+              Se connecter
+            </Link>
+          </div>
+        )}
       </Reveal>
     </section>
   );

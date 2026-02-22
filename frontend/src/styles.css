@@ -349,6 +349,7 @@ textarea:focus-visible,
 
 .signature-piece {
   display: grid;
+  justify-items: center;
 }
 
 .signature-visual {
@@ -384,7 +385,8 @@ textarea:focus-visible,
   display: grid;
   gap: 8px;
   align-content: start;
-  justify-items: start;
+  justify-items: center;
+  text-align: center;
 }
 
 .signature-eyebrow {
@@ -923,6 +925,8 @@ textarea:focus {
     padding: 18px;
     align-content: center;
     min-height: 420px;
+    justify-items: start;
+    text-align: left;
   }
 
   .trust-band {

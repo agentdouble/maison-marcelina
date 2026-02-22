@@ -92,7 +92,8 @@ const Gallery4 = ({ title = "Best-sellers", description, items }: Gallery4Props)
       <Carousel
         setApi={setCarouselApi}
         opts={{
-          align: "start",
+          align: "center",
+          containScroll: "trimSnaps",
           breakpoints: {
             "(max-width: 768px)": {
               dragFree: true,
@@ -100,11 +101,11 @@ const Gallery4 = ({ title = "Best-sellers", description, items }: Gallery4Props)
           },
         }}
       >
-        <CarouselContent className="-ml-3">
+        <CarouselContent className="ml-0">
           {items.map((item) => (
             <CarouselItem
               key={item.id}
-              className="basis-[78%] pl-3 sm:basis-[46%] lg:basis-[31%]"
+              className="basis-[84%] pl-3 sm:basis-[50%] lg:basis-[33.333%] xl:basis-[24%]"
             >
               <Link
                 to={item.href}

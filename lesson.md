@@ -53,6 +53,7 @@
 - Grouping legal links under one footer block (`Informations legales`) reduces visual noise on mobile.
 - Aligning `Informations legales` as a third footer column (same pattern as `Navigation`/`Assistance`) improves scanability.
 - Reducing footer vertical paddings and gaps keeps legal/navigation content visible without excess empty space.
+- On mobile, centering signature visual + copy improves balance before switching to split left/right layout on larger screens.
 
 ## errors to avoid
 
@@ -84,3 +85,4 @@
 - Do not spread legal links across multiple footer zones when a single grouped legal block is requested.
 - Do not hide legal links behind a separate bottom interaction when the request is a visible column list.
 - Do not over-pad footer sections after adding multiple columns, or the page end feels disproportionately tall.
+- Do not keep desktop-left alignment rules on mobile for hero-adjacent split blocks; center first, then branch at tablet.

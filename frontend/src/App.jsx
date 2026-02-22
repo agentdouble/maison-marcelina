@@ -554,7 +554,7 @@ function LoginPage() {
           title: "Maison Marcelina",
         }}
         googleText="Continuer avec Google"
-        signupText="Mot de passe oublie ?"
+        signupText="Mot de passe oublié ?"
         signupUrl="/contact"
         onLoginSuccess={() => navigate("/", { replace: true })}
       />

@@ -37,7 +37,7 @@ const Login1 = ({
   },
   buttonText = "Se connecter",
   googleText = "Continuer avec Google",
-  signupText = "Mot de passe oublie ?",
+  signupText = "Mot de passe oublié ?",
   signupUrl = "/contact",
   apiBaseUrl,
   onLoginSuccess,

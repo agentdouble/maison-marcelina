@@ -62,6 +62,9 @@
 - For hero animated titles on mobile, split/animate by words (not characters) to prevent mid-word line breaks.
 - Header tuning works best by reducing logo size slightly while increasing nav/icon sizes for clearer hierarchy.
 - For separator styling, keep it configurable because direction can switch between liquid and straight cut quickly.
+- A shadcn-style login block can be integrated into an existing handcrafted theme by adding only missing primitives (`input`) and preserving existing design tokens.
+- Frontend auth submit handlers should always abort in-flight requests on unmount and on resubmit to avoid duplicate login race conditions.
+- Redirecting to backend Google start endpoint from the UI keeps OAuth initiation simple while preserving PKCE state handling server-side.
 
 ## errors to avoid
 
@@ -102,3 +105,5 @@
 - Do not animate hero titles per character on narrow screens when readable word wrapping is required.
 - Do not upscale logo and nav/icons in the same direction blindly; tune them inversely for balance.
 - Do not force a liquid separator when the requested direction is a straight visual cut.
+- Do not fire concurrent login submits without cancellation/locking, or UI state can desync from backend auth responses.
+- Do not add demo-only component files in production routes when they are not used; keep login integration focused on the real route component.

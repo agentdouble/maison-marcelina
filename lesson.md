@@ -2,6 +2,7 @@
 
 ## successes
 
+- For split story layouts, a straight full-height image panel (without blob radius/shadow) creates a cleaner edge against the text column.
 - Compacting line-height and vertical gaps on editorial content improves density without sacrificing readability.
 - On editorial blocks, separating lead, body, signature, and closing claim styles gives a more coherent reading flow.
 - On split editorial layouts, keeping the narrative column frameless avoids the "card inside card" effect.
@@ -82,6 +83,7 @@
 
 ## errors to avoid
 
+- Do not keep organic liquid clipping on the story image when the requested direction is a straight full-height panel.
 - Do not over-space editorial paragraphs when a compact reading layout is requested.
 - Do not mix uppercase micro-typography with long narrative paragraphs on the same block; it breaks reading coherence.
 - Do not wrap a story text block in a card when it already sits beside a framed visual.

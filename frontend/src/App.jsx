@@ -6,6 +6,8 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
+  useParams,
 } from "react-router-dom";
 
 import { Footer7 } from "./components/ui/footer-7.tsx";
@@ -248,18 +250,51 @@ const marketplaceProductMedia = {
   ],
 };
 
-const marketplacePriceFilters = [
-  { value: "all", label: "Tous les prix", min: 0, max: Infinity },
-  { value: "under-130", label: "Jusqu'a 130 EUR", min: 0, max: 130 },
-  { value: "130-180", label: "130 a 180 EUR", min: 130, max: 180 },
-  { value: "over-180", label: "180 EUR et +", min: 180, max: Infinity },
+const marketplaceProductSizes = ["34", "36", "38", "40", "42"];
+
+const defaultProductSizeGuide = [
+  "34: poitrine 80-84 cm",
+  "36: poitrine 84-88 cm",
+  "38: poitrine 88-92 cm",
+  "40: poitrine 92-96 cm",
+  "42: poitrine 96-100 cm",
 ];
 
-const marketplaceSortOptions = [
-  { value: "featured", label: "Selection" },
-  { value: "price-asc", label: "Prix croissant" },
-  { value: "price-desc", label: "Prix decroissant" },
-  { value: "name-asc", label: "Nom A-Z" },
+const marketplaceProductDetailByLine = {
+  "Marceline Heritage": {
+    description: "Coupe structuree, ligne nette, port quotidien atelier.",
+    compositionCare: [
+      "100% coton",
+      "Doublure viscose",
+      "Lavage main a froid",
+      "Sechage a plat",
+    ],
+  },
+  "Marceline Riviera": {
+    description: "Coupe fluide, mouvement leger, esprit ete couture.",
+    compositionCare: [
+      "72% viscose, 28% lin",
+      "Lavage doux a 30 degres",
+      "Repassage temperature basse",
+      "Pas de seche-linge",
+    ],
+  },
+  "Marceline Audacieuse": {
+    description: "Volume affirme, coupe modelee, silhouette forte.",
+    compositionCare: [
+      "68% coton, 30% polyester, 2% elasthanne",
+      "Lavage a l'envers a 30 degres",
+      "Repassage sur envers",
+      "Nettoyage a sec possible",
+    ],
+  },
+};
+
+const defaultShippingAndReturns = [
+  "Preparation sous 24/48h",
+  "Livraison 2 a 4 jours ouvres",
+  "Echange sous 14 jours",
+  "Retour via page Contact",
 ];
 
 const signaturePiece = {
@@ -274,7 +309,7 @@ const bestSellerGalleryItems = products.slice(0, 4).map((product) => ({
   id: product.name.toLowerCase().replace(/\s+/g, "-"),
   title: product.name,
   description: formatMarketplacePrice(product.priceValue),
-  href: "/boutique",
+  href: "/collection",
   image: boutiqueProductMedia[product.id]?.[0] ?? product.image,
 }));
 
@@ -348,9 +383,8 @@ const footerSections = [
     title: "Navigation",
     links: [
       { name: "Accueil", href: "/" },
-      { name: "Les collections", href: "/collection" },
+      { name: "Boutique", href: "/collection" },
       { name: "Sur mesure", href: "/sur-mesure" },
-      { name: "Boutique", href: "/boutique" },
     ],
   },
   {
@@ -415,15 +449,36 @@ function HamburgerIcon({ open }) {
   );
 }
 
-function FilterIcon() {
+function HeartOutlineIcon() {
   return (
     <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
       <path
-        d="M4 7h16M7.5 12h9M10.5 17h3"
+        d="M12.1 19.2 5.8 13a4.2 4.2 0 0 1 6-6l.3.3.3-.3a4.2 4.2 0 0 1 6 6l-6.3 6.2Z"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ open = false }) {
+  return (
+    <svg
+      className={open ? "product-detail-chevron product-detail-chevron--open" : "product-detail-chevron"}
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+    >
+      <path
+        d="m9 5 6 7-6 7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -540,8 +595,36 @@ function formatMarketplacePrice(price) {
   return `${price} EUR`;
 }
 
-function getBoutiqueImages(product) {
-  return boutiqueProductMedia[product.id] ?? [product.image];
+function getCartItemId(item) {
+  return item.cartItemId ?? item.id;
+}
+
+function getProductDetailSections(product) {
+  const detailContent =
+    marketplaceProductDetailByLine[product.line] ?? marketplaceProductDetailByLine["Marceline Heritage"];
+
+  return [
+    {
+      id: "description",
+      title: "Description",
+      lines: [detailContent.description],
+    },
+    {
+      id: "size-guide",
+      title: "Guide des tailles",
+      lines: defaultProductSizeGuide,
+    },
+    {
+      id: "composition-care",
+      title: "Composition et entretien",
+      lines: detailContent.compositionCare,
+    },
+    {
+      id: "shipping-returns",
+      title: "Livraison, echanges et retours",
+      lines: defaultShippingAndReturns,
+    },
+  ];
 }
 
 function getMarketplaceImages(product) {
@@ -643,44 +726,49 @@ function CartItemsList({ items, onQuantityChange, onRemoveItem }) {
 
   return (
     <div className="cart-items-list">
-      {items.map((item) => (
-        <article className="cart-item-row" key={item.id}>
-          <img src={item.image} alt={item.name} loading="lazy" />
+      {items.map((item) => {
+        const cartItemId = getCartItemId(item);
 
-          <div className="cart-item-meta">
-            <h2>{item.name}</h2>
-            <p>{formatMarketplacePrice(item.price)}</p>
-          </div>
+        return (
+          <article className="cart-item-row" key={cartItemId}>
+            <img src={item.image} alt={item.name} loading="lazy" />
 
-          <div className="cart-item-actions">
-            <div className="cart-qty">
-              <button
-                type="button"
-                aria-label={`Retirer une unite de ${item.name}`}
-                onClick={() => onQuantityChange(item.id, -1)}
-              >
-                -
-              </button>
-              <span>{item.quantity}</span>
-              <button
-                type="button"
-                aria-label={`Ajouter une unite de ${item.name}`}
-                onClick={() => onQuantityChange(item.id, 1)}
-              >
-                +
-              </button>
+            <div className="cart-item-meta">
+              <h2>{item.name}</h2>
+              {item.size ? <p className="cart-item-size">Taille {item.size}</p> : null}
+              <p>{formatMarketplacePrice(item.price)}</p>
             </div>
 
-            <button
-              type="button"
-              className="cart-remove"
-              onClick={() => onRemoveItem(item.id)}
-            >
-              Supprimer
-            </button>
-          </div>
-        </article>
-      ))}
+            <div className="cart-item-actions">
+              <div className="cart-qty">
+                <button
+                  type="button"
+                  aria-label={`Retirer une unite de ${item.name}`}
+                  onClick={() => onQuantityChange(cartItemId, -1)}
+                >
+                  -
+                </button>
+                <span>{item.quantity}</span>
+                <button
+                  type="button"
+                  aria-label={`Ajouter une unite de ${item.name}`}
+                  onClick={() => onQuantityChange(cartItemId, 1)}
+                >
+                  +
+                </button>
+              </div>
+
+              <button
+                type="button"
+                className="cart-remove"
+                onClick={() => onRemoveItem(cartItemId)}
+              >
+                Supprimer
+              </button>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -743,7 +831,7 @@ function HomePage() {
             <h2>{signaturePiece.name}</h2>
             <p className="signature-meta">{signaturePiece.capsule}</p>
             <p className="signature-price">{signaturePiece.price}</p>
-            <Link className="home-cta signature-cta" to="/boutique">
+            <Link className="home-cta signature-cta" to="/collection">
               Decouvrir
             </Link>
           </div>
@@ -771,167 +859,241 @@ function HomePage() {
   );
 }
 
-function CollectionPage({ onAddToCart }) {
-  const [query, setQuery] = useState("");
+function CollectionPage() {
   const [activeCollection, setActiveCollection] = useState("Toutes");
-  const [activePriceFilter, setActivePriceFilter] = useState("all");
-  const [activeSort, setActiveSort] = useState("featured");
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const navigate = useNavigate();
+  const pointerStartRef = useRef({ x: 0, y: 0 });
 
-  const collectionChips = useMemo(
+  const collectionFilters = useMemo(
     () => ["Toutes", ...new Set(collectionMarketplaceProducts.map((product) => product.line))],
     []
   );
 
   const visibleProducts = useMemo(() => {
-    const selectedPrice =
-      marketplacePriceFilters.find((filter) => filter.value === activePriceFilter) ??
-      marketplacePriceFilters[0];
-    const normalizedQuery = query.trim().toLowerCase();
-
-    const filtered = collectionMarketplaceProducts.filter((product) => {
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        product.name.toLowerCase().includes(normalizedQuery) ||
-        product.line.toLowerCase().includes(normalizedQuery);
-      const matchesCollection =
-        activeCollection === "Toutes" || product.line === activeCollection;
-      const matchesPrice =
-        product.price >= selectedPrice.min &&
-        (selectedPrice.max === Infinity || product.price <= selectedPrice.max);
-
-      return matchesQuery && matchesCollection && matchesPrice;
-    });
-
-    if (activeSort === "price-asc") {
-      return [...filtered].sort((first, second) => first.price - second.price);
+    if (activeCollection === "Toutes") {
+      return collectionMarketplaceProducts;
     }
 
-    if (activeSort === "price-desc") {
-      return [...filtered].sort((first, second) => second.price - first.price);
+    return collectionMarketplaceProducts.filter(
+      (product) => product.line === activeCollection
+    );
+  }, [activeCollection]);
+
+  const handleCardPointerDown = (event) => {
+    pointerStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+  };
+
+  const handleCardPointerUp = (event, productId) => {
+    if (event.target instanceof Element && event.target.closest("button, a")) {
+      return;
     }
 
-    if (activeSort === "name-asc") {
-      return [...filtered].sort((first, second) => first.name.localeCompare(second.name));
+    const deltaX = Math.abs(event.clientX - pointerStartRef.current.x);
+    const deltaY = Math.abs(event.clientY - pointerStartRef.current.y);
+
+    if (deltaX + deltaY > 12) {
+      return;
     }
 
-    return filtered;
-  }, [activeCollection, activePriceFilter, activeSort, query]);
+    navigate(`/collection/${productId}`);
+  };
+
+  const handleCardKeyDown = (event, productId) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    navigate(`/collection/${productId}`);
+  };
 
   return (
     <section className="page-view collection-marketplace-view">
-      <Reveal as="header" className="collection-marketplace-hero">
-        <p className="collection-marketplace-kicker">Les collections</p>
-        <h1>Boutique marketplace</h1>
-
-        <button
-          type="button"
-          className={filtersOpen ? "collection-filter-toggle collection-filter-toggle--open" : "collection-filter-toggle"}
-          aria-expanded={filtersOpen}
-          aria-controls="collection-filters-panel"
-          onClick={() => setFiltersOpen((current) => !current)}
-          aria-label={filtersOpen ? "Fermer les filtres" : "Ouvrir les filtres"}
-        >
-          <FilterIcon />
-        </button>
-      </Reveal>
-
-      <div className="collection-chip-scroller" role="tablist" aria-label="Collections">
-        {collectionChips.map((collectionName) => (
-          <button
-            key={collectionName}
-            type="button"
-            role="tab"
-            aria-selected={activeCollection === collectionName}
-            className={
-              activeCollection === collectionName
-                ? "collection-chip collection-chip--active"
-                : "collection-chip"
-            }
-            onClick={() => setActiveCollection(collectionName)}
-          >
-            {collectionName}
-          </button>
-        ))}
-      </div>
-
-      {filtersOpen ? (
-        <div className="collection-marketplace-toolbar" id="collection-filters-panel">
-          <input
-            id="collection-search"
-            type="search"
-            name="collection-search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Recherche"
-            autoComplete="off"
-            aria-label="Recherche"
-          />
-
-          <select
-            id="collection-price"
-            name="collection-price"
-            value={activePriceFilter}
-            onChange={(event) => setActivePriceFilter(event.target.value)}
-            aria-label="Prix"
-          >
-            {marketplacePriceFilters.map((filter) => (
-              <option key={filter.value} value={filter.value}>
-                {filter.label}
-              </option>
-            ))}
-          </select>
-
-          <select
-            id="collection-sort"
-            name="collection-sort"
-            value={activeSort}
-            onChange={(event) => setActiveSort(event.target.value)}
-            aria-label="Tri"
-          >
-            {marketplaceSortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      ) : null}
-
-      <p className="collection-result-count">{visibleProducts.length} pieces</p>
-
-      <div className="collection-marketplace-grid">
-        {visibleProducts.map((product, index) => (
-          <Reveal
-            as="article"
-            className="collection-marketplace-card"
-            key={product.id}
-            delay={index * 50}
-          >
-            <ProductImageSwiper
-              images={getMarketplaceImages(product)}
-              alt={product.name}
-            />
-            <div className="collection-marketplace-card-body">
-              <h2>{product.name}</h2>
-              <p>{formatMarketplacePrice(product.price)}</p>
-              <button
-                type="button"
-                className="collection-add-button"
-                onClick={() =>
-                  onAddToCart({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: getMarketplaceImages(product)[0] ?? product.image,
-                  })
-                }
-              >
-                Ajouter
-              </button>
+      <div className="collection-marketplace-layout">
+        <aside className="collection-marketplace-sidebar" aria-label="Filtres collections">
+          <section className="collection-sidebar-block" aria-label="Collections">
+            <div className="collection-sidebar-list">
+              {collectionFilters.map((collectionName) => (
+                <button
+                  type="button"
+                  key={collectionName}
+                  onClick={() => setActiveCollection(collectionName)}
+                  className={
+                    activeCollection === collectionName
+                      ? "collection-sidebar-button collection-sidebar-button--active"
+                      : "collection-sidebar-button"
+                  }
+                >
+                  {collectionName}
+                </button>
+              ))}
             </div>
-          </Reveal>
-        ))}
+          </section>
+
+          <p className="collection-result-count">{visibleProducts.length} pieces</p>
+        </aside>
+
+        <div className="collection-marketplace-grid">
+          {visibleProducts.map((product, index) => (
+            <article
+              className="collection-marketplace-card"
+              key={product.id}
+              role="link"
+              tabIndex={0}
+              onPointerDown={handleCardPointerDown}
+              onPointerUp={(event) => handleCardPointerUp(event, product.id)}
+              onKeyDown={(event) => handleCardKeyDown(event, product.id)}
+            >
+              <div className="collection-marketplace-media">
+                <span className="collection-card-eyebrow" aria-hidden="true">
+                  Essentiels
+                </span>
+                <ProductImageSwiper
+                  images={getMarketplaceImages(product)}
+                  alt={product.name}
+                />
+                <span className="collection-card-favorite" aria-hidden="true">
+                  <HeartOutlineIcon />
+                </span>
+              </div>
+              <div className="collection-marketplace-card-body">
+                <div className="collection-card-meta">
+                  <h2>{product.name}</h2>
+                  <p className="collection-marketplace-price">
+                    {formatMarketplacePrice(product.price)}
+                  </p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProductDetailPage({ onAddToCart }) {
+  const { productId } = useParams();
+  const [selectedSize, setSelectedSize] = useState("");
+  const [openSectionId, setOpenSectionId] = useState(null);
+
+  const product = useMemo(
+    () =>
+      collectionMarketplaceProducts.find((item) => item.id === productId) ?? null,
+    [productId]
+  );
+
+  useEffect(() => {
+    setSelectedSize("");
+    setOpenSectionId(null);
+  }, [productId]);
+
+  if (!product) {
+    return <Navigate to="/collection" replace />;
+  }
+
+  const detailSections = getProductDetailSections(product);
+  const canAddToCart = selectedSize !== "";
+
+  return (
+    <section className="page-view product-detail-view">
+      <div className="product-detail-layout">
+        <div className="product-detail-media">
+          <ProductImageSwiper
+            images={getMarketplaceImages(product)}
+            alt={product.name}
+          />
+        </div>
+
+        <Reveal className="product-detail-content">
+          <p className="product-detail-line">{product.line}</p>
+          <h1>{product.name}</h1>
+          <p className="product-detail-price">{formatMarketplacePrice(product.price)}</p>
+          <label className="product-detail-size-label" htmlFor="product-size">
+            Taille
+          </label>
+          <select
+            id="product-size"
+            className="product-detail-size-select"
+            value={selectedSize}
+            onChange={(event) => setSelectedSize(event.target.value)}
+            required
+          >
+            <option value="">Choisir une taille</option>
+            {marketplaceProductSizes.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="product-detail-add-button"
+            disabled={!canAddToCart}
+            onClick={() => {
+              if (!canAddToCart) {
+                return;
+              }
+
+              onAddToCart({
+                id: product.id,
+                cartItemId: `${product.id}-${selectedSize}`,
+                name: product.name,
+                size: selectedSize,
+                price: product.price,
+                image: getMarketplaceImages(product)[0] ?? product.image,
+              });
+            }}
+          >
+            Ajouter au panier
+          </button>
+
+          <div className="product-detail-accordion" aria-label="Informations produit">
+            {detailSections.map((section) => {
+              const isOpen = openSectionId === section.id;
+
+              return (
+                <section
+                  key={section.id}
+                  className={isOpen ? "product-detail-accordion-item is-open" : "product-detail-accordion-item"}
+                >
+                  <button
+                    type="button"
+                    className="product-detail-accordion-trigger"
+                    onClick={() =>
+                      setOpenSectionId((current) =>
+                        current === section.id ? null : section.id
+                      )
+                    }
+                    aria-expanded={isOpen}
+                    aria-controls={`product-detail-panel-${section.id}`}
+                  >
+                    <span>{section.title}</span>
+                    <ChevronRightIcon open={isOpen} />
+                  </button>
+
+                  {isOpen ? (
+                    <div
+                      id={`product-detail-panel-${section.id}`}
+                      className="product-detail-accordion-panel"
+                    >
+                      {section.lines.map((line) => (
+                        <p key={`${section.id}-${line}`}>{line}</p>
+                      ))}
+                    </div>
+                  ) : null}
+                </section>
+              );
+            })}
+          </div>
+
+          <Link className="product-detail-back" to="/collection">
+            Retour boutique
+          </Link>
+        </Reveal>
       </div>
     </section>
   );
@@ -1030,49 +1192,6 @@ function ContactPage() {
 
         <button type="submit">Envoyer</button>
       </Reveal>
-    </section>
-  );
-}
-
-function BoutiquePage({ onAddToCart }) {
-  return (
-    <section className="page-view">
-      <header className="section-head">
-        <h1>Boutique</h1>
-      </header>
-
-      <div className="product-grid">
-        {products.map((product, index) => (
-          <Reveal
-            as="article"
-            className="product-card"
-            key={product.id}
-            delay={index * 80}
-          >
-            <ProductImageSwiper
-              images={getBoutiqueImages(product)}
-              alt={product.name}
-            />
-            <div className="product-card-body">
-              <h2>{product.name}</h2>
-              <p>{formatMarketplacePrice(product.priceValue)}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() =>
-                onAddToCart({
-                  id: product.id,
-                  name: product.name,
-                  price: product.priceValue,
-                  image: getBoutiqueImages(product)[0] ?? product.image,
-                })
-              }
-            >
-              Ajouter
-            </button>
-          </Reveal>
-        ))}
-      </div>
     </section>
   );
 }
@@ -1213,24 +1332,29 @@ export function App() {
 
   const handleAddToCart = (product) => {
     setCartItems((current) => {
-      const existingItem = current.find((item) => item.id === product.id);
+      const incomingCartItemId = getCartItemId(product);
+      const existingItem = current.find(
+        (item) => getCartItemId(item) === incomingCartItemId
+      );
 
       if (!existingItem) {
         return [...current, { ...product, quantity: 1 }];
       }
 
       return current.map((item) =>
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        getCartItemId(item) === incomingCartItemId
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
       );
     });
 
     setCartOpen(true);
   };
 
-  const handleQuantityChange = (productId, change) => {
+  const handleQuantityChange = (cartItemId, change) => {
     setCartItems((current) =>
       current.flatMap((item) => {
-        if (item.id !== productId) {
+        if (getCartItemId(item) !== cartItemId) {
           return [item];
         }
 
@@ -1245,8 +1369,10 @@ export function App() {
     );
   };
 
-  const handleRemoveItem = (productId) => {
-    setCartItems((current) => current.filter((item) => item.id !== productId));
+  const handleRemoveItem = (cartItemId) => {
+    setCartItems((current) =>
+      current.filter((item) => getCartItemId(item) !== cartItemId)
+    );
   };
 
   return (
@@ -1262,16 +1388,17 @@ export function App() {
           <Route path="/" element={<HomePage />} />
           <Route
             path="/collection"
-            element={<CollectionPage onAddToCart={handleAddToCart} />}
+            element={<CollectionPage />}
+          />
+          <Route
+            path="/collection/:productId"
+            element={<ProductDetailPage onAddToCart={handleAddToCart} />}
           />
           <Route path="/collections" element={<Navigate to="/collection" replace />} />
           <Route path="/marketplace" element={<Navigate to="/collection" replace />} />
           <Route path="/sur-mesure" element={<SurMesurePage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route
-            path="/boutique"
-            element={<BoutiquePage onAddToCart={handleAddToCart} />}
-          />
+          <Route path="/boutique" element={<Navigate to="/collection" replace />} />
           <Route
             path="/panier"
             element={

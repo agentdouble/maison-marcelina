@@ -67,6 +67,35 @@
 - For hero animated titles on mobile, split/animate by words (not characters) to prevent mid-word line breaks.
 - Header tuning works best by reducing logo size slightly while increasing nav/icon sizes for clearer hierarchy.
 - For separator styling, keep it configurable because direction can switch between liquid and straight cut quickly.
+- For a luxe marketplace page, keep product cards minimal (image/name/price) and move search/filter/tri controls into the hero + chips area.
+- For front-only catalog interactions, deriving visible products with `useMemo` keeps filtering/sorting predictable without side effects.
+- On dense collection pages, a persistent side filter rail can replace stacked top controls and keep scanability high.
+- When `/boutique` and `/collection` are unified, keep the lateral filter UX on `/collection` to preserve behavior expectations.
+- A reusable swipe media component per card keeps product galleries consistent inside the collections marketplace.
+- For front-only cart flows, functional `setState` updates (`current => ...`) keep quantity/add/remove operations race-safe.
+- Keeping collection hero frameless avoids the boxed look and aligns with the premium direction.
+- Consolidating `/boutique` into a redirect to `/collection` simplifies navigation without breaking existing inbound links.
+- When `/collection` is the canonical route, using `Boutique` as the visible label everywhere avoids navigation confusion.
+- Removing a redundant sidebar heading keeps hierarchy cleaner when the page title already gives context.
+- Removing a redundant page title can improve focus when the side filter rail already establishes context.
+- For the boutique sidebar, keeping only the `Collections` filter simplifies navigation and reduces unnecessary choices.
+- A boutique grid should use fluid columns (`auto-fit`/`minmax`) so product cards occupy the full available width.
+- Keeping boutique card width fixed on filtered and unfiltered views avoids visual jumps during navigation.
+- Card-to-detail navigation is safest when tap/click handling ignores buttons and drag gestures.
+- In product cards, keeping price and `Ajouter` on a single action row improves scan speed and click clarity.
+- For phone-first boutique UI, a flat 2-column product board reads better than elevated cards.
+- Mobile product visuals feel closer to fashion catalog patterns with simple overlay cues (label + heart).
+- For desktop webapp catalogs, moving from sidebar rails to a full-width product wall improves parity with luxury commerce patterns.
+- On wide screens, flat product tiles with minimal metadata strips often feel more premium than shadowed cards.
+- Keeping product names in the site's editorial font preserves brand consistency across catalog layouts.
+- Removing rounded corners from best-sellers visual cards helps match a sharper catalogue direction.
+- On boutique cards, showing only name + price in one horizontal row keeps scanning faster than mixing direct cart actions.
+- In catalog mode, preserve the global site background to avoid a disconnected white panel effect.
+- In webapp catalog mode, a fixed 5-column desktop grid gives a cleaner premium rhythm than auto-varying row density.
+- In dense product grids, disabling delayed reveal animations avoids "empty rows" perception and improves immediate readability.
+- Header navigation labels can be updated independently from route paths to keep UX wording flexible.
+- On product pages, size selection must be part of the add-to-cart payload so basket lines stay consistent per variant.
+- Product detail information works best as clean collapsible rows (description/size guide/composition/shipping-returns) instead of long static paragraphs.
 - A shadcn-style login block can be integrated into an existing handcrafted theme by adding only missing primitives (`input`) and preserving existing design tokens.
 - Frontend auth submit handlers should always abort in-flight requests on unmount and on resubmit to avoid duplicate login race conditions.
 - Redirecting to backend Google start endpoint from the UI keeps OAuth initiation simple while preserving PKCE state handling server-side.
@@ -125,6 +154,27 @@
 - Do not animate hero titles per character on narrow screens when readable word wrapping is required.
 - Do not upscale logo and nav/icons in the same direction blindly; tune them inversely for balance.
 - Do not force a liquid separator when the requested direction is a straight visual cut.
+- Do not keep obsolete collection components/styles after a page rewrite, or old selectors can create hard-to-debug UI regressions.
+- Do not expect `npm run build` to work on a fresh clone before `npm install`.
+- Do not keep filter/search controls permanently exposed in the hero when the requested direction is a cleaner, premium layout.
+- Do not stack framed filter containers under an already framed hero; it creates a heavy "cadre dans cadre" effect.
+- Do not style card internals with broad selectors like `.product-card div` when adding swipe wrappers; target explicit classes to avoid layout regressions.
+- Do not assume every product has multiple photos; swipe UI must gracefully fallback to a single static image.
+- Do not keep route-specific UI/styles after replacing a page with a redirect, or dead code will accumulate quickly.
+- Do not remove active filter affordances when merging two routes into one, or users lose the expected navigation model.
+- Do not mix `Les collections` and `Boutique` labels for the same destination, or UX becomes ambiguous.
+- Do not lock boutique grids to fixed 2/3 desktop columns, or large right-side empty space will appear on wide screens.
+- Do not bind raw card click navigation without guarding for swipe movement and nested button clicks, or users get accidental redirects.
+- Do not split price and add-to-cart into stacked micro-lines on dense cards; it slows comparison and action.
+- Do not reuse desktop luxury card treatments unchanged on mobile catalog views; they reduce scanability.
+- Do not keep fixed-width desktop product cards when the target direction is full-bleed webapp catalogs; it creates dead zones and weak rhythm.
+- Do not switch product name typography to utilitarian sans styles in catalog mode; it breaks visual continuity with the brand.
+- Do not reintroduce decorative color swatches on product media when the direction is minimal and content-led.
+- Do not overload boutique listing cards with secondary actions when the primary action is opening the product detail page.
+- Do not layer opaque local backgrounds over the boutique grid when the direction requires continuity with the site backdrop.
+- Do not leave desktop catalog column count ambiguous when a strict merchandising layout (e.g. 5-up) is requested.
+- Do not apply staggered reveal wrappers on every catalog card when users expect all rows visible on initial render.
+- Do not merge cart lines only by product id once sizes are selectable, or different variants will overwrite each other.
 - Do not keep a separate login icon visible on phone when auth is already in the hamburger menu; it clutters the header.
 - Do not use an asymmetric filled `X` glyph for hamburger close icons; it can look off-center inside circular buttons.
 - Do not rely only on route-change to close a mobile menu; outside-click dismissal is expected interaction.

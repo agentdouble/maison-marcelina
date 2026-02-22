@@ -30,9 +30,32 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - `Piece signature` image uses a liquid morph style (organic shape + soft highlights)
 - `Piece signature` CTA `Decouvrir` is frameless (no round/pill background)
 - Scroll reveal animations and full-page web-app layout
-- Marketplace collections page
-- Boutique page with product cards
-- Sur-mesure request form page (project type, name/email, free message)
+- Boutique page (`/collection`) rebuilt as a mobile-first luxe marketplace:
+  - en-tête frameless
+  - bandeau latéral de filtres (`Collections` uniquement)
+  - filtres collection (`Toutes`, `Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
+  - filtrage front-only local sur collection
+  - grille produits responsive qui occupe toute la largeur disponible
+  - taille de cartes stable entre vue `Toutes` et vue filtrée
+  - en mode téléphone, grille inspirée catalogue (2 colonnes, visuels plats, meta compacte)
+  - en mode téléphone, coeur superposé sur le visuel produit (sans pastille couleur)
+  - en mode webapp, mur catalogue pleine largeur (5 colonnes) avec bande filtre discrète en tête
+  - en mode webapp, cartes produits plates (sans effet carte) et overlays visuels discrets
+  - noms des vêtements gardent la typographie éditoriale du site
+  - en boutique, le bouton `Ajouter` n’est pas affiché sur les cartes
+  - nom et prix sont alignés sur une seule ligne dans chaque carte
+  - cartes boutique affichées immédiatement (sans reveal différé par ligne)
+  - la boutique conserve le background global du site (pas de fond blanc local)
+  - clic sur une carte ouvre la fiche produit dédiée
+  - carrousel swipe latéral sur chaque visuel produit (si plusieurs photos)
+  - fiche produit (`/collection/:productId`) avec selection de taille obligatoire
+  - blocs repliables sur fiche produit: `Description`, `Guide des tailles`, `Composition et entretien`, `Livraison, echanges et retours`
+  - ajout panier par variante de taille (deux tailles d'un meme produit restent separees)
+  - carrousel `Best-sellers` sans bord arrondi sur les visuels
+- Panneau panier global:
+  - ouverture/fermeture depuis l’icône panier du header
+  - gestion des quantités, suppression et total
+- Sur-mesure contact form page
 - Command support contact page
 - Login page based on `Login1` (shadcn-style) connected to backend auth
 - Professional buyer account area on `/compte` with tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
@@ -130,10 +153,11 @@ Always run the app from the repository root:
 ## Frontend routes
 
 - `/` home
-- `/collection` collections marketplace
+- `/collection` boutique marketplace
+- `/collection/:productId` fiche produit
 - `/sur-mesure` custom request form
 - `/contact` order issue form
-- `/boutique` boutique listing
+- `/boutique` redirection vers `/collection`
 - `/panier` cart page
 - `/login` login form
 - `/compte` buyer account area (overview, orders, profile data, security; requires authenticated session)

@@ -1283,10 +1283,12 @@ function SurMesurePage() {
 
   return (
     <section className="page-view form-view">
-      <Reveal className="form-panel sur-mesure-panel">
+      <Reveal className="sur-mesure-panel">
         <p className="sur-mesure-intro">
-          Le sur mesure permet d'adapter la coupe, les matieres, les couleurs et les finitions selon
-          votre style, votre morphologie et l'occasion visee.
+          Le sur mesure permet de definir une piece vraiment personnelle: coupe, longueur, encolure,
+          manches, matieres, couleurs et finitions. Nous adaptons chaque demande a votre silhouette,
+          a votre usage et au niveau de formalite recherche, qu'il s'agisse d'une tenue du quotidien,
+          d'une occasion speciale ou d'une piece ceremonie.
         </p>
 
         {isAuthenticated ? (

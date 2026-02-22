@@ -1,12 +1,25 @@
-# app-template
+# Maison Marcelina
 
-Production-ready app template with a Python backend and a React frontend.
+Base web app for Maison Marcelina with a Python backend and a React frontend.
 
 ## Stack
 
 - Backend: FastAPI (Python 3.11+) managed with `uv`
 - Frontend: React + Vite
 - Orchestration: `start.sh` (single entrypoint)
+
+## Current frontend scope (mock)
+
+The current frontend is a visual mock for product direction, inspired by the
+brand brief and Atelier R style cues.
+
+- Hero section with couture visual identity
+- "Les collections" section (Heritage, Riviera, Audacieuse)
+- "Shop the look" product grid (mock cards)
+- "Notre histoire" brand section
+- Instagram block and footer links
+
+This stage is static UI only (no cart/auth/checkout wiring yet).
 
 ## Project layout
 

@@ -109,7 +109,7 @@ const Gallery4 = ({ title = "Best-sellers", description, items }: Gallery4Props)
             >
               <Link
                 to={item.href}
-                className="group relative block min-h-[24rem] overflow-hidden rounded-[20px] shadow-[0_10px_28px_rgba(41,27,20,0.16)]"
+                className="group relative block min-h-[24rem] overflow-hidden shadow-[0_10px_28px_rgba(41,27,20,0.16)]"
               >
                 <img
                   src={item.image}

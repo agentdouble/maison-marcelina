@@ -31,11 +31,36 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - `Piece signature` image uses a liquid morph style (organic shape + soft highlights)
 - `Piece signature` CTA `Decouvrir` is frameless (no round/pill background)
 - Scroll reveal animations and full-page web-app layout
-- Marketplace collections page
-- Boutique page with product cards
-- Sur-mesure request form page (project type, name/email, free message)
+- Boutique page (`/collection`) rebuilt as a mobile-first luxe marketplace:
+  - en-tête frameless
+  - bandeau latéral de filtres (`Collections` uniquement)
+  - filtres collection (`Toutes`, `Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
+  - filtrage front-only local sur collection
+  - grille produits responsive qui occupe toute la largeur disponible
+  - taille de cartes stable entre vue `Toutes` et vue filtrée
+  - en mode téléphone, grille inspirée catalogue (2 colonnes, visuels plats, meta compacte)
+  - en mode téléphone, coeur superposé sur le visuel produit (sans pastille couleur)
+  - en mode webapp, mur catalogue pleine largeur (5 colonnes) avec bande filtre discrète en tête
+  - en mode webapp, cartes produits plates (sans effet carte) et overlays visuels discrets
+  - noms des vêtements gardent la typographie éditoriale du site
+  - en boutique, le bouton `Ajouter` n’est pas affiché sur les cartes
+  - nom et prix sont alignés sur une seule ligne dans chaque carte
+  - cartes boutique affichées immédiatement (sans reveal différé par ligne)
+  - la boutique conserve le background global du site (pas de fond blanc local)
+  - clic sur une carte ouvre la fiche produit dédiée
+  - carrousel swipe latéral sur chaque visuel produit (si plusieurs photos)
+  - fiche produit (`/collection/:productId`) avec selection de taille obligatoire
+  - blocs repliables sur fiche produit: `Description`, `Guide des tailles`, `Composition et entretien`, `Livraison, echanges et retours`
+  - ajout panier par variante de taille (deux tailles d'un meme produit restent separees)
+  - carrousel `Best-sellers` sans bord arrondi sur les visuels
+- Panneau panier global:
+  - ouverture/fermeture depuis l’icône panier du header
+  - gestion des quantités, suppression et total
+- Sur-mesure contact form page
 - Command support contact page
 - Login page based on `Login1` (shadcn-style) connected to backend auth
+- Professional buyer account area on `/compte` with tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
+- Account order history is read-only from backend data (no manual order creation from profile)
 - Themed `Footer7` with three footer columns: `Navigation`, `Assistance`, `Informations legales`
 
 ## Project layout
@@ -45,12 +70,15 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 ├── backend/
 │   ├── pyproject.toml
 │   ├── src/app/
+│   │   ├── api/account.py
 │   │   ├── api/auth.py
 │   │   ├── api/health.py
 │   │   ├── core/config.py
 │   │   ├── core/logging.py
+│   │   ├── services/supabase_account.py
 │   │   ├── services/supabase_auth.py
 │   │   └── main.py
+│   ├── tests/test_account.py
 │   ├── tests/test_auth.py
 │   ├── tests/test_health.py
 │   └── uv.lock
@@ -127,13 +155,15 @@ Always run the app from the repository root:
 
 - `/` home
 - `/notre-histoire` brand story page
-- `/collection` collections marketplace
 - `/histoire` legacy alias redirecting to `/notre-histoire`
+- `/collection` boutique marketplace
+- `/collection/:productId` fiche produit
 - `/sur-mesure` custom request form
 - `/contact` order issue form
-- `/boutique` boutique listing
+- `/boutique` redirection vers `/collection`
 - `/panier` cart page
 - `/login` login form
+- `/compte` buyer account area (overview, orders, profile data, security; requires authenticated session)
 - `/mentions-legales` legal notice page
 - `/cgv` conditions page
 - `/politique-remboursement` refund policy page
@@ -172,6 +202,7 @@ If `SUPABASE_GOOGLE_REDIRECT_URL` is empty, backend defaults to:
 - `POST /auth/signup`
   - body: `{"email":"...", "password":"..."}`
   - response: Supabase auth payload (`user`, optional session tokens depending on email confirmation policy)
+- Auth errors from Supabase are returned with their upstream HTTP status and message (for example `400`, `401`, `422`); transient/retryable errors are normalized to `503`.
 - `GET /auth/google/start`
   - starts Google OAuth (PKCE)
   - default behavior: HTTP redirect to Google
@@ -182,6 +213,24 @@ If `SUPABASE_GOOGLE_REDIRECT_URL` is empty, backend defaults to:
 
 Google login requires enabling the Google provider in Supabase Auth and adding the callback URL in your Supabase redirect URLs allow list.
 
+## Backend Account API
+
+All `/account/*` endpoints require `Authorization: Bearer <access_token>`.
+- invalid/expired bearer sessions are normalized to `401`
+
+- `GET /account/profile`
+  - returns profile fields (`full_name`, `phone`, `address`) plus account email
+- `PUT /account/profile`
+  - body: `{"full_name":"...", "phone":"...", "address":"..."}`
+  - upserts user profile
+- `GET /account/orders`
+  - returns user orders list
+
+Supabase tables used:
+
+- `public.customer_profiles` (1 row per user)
+- `public.customer_orders` (N rows per user)
+
 ## Login flow in frontend
 
 - `/login` uses `src/components/ui/login-1.tsx`
@@ -189,6 +238,11 @@ Google login requires enabling the Google provider in Supabase Auth and adding t
 - Account creation submit calls `POST {VITE_API_BASE_URL}/auth/signup`
 - Google button redirects browser to `{VITE_API_BASE_URL}/auth/google/start`
 - On password login success, response payload is stored in `localStorage` as `mm_auth_session`, then user is redirected to `/`
+- Profile icon routes to `/compte` when authenticated, otherwise `/login`
+- `/compte` is split in tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
+- `Coordonnees` can create/update profile data via backend `/account/profile`
+- `Commandes` lists account orders from backend `/account/orders` (read-only for buyers)
+- if account requests return `401/403`, frontend clears stale `mm_auth_session` and redirects to `/login`
 
 ## Commands
 

@@ -7,6 +7,16 @@ export interface AuthSessionPayload {
   user: Record<string, unknown> | null;
 }
 
+export class ApiRequestError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiRequestError";
+    this.status = status;
+  }
+}
+
 interface LoginWithPasswordOptions {
   apiBaseUrl?: string;
   email: string;
@@ -19,6 +29,38 @@ interface SignUpWithPasswordOptions {
   email: string;
   password: string;
   signal?: AbortSignal;
+}
+
+export interface AccountProfilePayload {
+  email: string | null;
+  full_name: string | null;
+  phone: string | null;
+  address: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AccountOrderPayload {
+  id: number | null;
+  order_number: string;
+  status: string;
+  total_amount: number | string;
+  currency: string;
+  items_count: number;
+  ordered_at: string | null;
+  created_at: string | null;
+}
+
+interface AccountRequestOptions {
+  apiBaseUrl?: string;
+  accessToken: string;
+  signal?: AbortSignal;
+}
+
+interface UpdateAccountProfileOptions extends AccountRequestOptions {
+  full_name: string | null;
+  phone: string | null;
+  address: string | null;
 }
 
 function resolveApiBaseUrl(apiBaseUrl?: string): string {
@@ -35,6 +77,15 @@ async function parseResponseBody(response: Response): Promise<unknown> {
   } catch {
     return null;
   }
+}
+
+function extractApiError(payload: unknown, fallback: string): string {
+  return typeof payload === "object" &&
+    payload !== null &&
+    "detail" in payload &&
+    typeof (payload as { detail?: unknown }).detail === "string"
+    ? (payload as { detail: string }).detail
+    : fallback;
 }
 
 export async function loginWithPassword({
@@ -56,14 +107,7 @@ export async function loginWithPassword({
   const payload = await parseResponseBody(response);
 
   if (!response.ok) {
-    const detail =
-      typeof payload === "object" &&
-      payload !== null &&
-      "detail" in payload &&
-      typeof (payload as { detail?: unknown }).detail === "string"
-        ? (payload as { detail: string }).detail
-        : "Connexion impossible";
-    throw new Error(detail);
+    throw new ApiRequestError(extractApiError(payload, "Connexion impossible"), response.status);
   }
 
   return payload as AuthSessionPayload;
@@ -88,17 +132,97 @@ export async function signUpWithPassword({
   const payload = await parseResponseBody(response);
 
   if (!response.ok) {
-    const detail =
-      typeof payload === "object" &&
-      payload !== null &&
-      "detail" in payload &&
-      typeof (payload as { detail?: unknown }).detail === "string"
-        ? (payload as { detail: string }).detail
-        : "Creation impossible";
-    throw new Error(detail);
+    throw new ApiRequestError(extractApiError(payload, "Creation impossible"), response.status);
   }
 
   return payload as AuthSessionPayload;
+}
+
+export async function getAccountProfile({
+  apiBaseUrl,
+  accessToken,
+  signal,
+}: AccountRequestOptions): Promise<AccountProfilePayload> {
+  const response = await fetch(`${resolveApiBaseUrl(apiBaseUrl)}/account/profile`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    signal,
+  });
+
+  const payload = await parseResponseBody(response);
+
+  if (!response.ok) {
+    throw new ApiRequestError(
+      extractApiError(payload, "Lecture profil impossible"),
+      response.status,
+    );
+  }
+
+  return payload as AccountProfilePayload;
+}
+
+export async function updateAccountProfile({
+  apiBaseUrl,
+  accessToken,
+  full_name,
+  phone,
+  address,
+  signal,
+}: UpdateAccountProfileOptions): Promise<AccountProfilePayload> {
+  const response = await fetch(`${resolveApiBaseUrl(apiBaseUrl)}/account/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ full_name, phone, address }),
+    signal,
+  });
+
+  const payload = await parseResponseBody(response);
+
+  if (!response.ok) {
+    throw new ApiRequestError(
+      extractApiError(payload, "Enregistrement profil impossible"),
+      response.status,
+    );
+  }
+
+  return payload as AccountProfilePayload;
+}
+
+export async function listAccountOrders({
+  apiBaseUrl,
+  accessToken,
+  signal,
+}: AccountRequestOptions): Promise<AccountOrderPayload[]> {
+  const response = await fetch(`${resolveApiBaseUrl(apiBaseUrl)}/account/orders`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    signal,
+  });
+
+  const payload = await parseResponseBody(response);
+
+  if (!response.ok) {
+    throw new ApiRequestError(
+      extractApiError(payload, "Lecture commandes impossible"),
+      response.status,
+    );
+  }
+
+  if (typeof payload !== "object" || payload === null || !("orders" in payload)) {
+    return [];
+  }
+  const maybeOrders = (payload as { orders?: unknown }).orders;
+  return Array.isArray(maybeOrders) ? (maybeOrders as AccountOrderPayload[]) : [];
 }
 
 export function startGoogleOAuth(apiBaseUrl?: string): void {

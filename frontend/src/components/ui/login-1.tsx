@@ -102,7 +102,9 @@ const Login1 = ({
 
       if (isSignUp) {
         setSuccessMessage(
-          payload.access_token ? "Compte cree" : "Compte cree. Verifie ton email"
+          payload.access_token
+            ? "Compte cree"
+            : "Compte cree. Verification de l'adresse e-mail requise"
         );
         setPassword("");
         setConfirmPassword("");

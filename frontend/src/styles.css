@@ -1,0 +1,157 @@
+:root {
+  font-family: "Space Grotesk", "Sora", system-ui, sans-serif;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+}
+
+.scene {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 18% 20%, #fff1cc 0%, transparent 40%),
+    radial-gradient(circle at 82% 78%, #d6f0ff 0%, transparent 45%),
+    linear-gradient(135deg, #e2ebf0 0%, #f9fbfc 60%, #f3f6f8 100%);
+  transition: background 300ms ease;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: radial-gradient(#0f172a 0.75px, transparent 0.75px);
+  background-size: 4px 4px;
+  pointer-events: none;
+}
+
+.panel {
+  position: relative;
+  width: min(92vw, 440px);
+  aspect-ratio: 1 / 1;
+  border-radius: 32px;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow:
+    0 24px 70px rgba(15, 23, 42, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  display: grid;
+  place-items: center;
+}
+
+.orbit {
+  position: relative;
+  width: min(62vw, 280px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 2px solid rgba(51, 65, 85, 0.15);
+  animation: spin 12s linear infinite;
+}
+
+.core {
+  position: absolute;
+  inset: 34%;
+  border-radius: 24px;
+  transform: rotate(20deg);
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+  box-shadow:
+    0 18px 30px rgba(15, 23, 42, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.satellite {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  top: calc(50% - 8px);
+  left: calc(50% - 8px);
+  transform-origin: 8px 8px;
+}
+
+.satellite--a {
+  background: #0369a1;
+  transform: rotate(12deg) translateX(132px);
+}
+
+.satellite--b {
+  background: #0f766e;
+  transform: rotate(148deg) translateX(132px);
+}
+
+.satellite--c {
+  background: #b45309;
+  transform: rotate(272deg) translateX(132px);
+}
+
+.scene--loading .orbit {
+  filter: grayscale(0.1);
+}
+
+.scene--ok .orbit {
+  border-color: rgba(4, 120, 87, 0.35);
+}
+
+.scene--error .orbit {
+  border-color: rgba(220, 38, 38, 0.45);
+  animation-duration: 2.8s;
+}
+
+.scene--error .satellite {
+  background: #dc2626;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .panel {
+    border-radius: 24px;
+  }
+
+  .satellite--a,
+  .satellite--b,
+  .satellite--c {
+    transform-origin: 8px 8px;
+  }
+
+  .satellite--a {
+    transform: rotate(12deg) translateX(102px);
+  }
+
+  .satellite--b {
+    transform: rotate(148deg) translateX(102px);
+  }
+
+  .satellite--c {
+    transform: rotate(272deg) translateX(102px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit {
+    animation: none;
+  }
+}

@@ -129,9 +129,9 @@ function getOrderStatusTone(status) {
 
 const navItems = [
   { to: "/", label: "Accueil" },
-  { to: "/notre-histoire", label: "Notre Histoire" },
   { to: "/collection", label: "Les collections" },
   { to: "/sur-mesure", label: "Sur mesure" },
+  { to: "/notre-histoire", label: "Notre Histoire" },
 ];
 
 const collections = [
@@ -152,7 +152,7 @@ const collections = [
   {
     title: "Marceline Audacieuse",
     season: "Collection permanente",
-    palette: ["Leopard", "Vache", "Rouge", "Noir"],
+    palette: ["Léopard", "Vache", "Rouge", "Noir"],
     image:
       "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80",
   },
@@ -257,7 +257,7 @@ const collectionMarketplaceProducts = [
   },
   {
     id: "riviera-ecume",
-    name: "Top Ecume",
+    name: "Top Écume",
     price: 96,
     line: "Marceline Riviera",
     image:
@@ -297,7 +297,7 @@ const collectionMarketplaceProducts = [
   },
   {
     id: "audacieuse-leopard",
-    name: "Jupe Leopard",
+    name: "Jupe Léopard",
     price: 158,
     line: "Marceline Audacieuse",
     image:
@@ -376,44 +376,44 @@ const defaultProductSizeGuide = [
 
 const marketplaceProductDetailByLine = {
   "Marceline Heritage": {
-    description: "Coupe structuree, ligne nette, port quotidien atelier.",
+    description: "Coupe structurée, ligne nette, port quotidien atelier.",
     compositionCare: [
       "100% coton",
       "Doublure viscose",
-      "Lavage main a froid",
-      "Sechage a plat",
+      "Lavage main à froid",
+      "Séchage à plat",
     ],
   },
   "Marceline Riviera": {
-    description: "Coupe fluide, mouvement leger, esprit ete couture.",
+    description: "Coupe fluide, mouvement léger, esprit été couture.",
     compositionCare: [
       "72% viscose, 28% lin",
-      "Lavage doux a 30 degres",
-      "Repassage temperature basse",
-      "Pas de seche-linge",
+      "Lavage doux à 30 degrés",
+      "Repassage température basse",
+      "Pas de sèche-linge",
     ],
   },
   "Marceline Audacieuse": {
-    description: "Volume affirme, coupe modelee, silhouette forte.",
+    description: "Volume affirmé, coupe modelée, silhouette forte.",
     compositionCare: [
-      "68% coton, 30% polyester, 2% elasthanne",
-      "Lavage a l'envers a 30 degres",
+      "68% coton, 30% polyester, 2% élasthanne",
+      "Lavage à l'envers à 30 degrés",
       "Repassage sur envers",
-      "Nettoyage a sec possible",
+      "Nettoyage à sec possible",
     ],
   },
 };
 
 const defaultShippingAndReturns = [
-  "Preparation sous 24/48h",
-  "Livraison 2 a 4 jours ouvres",
-  "Echange sous 14 jours",
+  "Préparation sous 24/48h",
+  "Livraison 2 à 4 jours ouvrés",
+  "Échange sous 14 jours",
   "Retour via page Contact",
 ];
 
 const signaturePiece = {
   name: "Robe Signature Atelier",
-  capsule: "Edition Maison",
+  capsule: "Édition Maison",
   price: "189 EUR",
   image:
     "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80",
@@ -428,29 +428,29 @@ const bestSellerGalleryItems = products.slice(0, 4).map((product) => ({
 }));
 
 const trustHighlights = [
-  { title: "Livraison offerte", value: "Des 120 EUR" },
+  { title: "Livraison offerte", value: "Dès 120 EUR" },
   { title: "Retours", value: "14 jours" },
-  { title: "Paiement", value: "Securise" },
+  { title: "Paiement", value: "Sécurisé" },
   { title: "Support", value: "7j/7" },
 ];
 
 const storyParagraphs = [
-  "Maison Marcelina, c'est avant tout une histoire de transmission, de memoire et d'elegance intemporelle.",
-  "Le nom trouve son origine dans celui de Marceline, la soeur de ma grand-mere, une femme dont le souvenir evoque l'allure et le charisme discret.",
-  "Au-dela de l'apparence, Marceline incarnait une posture: une elegance qui sait se mettre en valeur, se faire ecouter et admirer.",
-  "Chaque detail apporte de la classe: un ourlet net, un tissu soigneusement choisi, une finition delicate, un motif assume.",
-  "Maison Marcelina n'est pas une femme figee dans une photo en noir et blanc. C'est une elegance qui vit avec son temps.",
+  "Maison Marcelina, c'est avant tout une histoire de transmission, de mémoire et d'élégance intemporelle.",
+  "Le nom trouve son origine dans celui de Marceline, la sœur de ma grand-mère, une femme dont le souvenir évoque l'allure et le charisme discret.",
+  "Au-delà de l'apparence, Marceline incarnait une posture: une élégance qui sait se mettre en valeur, se faire écouter et admirer.",
+  "Chaque détail apporte de la classe: un ourlet net, un tissu soigneusement choisi, une finition délicate, un motif assumé.",
+  "Maison Marcelina n'est pas une femme figée dans une photo en noir et blanc. C'est une élégance qui vit avec son temps.",
   "Choisir le nom Maison Marcelina, c'est rendre hommage aux femmes qui nous inspirent.",
 ];
 
 const storySignature =
-  "Toujours chic. Toujours appretee. Un brushing impeccable. Un rouge a levres precis. Une signature assumee.";
+  "Toujours chic. Toujours apprêtée. Un brushing impeccable. Un rouge à lèvres précis. Une signature assumée.";
 
 const storyPillars = [
-  "Des creations cousues main avec soin",
-  "Des pieces pensees pour durer",
+  "Des créations cousues main avec soin",
+  "Des pièces pensées pour durer",
   "Une touche de chic dans le quotidien",
-  "Une douceur qui n'efface jamais le caractere",
+  "Une douceur qui n'efface jamais le caractère",
 ];
 
 const storyImage =
@@ -459,23 +459,23 @@ const storyImage =
 const legalPages = [
   {
     path: "/mentions-legales",
-    label: "Mentions legales",
-    title: "Mentions legales",
+    label: "Mentions légales",
+    title: "Mentions légales",
     lines: [
       "Maison Marcelina.",
-      "Editeur du site.",
-      "Hebergement technique.",
+      "Éditeur du site.",
+      "Hébergement technique.",
       "Contact: page Contact.",
     ],
   },
   {
     path: "/cgv",
     label: "CGV",
-    title: "Conditions generales de vente",
+    title: "Conditions générales de vente",
     lines: [
       "Vente en ligne d'articles couture.",
-      "Paiement securise.",
-      "Delais variables selon collection.",
+      "Paiement sécurisé.",
+      "Délais variables selon collection.",
       "Retours selon conditions commande.",
     ],
   },
@@ -485,9 +485,9 @@ const legalPages = [
     title: "Politique de remboursement",
     lines: [
       "Demande de retour via page Contact.",
-      "Verification de l'etat de la piece.",
+      "Vérification de l'état de la pièce.",
       "Remboursement selon mode de paiement initial.",
-      "Delai de traitement apres validation.",
+      "Délai de traitement après validation.",
     ],
   },
   {
@@ -497,18 +497,18 @@ const legalPages = [
     lines: [
       "Cookies techniques pour fonctionnement.",
       "Mesure d'audience selon consentement.",
-      "Gestion des preferences utilisateur.",
+      "Gestion des préférences utilisateur.",
       "Suppression possible via navigateur.",
     ],
   },
   {
     path: "/accessibilite",
-    label: "Accessibilite",
-    title: "Accessibilite",
+    label: "Accessibilité",
+    title: "Accessibilité",
     lines: [
       "Navigation clavier prioritaire.",
       "Contrastes lisibles et focus visibles.",
-      "Support mobile et ecrans standards.",
+      "Support mobile et écrans standards.",
       "Signalement des blocages via Contact.",
     ],
   },
@@ -812,7 +812,7 @@ function getProductDetailSections(product) {
     },
     {
       id: "shipping-returns",
-      title: "Livraison, echanges et retours",
+      title: "Livraison, échanges et retours",
       lines: defaultShippingAndReturns,
     },
   ];
@@ -934,7 +934,7 @@ function CartItemsList({ items, onQuantityChange, onRemoveItem }) {
               <div className="cart-qty">
                 <button
                   type="button"
-                  aria-label={`Retirer une unite de ${item.name}`}
+                  aria-label={`Retirer une unité de ${item.name}`}
                   onClick={() => onQuantityChange(cartItemId, -1)}
                 >
                   -
@@ -942,7 +942,7 @@ function CartItemsList({ items, onQuantityChange, onRemoveItem }) {
                 <span>{item.quantity}</span>
                 <button
                   type="button"
-                  aria-label={`Ajouter une unite de ${item.name}`}
+                  aria-label={`Ajouter une unité de ${item.name}`}
                   onClick={() => onQuantityChange(cartItemId, 1)}
                 >
                   +
@@ -1018,12 +1018,12 @@ function HomePage() {
             />
           </div>
           <div className="signature-content">
-            <p className="signature-eyebrow">Piece signature</p>
+            <p className="signature-eyebrow">Pièce signature</p>
             <h2>{signaturePiece.name}</h2>
             <p className="signature-meta">{signaturePiece.capsule}</p>
             <p className="signature-price">{signaturePiece.price}</p>
             <Link className="home-cta signature-cta" to="/collection">
-              Decouvrir
+              Découvrir
             </Link>
           </div>
         </Reveal>
@@ -1077,8 +1077,8 @@ function NotreHistoirePage() {
           </p>
 
           <p className="story-claim">
-            Maison Marcelina n'est pas seulement une marque, c'est une elegance
-            cousue a la main.
+            Maison Marcelina n'est pas seulement une marque, c'est une élégance
+            cousue à la main.
           </p>
 
           <h2 className="story-subtitle">Aujourd'hui, Maison Marcelina</h2>
@@ -1167,7 +1167,7 @@ function CollectionPage() {
             </div>
           </section>
 
-          <p className="collection-result-count">{visibleProducts.length} pieces</p>
+          <p className="collection-result-count">{visibleProducts.length} pièces</p>
         </aside>
 
         <div className="collection-marketplace-grid">
@@ -1243,6 +1243,9 @@ function ProductDetailPage({ onAddToCart }) {
         </div>
 
         <Reveal className="product-detail-content">
+          <Link className="product-detail-back" to="/collection">
+            Retour boutique
+          </Link>
           <p className="product-detail-line">{product.line}</p>
           <h1>{product.name}</h1>
           <p className="product-detail-price">{formatMarketplacePrice(product.price)}</p>
@@ -1323,10 +1326,6 @@ function ProductDetailPage({ onAddToCart }) {
               );
             })}
           </div>
-
-          <Link className="product-detail-back" to="/collection">
-            Retour boutique
-          </Link>
         </Reveal>
       </div>
     </section>
@@ -1364,7 +1363,6 @@ function SurMesurePage() {
           loading="lazy"
           decoding="async"
         />
-
         {isAuthenticated ? (
           <form className="sur-mesure-request-form" onSubmit={handleRequestSubmit} onInput={handleRequestEdit}>
             <div className="field-row">
@@ -1389,7 +1387,6 @@ function SurMesurePage() {
               <span>Demande</span>
               <textarea name="requestMessage" placeholder="Coupe, matières, contraintes..." required />
             </label>
-
             {requestSent ? <p className="sur-mesure-feedback">Demande envoyée</p> : null}
 
             <button type="submit">Envoyer la demande</button>
@@ -1417,7 +1414,7 @@ function ContactPage() {
       <Reveal as="form" className="form-panel" onSubmit={(event) => event.preventDefault()}>
         <div className="field-row">
           <label>
-            <span>Numero de commande</span>
+            <span>Numéro de commande</span>
             <input type="text" name="orderNumber" placeholder="MM-0000" required />
           </label>
 
@@ -1439,7 +1436,7 @@ function ContactPage() {
 
         <label>
           <span>Message</span>
-          <textarea name="issueMessage" placeholder="Details du souci..." required />
+          <textarea name="issueMessage" placeholder="Détails du souci..." required />
         </label>
 
         <button type="submit">Envoyer</button>
@@ -1494,7 +1491,7 @@ function AccountPage() {
   const email =
     user && typeof user.email === "string" && user.email.trim().length > 0
       ? user.email.trim()
-      : "Non renseigne";
+      : "Non renseigné";
   const clientId = user && typeof user.id === "string" ? user.id : "";
   const createdAt = user && typeof user.created_at === "string" ? user.created_at : "";
   const lastSignInAt =
@@ -1505,8 +1502,8 @@ function AccountPage() {
   const tabs = [
     { id: "overview", label: "Vue d'ensemble" },
     { id: "orders", label: "Commandes" },
-    { id: "details", label: "Coordonnees" },
-    { id: "security", label: "Securite" },
+    { id: "details", label: "Coordonnées" },
+    { id: "security", label: "Sécurité" },
   ];
 
   const profileFieldCount = [profileForm.full_name, profileForm.phone, profileForm.address].filter(
@@ -1656,7 +1653,7 @@ function AccountPage() {
         address: typeof payload.address === "string" ? payload.address : "",
       });
       setProfileUpdatedAt(typeof payload.updated_at === "string" ? payload.updated_at : "");
-      setSuccessMessage("Coordonnees enregistrees");
+      setSuccessMessage("Coordonnées enregistrées");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;
@@ -1735,18 +1732,18 @@ function AccountPage() {
                   <strong>{formatOrderTotal(totalSpent, "EUR")}</strong>
                 </div>
                 <div className="account-metric">
-                  <span>En preparation</span>
+                  <span>En préparation</span>
                   <strong>{inProgressOrders}</strong>
                 </div>
                 <div className="account-metric">
-                  <span>Derniere commande</span>
+                  <span>Dernière commande</span>
                   <strong>{latestOrderDate}</strong>
                 </div>
               </div>
 
               <div className="account-grid">
                 <section className="account-card">
-                  <h3>Identite client</h3>
+                  <h3>Identité client</h3>
                   <div className="account-kv-grid">
                     <div className="account-kv">
                       <span>Nom</span>
@@ -1757,7 +1754,7 @@ function AccountPage() {
                       <strong>{email}</strong>
                     </div>
                     <div className="account-kv">
-                      <span>Telephone</span>
+                      <span>Téléphone</span>
                       <strong>{profileForm.phone.trim() || "-"}</strong>
                     </div>
                     <div className="account-kv">
@@ -1775,7 +1772,7 @@ function AccountPage() {
                       <strong>{formatClientId(clientId)}</strong>
                     </div>
                     <div className="account-kv">
-                      <span>Mise a jour profil</span>
+                      <span>Mise à jour profil</span>
                       <strong>{formatAccountDate(profileUpdatedAt)}</strong>
                     </div>
                   </div>
@@ -1874,7 +1871,7 @@ function AccountPage() {
                         full_name: event.target.value,
                       }))
                     }
-                    placeholder="Nom et prenom"
+                    placeholder="Nom et prénom"
                     autoComplete="name"
                   />
                 </label>
@@ -1883,7 +1880,7 @@ function AccountPage() {
                   <input type="email" value={email} autoComplete="email" disabled />
                 </label>
                 <label className="account-field">
-                  <span>Telephone</span>
+                  <span>Téléphone</span>
                   <input
                     type="text"
                     value={profileForm.phone}
@@ -1931,11 +1928,11 @@ function AccountPage() {
                       <strong>{email}</strong>
                     </div>
                     <div className="account-kv">
-                      <span>Email verifie</span>
+                      <span>Email vérifié</span>
                       <strong>{emailConfirmedAt ? "Oui" : "Non"}</strong>
                     </div>
                     <div className="account-kv">
-                      <span>Derniere connexion</span>
+                      <span>Dernière connexion</span>
                       <strong>{formatAccountDate(lastSignInAt)}</strong>
                     </div>
                     <div className="account-kv">
@@ -1945,10 +1942,10 @@ function AccountPage() {
                   </div>
                 </section>
                 <section className="account-card">
-                  <h3>Acces</h3>
+                  <h3>Accès</h3>
                   <div className="account-actions">
                     <button type="button" className="account-logout-btn" onClick={handleLogout}>
-                      Se deconnecter
+                      Se déconnecter
                     </button>
                     <Link className="account-secondary-link" to="/contact">
                       Assistance

@@ -1063,7 +1063,9 @@ textarea:focus-visible,
 
 .product-detail-back {
   width: fit-content;
-  margin-top: 2px;
+  margin: 0 0 2px;
+  justify-self: end;
+  align-self: start;
   color: rgba(78, 48, 36, 0.84);
   text-decoration: none;
   font-size: 11px;

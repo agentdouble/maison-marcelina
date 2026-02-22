@@ -65,7 +65,7 @@ const Login1 = ({
       return;
     }
     if (isSignUp && password !== confirmPassword) {
-      setErrorMessage("Mots de passe differents");
+      setErrorMessage("Mots de passe différents");
       return;
     }
 
@@ -103,8 +103,8 @@ const Login1 = ({
       if (isSignUp) {
         setSuccessMessage(
           payload.access_token
-            ? "Compte cree"
-            : "Compte cree. Verification de l'adresse e-mail requise"
+            ? "Compte créé"
+            : "Compte créé. Vérification de l'adresse e-mail requise"
         );
         setPassword("");
         setConfirmPassword("");
@@ -133,8 +133,8 @@ const Login1 = ({
     }
   };
 
-  const submitLabel = isSignUp ? "Creer un compte" : buttonText;
-  const loadingLabel = isSignUp ? "Creation..." : "Patiente...";
+  const submitLabel = isSignUp ? "Créer un compte" : buttonText;
+  const loadingLabel = isSignUp ? "Création..." : "Patiente...";
 
   return (
     <section className="login1-shell">
@@ -234,7 +234,7 @@ const Login1 = ({
                 setIsSignUp((current) => !current);
               }}
             >
-              {isSignUp ? "J'ai deja un compte" : "Creer un compte"}
+              {isSignUp ? "J'ai déjà un compte" : "Créer un compte"}
             </button>
           </div>
         </div>

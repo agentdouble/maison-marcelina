@@ -17,7 +17,7 @@ import { LuminaInteractiveList } from "./components/ui/lumina-interactive-list.t
 const navItems = [
   { to: "/", label: "Accueil" },
   { to: "/collection", label: "Les collections" },
-  { to: "/sur-mesure", label: "L'atelier du sur mesure" },
+  { to: "/sur-mesure", label: "Sur mesure" },
 ];
 
 const collections = [
@@ -216,10 +216,16 @@ function HamburgerIcon({ open }) {
   return (
     <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
       {open ? (
-        <path
-          d="M6.4 6.4a1 1 0 0 1 1.4 0L12 10.6l4.2-4.2a1 1 0 1 1 1.4 1.4L13.4 12l4.2 4.2a1 1 0 1 1-1.4 1.4L12 13.4l-4.2 4.2a1 1 0 1 1-1.4-1.4l4.2-4.2-4.2-4.2a1 1 0 0 1 0-1.4Z"
-          fill="currentColor"
-        />
+        <g
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M7.25 7.25 16.75 16.75" />
+          <path d="M16.75 7.25 7.25 16.75" />
+        </g>
       ) : (
         <path
           d="M4 7.5a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 4.5a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm1 3.5a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2H5Z"
@@ -233,14 +239,46 @@ function HamburgerIcon({ open }) {
 function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const headerRef = useRef(null);
   const menuClass = mobileMenuOpen ? "menu-tabs menu-tabs--open" : "menu-tabs";
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event) => {
+      const headerNode = headerRef.current;
+      if (!headerNode) {
+        return;
+      }
+
+      if (!headerNode.contains(event.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [mobileMenuOpen]);
+
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef}>
       <div className="brand-row">
         <Link className="brand-link" to="/" aria-label="Accueil Maison Marcelina">
           <img src="/logo-marcelina.svg" alt="Logo Maison Marcelina" />
@@ -260,6 +298,17 @@ function SiteHeader() {
               {item.label}
             </NavLink>
           ))}
+          <NavLink
+            to="/login"
+            onClick={() => setMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              isActive
+                ? "menu-tab menu-tab--mobile-only menu-tab--active"
+                : "menu-tab menu-tab--mobile-only"
+            }
+          >
+            Login
+          </NavLink>
         </nav>
 
         <div className="header-actions">
@@ -425,15 +474,6 @@ function SurMesurePage() {
 
       <Reveal as="form" className="form-panel" onSubmit={(event) => event.preventDefault()}>
         <div className="field-row">
-          <label>
-            <span>Point de contact</span>
-            <select name="contactPoint" defaultValue="email" required>
-              <option value="email">Email</option>
-              <option value="telephone">Telephone</option>
-              <option value="instagram">Instagram</option>
-            </select>
-          </label>
-
           <label>
             <span>Projet souhaite</span>
             <select name="projectType" defaultValue="robe" required>

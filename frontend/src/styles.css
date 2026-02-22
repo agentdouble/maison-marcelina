@@ -209,12 +209,18 @@ textarea {
 .menu-toggle svg {
   width: 18px;
   height: 18px;
+  display: block;
 }
 
 .profile-link svg,
 .cart-link svg {
   width: 20px;
   height: 20px;
+  display: block;
+}
+
+.menu-tab--mobile-only {
+  display: inline-flex;
 }
 
 .menu-toggle--open {
@@ -976,9 +982,17 @@ textarea:focus {
     font-size: 13px;
   }
 
+  .menu-tab--mobile-only {
+    display: none;
+  }
+
   .brand-link img {
     max-width: 292px;
     height: clamp(45px, 4vw, 56px);
+  }
+
+  .profile-link {
+    display: inline-flex;
   }
 
   .page-view {
@@ -1062,6 +1076,32 @@ textarea:focus {
 
   .site-footer {
     padding: 0;
+  }
+}
+
+@media (max-width: 739px) {
+  .brand-link img {
+    max-width: 70vw;
+    height: clamp(42px, 10vw, 52px);
+  }
+
+  .menu-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .menu-toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .cart-link svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .profile-link {
+    display: none;
   }
 }
 

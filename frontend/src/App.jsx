@@ -1267,11 +1267,8 @@ function ProductDetailPage({ onAddToCart }) {
 }
 
 function SurMesurePage() {
-  const session = readStoredAuthSession();
-  const user = session && session.user && typeof session.user === "object" ? session.user : null;
-  const email =
-    user && typeof user.email === "string" && user.email.trim().length > 0 ? user.email.trim() : "";
-  const isAuthenticated = Boolean(session && session.access_token);
+  const isAuthenticated = Boolean(readStoredAuthSession());
+  const [requestSent, setRequestSent] = useState(false);
   const conceptSteps = [
     {
       title: "Brief atelier",
@@ -1286,6 +1283,17 @@ function SurMesurePage() {
       detail: "Finitions, controles et remise de la piece.",
     },
   ];
+  const handleRequestSubmit = (event) => {
+    event.preventDefault();
+    setRequestSent(true);
+  };
+
+  const handleRequestEdit = () => {
+    if (!requestSent) {
+      return;
+    }
+    setRequestSent(false);
+  };
 
   return (
     <section className="page-view form-view">
@@ -1303,24 +1311,43 @@ function SurMesurePage() {
           ))}
         </div>
 
-        <div className="sur-mesure-access">
-          {isAuthenticated ? (
-            <>
-              <p>Compte connecte</p>
-              {email ? <strong>{email}</strong> : null}
-              <Link className="sur-mesure-action" to="/compte">
-                Acceder au compte
-              </Link>
-            </>
-          ) : (
-            <>
-              <p>Connectez-vous pour lancer votre projet.</p>
-              <Link className="sur-mesure-action" to="/login">
-                Se connecter
-              </Link>
-            </>
-          )}
-        </div>
+        {isAuthenticated ? (
+          <form className="sur-mesure-request-form" onSubmit={handleRequestSubmit} onInput={handleRequestEdit}>
+            <div className="field-row">
+              <label>
+                <span>Projet souhaite</span>
+                <select name="projectType" defaultValue="robe" required>
+                  <option value="robe">Robe</option>
+                  <option value="ensemble">Ensemble</option>
+                  <option value="jupe">Jupe</option>
+                  <option value="ceremonie">Piece ceremonie</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Delai souhaite</span>
+                <input type="text" name="timeline" placeholder="Ex. Juin 2026" required />
+              </label>
+            </div>
+
+            <label>
+              <span>Demande</span>
+              <textarea name="requestMessage" placeholder="Coupe, matieres, contraintes..." required />
+            </label>
+
+            {requestSent ? <p className="sur-mesure-feedback">Demande envoyee</p> : null}
+
+            <button type="submit">Envoyer la demande</button>
+          </form>
+        ) : (
+          <div className="sur-mesure-access">
+            <p>Connexion requise</p>
+            <Link className="sur-mesure-action" to="/login">
+              Se connecter
+            </Link>
+          </div>
+        )}
       </Reveal>
     </section>
   );

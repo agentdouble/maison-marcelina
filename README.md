@@ -55,7 +55,7 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Panneau panier global:
   - ouverture/fermeture depuis l’icône panier du header
   - gestion des quantités, suppression et total
-- Sur-mesure concept page with auth gate (`/login` required to launch a project)
+- Sur-mesure concept + request flow (authenticated users can submit a request, otherwise login gate)
 - Command support contact page
 - Login page based on `Login1` (shadcn-style) connected to backend auth
 - Professional buyer account area on `/compte` with tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
@@ -155,7 +155,7 @@ Always run the app from the repository root:
 - `/` home
 - `/collection` boutique marketplace
 - `/collection/:productId` fiche produit
-- `/sur-mesure` custom concept page (asks login when session is missing)
+- `/sur-mesure` custom concept page with request form for authenticated users (asks login when session is missing)
 - `/contact` order issue form
 - `/boutique` redirection vers `/collection`
 - `/panier` cart page

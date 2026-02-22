@@ -32,7 +32,7 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Scroll reveal animations and full-page web-app layout
 - Marketplace collections page
 - Boutique page with product cards
-- Sur-mesure contact form page
+- Sur-mesure request form page (project type, name/email, free message)
 - Command support contact page
 - Login page
 - Themed `Footer7` with three footer columns: `Navigation`, `Assistance`, `Informations legales`

@@ -473,15 +473,6 @@ function SurMesurePage() {
       <Reveal as="form" className="form-panel" onSubmit={(event) => event.preventDefault()}>
         <div className="field-row">
           <label>
-            <span>Point de contact</span>
-            <select name="contactPoint" defaultValue="email" required>
-              <option value="email">Email</option>
-              <option value="telephone">Telephone</option>
-              <option value="instagram">Instagram</option>
-            </select>
-          </label>
-
-          <label>
             <span>Projet souhaite</span>
             <select name="projectType" defaultValue="robe" required>
               <option value="robe">Robe</option>

@@ -144,15 +144,20 @@ export const Footer7 = ({
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col justify-between gap-4 border-t border-[#6a4d3f24] py-6 text-xs uppercase tracking-[0.08em] text-[#6a4d3f] md:flex-row md:items-center">
+        <div className="mt-8 flex flex-col justify-between gap-4 border-t border-[#6a4d3f24] py-6 text-xs uppercase tracking-[0.08em] text-[#6a4d3f] md:flex-row md:items-start">
           <p>{copyright}</p>
-          <ul className="flex flex-wrap gap-x-5 gap-y-2">
-            {legalLinks.map((link) => (
-              <li key={link.name} className="transition hover:text-[#4e3024]">
-                <FooterNavLink href={link.href}>{link.name}</FooterNavLink>
-              </li>
-            ))}
-          </ul>
+          <details className="group md:text-right">
+            <summary className="cursor-pointer list-none text-[11px] tracking-[0.12em] text-[#4e3024]">
+              Informations legales
+            </summary>
+            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 md:justify-end">
+              {legalLinks.map((link) => (
+                <li key={link.name} className="transition hover:text-[#4e3024]">
+                  <FooterNavLink href={link.href}>{link.name}</FooterNavLink>
+                </li>
+              ))}
+            </ul>
+          </details>
         </div>
       </div>
     </section>

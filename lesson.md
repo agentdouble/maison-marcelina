@@ -50,6 +50,7 @@
 - Moving best-sellers to an Embla-based carousel gives richer interaction than a static grid while keeping routing and data simple.
 - Replacing a minimal legal strip with a themed, data-driven footer component improves consistency while reusing existing route contracts.
 - Keeping footer copy concise preserves the brand tone and avoids explanatory text bloat.
+- Grouping legal links under one footer block (`Informations legales`) reduces visual noise on mobile.
 
 ## errors to avoid
 
@@ -78,3 +79,4 @@
 - Do not use `@/components/ui/*` imports without configuring Vite alias `@`, or builds will fail.
 - Do not integrate shadcn snippets in JS projects without adding TS/Tailwind support first.
 - Do not duplicate legal route definitions in footer data; map from existing legal page source of truth.
+- Do not spread legal links across multiple footer zones when a single grouped legal block is requested.

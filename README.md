@@ -33,7 +33,7 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Sur-mesure contact form page
 - Command support contact page
 - Login page
-- Themed `Footer7` with navigation, assistance, social icons, and legal links
+- Themed `Footer7` with navigation, assistance, social icons, and one grouped legal block
 
 ## Project layout
 

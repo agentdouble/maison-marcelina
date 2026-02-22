@@ -15,7 +15,7 @@ Base web app for Maison Marcelina with a Python backend and a React frontend.
 The frontend is a multi-page brand mock focused on couture and boutique flows.
 
 - Compact sticky top band with large logo, profile icon, and mobile hamburger nav
-- Centered navigation tabs (`Accueil`, `Les collections`, `L'atelier du sur mesure`)
+- Centered navigation tabs (`Accueil`, `Les collections`, `Sur mesure`)
 - Header action icons for cart and `Login` (login kept at top-right)
 - Liquid visual design (glass surfaces, fluid highlights, soft moving blobs)
 - Full-viewport home shader slider (`lumina-interactive-list`) fed by the 3 collections

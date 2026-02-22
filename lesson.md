@@ -39,6 +39,7 @@
 - Removing numeric counters from the hero slider can reduce visual clutter when title navigation is already visible.
 - Centering hero copy and bottom navigation creates stronger visual hierarchy on animation-first homepages.
 - Frameless bottom nav labels paired with centered progress lines improve readability without heavy UI chrome.
+- Keeping concise primary nav labels (e.g. `Sur mesure`) improves readability and mobile stability.
 - Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
 - On homepages with a strong hero, placing `Piece signature` then `Best-sellers` then a compact trust band creates a clean conversion flow.
 - A hero slider should use full viewport height when it is the primary first impression block.

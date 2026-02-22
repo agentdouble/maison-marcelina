@@ -15,7 +15,7 @@ import { LuminaInteractiveList } from "./components/ui/lumina-interactive-list.t
 const navItems = [
   { to: "/", label: "Accueil" },
   { to: "/collection", label: "Les collections" },
-  { to: "/sur-mesure", label: "L'atelier du sur mesure" },
+  { to: "/sur-mesure", label: "Sur mesure" },
 ];
 
 const collections = [

@@ -28,12 +28,11 @@ interface Footer7Props {
 
 const defaultSections = [
   {
-    title: "Collections",
+    title: "Boutique",
     links: [
       { name: "Accueil", href: "/" },
-      { name: "Les collections", href: "/collection" },
+      { name: "Boutique", href: "/collection" },
       { name: "Sur mesure", href: "/sur-mesure" },
-      { name: "Boutique", href: "/boutique" },
     ],
   },
   {

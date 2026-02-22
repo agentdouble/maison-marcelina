@@ -73,6 +73,23 @@ const products = [
   },
 ];
 
+const signaturePiece = {
+  name: "Robe Signature Atelier",
+  capsule: "Edition Maison",
+  price: "189 EUR",
+  image:
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80",
+};
+
+const bestSellers = products.slice(0, 4);
+
+const trustHighlights = [
+  { title: "Livraison offerte", value: "Des 120 EUR" },
+  { title: "Retours", value: "14 jours" },
+  { title: "Paiement", value: "Securise" },
+  { title: "Support", value: "7j/7" },
+];
+
 const legalPages = [
   {
     path: "/mentions-legales",
@@ -314,6 +331,66 @@ function HomePage() {
   return (
     <section className="page-view home-view">
       <LuminaInteractiveList slides={luminaHomeSlides} />
+
+      <div className="home-sections">
+        <Reveal as="article" className="signature-piece">
+          <img
+            src={signaturePiece.image}
+            alt={signaturePiece.name}
+            loading="lazy"
+          />
+          <div className="signature-content">
+            <p className="signature-eyebrow">Piece signature</p>
+            <h2>{signaturePiece.name}</h2>
+            <p className="signature-meta">{signaturePiece.capsule}</p>
+            <p className="signature-price">{signaturePiece.price}</p>
+            <Link className="home-cta" to="/boutique">
+              Decouvrir
+            </Link>
+          </div>
+        </Reveal>
+
+        <section className="best-sellers-block" aria-labelledby="best-sellers-title">
+          <Reveal as="header" className="home-block-head" delay={70}>
+            <p>Selection</p>
+            <h2 id="best-sellers-title">Best-sellers</h2>
+          </Reveal>
+
+          <div className="best-sellers-grid">
+            {bestSellers.map((product, index) => (
+              <Reveal
+                as="article"
+                className="best-seller-card"
+                key={`best-${product.name}`}
+                delay={110 + index * 70}
+              >
+                <img src={product.image} alt={product.name} loading="lazy" />
+                <div className="best-seller-content">
+                  <h3>{product.name}</h3>
+                  <p>{product.price}</p>
+                </div>
+                <Link className="home-cta" to="/boutique">
+                  Voir
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        <Reveal
+          as="section"
+          className="trust-band"
+          aria-label="Services boutique"
+          delay={90}
+        >
+          {trustHighlights.map((item) => (
+            <article className="trust-item" key={item.title}>
+              <p>{item.title}</p>
+              <span>{item.value}</span>
+            </article>
+          ))}
+        </Reveal>
+      </div>
     </section>
   );
 }

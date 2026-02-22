@@ -132,7 +132,7 @@ export async function signUpWithPassword({
   const payload = await parseResponseBody(response);
 
   if (!response.ok) {
-    throw new ApiRequestError(extractApiError(payload, "Creation impossible"), response.status);
+    throw new ApiRequestError(extractApiError(payload, "Création impossible"), response.status);
   }
 
   return payload as AuthSessionPayload;

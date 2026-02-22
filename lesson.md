@@ -2,6 +2,9 @@
 
 ## successes
 
+- When French UI copy is touched, sweep the whole frontend (`App.jsx`, shared UI components, and auth fallback messages) in the same pass to keep accent usage consistent.
+- Header tab order should be driven from one `navItems` source so quick label-position requests (like moving `Notre Histoire` to the right of `Sur mesure`) stay low risk.
+- On product detail pages, placing `Retour boutique` as the first right-aligned element keeps navigation visible without competing with accordion rows.
 - When a request targets copy inside a page, keep route/nav structure and only remove the targeted text element.
 - Making the story view full-bleed at the view class level keeps the edge-to-edge behavior scoped and predictable.
 - For split story layouts, a straight full-height image panel (without blob radius/shadow) creates a cleaner edge against the text column.
@@ -125,6 +128,9 @@
 
 ## errors to avoid
 
+- Do not fix accents only on one page when equivalent labels/messages exist in shared components or account/auth flows.
+- Do not update footer navigation order when the request explicitly targets header tab placement.
+- Do not keep `Retour boutique` below the shipping/returns accordion when the requested UX is a top-right back action.
 - Do not interpret "remove text in a tab" as "delete the whole tab/page feature".
 - Do not keep organic liquid clipping on the story image when the requested direction is a straight full-height panel.
 - Do not over-space editorial paragraphs when a compact reading layout is requested.

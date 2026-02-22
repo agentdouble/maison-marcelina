@@ -15,7 +15,7 @@ Base web app for Maison Marcelina with a Python backend and a React frontend.
 The frontend is a multi-page brand mock focused on couture and boutique flows.
 
 - Compact sticky top band with large logo, profile icon, and mobile hamburger nav
-- Centered navigation tabs (`Accueil`, `Notre Histoire`, `Les collections`, `Sur mesure`)
+- Centered navigation tabs (`Accueil`, `Les collections`, `Sur mesure`, `Notre Histoire`)
 - Header actions keep cart visible; `Login` moves into the hamburger on mobile and stays as profile icon on desktop
 - Mobile header controls (logo, hamburger, cart) are intentionally scaled up for readability
 - Mobile hamburger closes on outside click and `Escape` for cleaner interaction
@@ -24,12 +24,12 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Full-viewport home shader slider (`lumina-interactive-list`) fed by the 3 collections
 - In-hero collection buttons remain frameless and visible (`Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
 - Home continuation after slider with:
-  - `Piece signature` spotlight block (content aligned opposite image)
+  - `Pièce signature` spotlight block (content aligned opposite image)
   - animated `Best-sellers` carousel (`Gallery4` + Embla)
   - trust band (`Livraison`, `Retours`, `Paiement`, `Support`)
 - Post-hero home blocks are intentionally frameless (no card container wrappers)
-- `Piece signature` image uses a liquid morph style (organic shape + soft highlights)
-- `Piece signature` CTA `Decouvrir` is frameless (no round/pill background)
+- `Pièce signature` image uses a liquid morph style (organic shape + soft highlights)
+- `Pièce signature` CTA `Découvrir` is frameless (no round/pill background)
 - Scroll reveal animations and full-page web-app layout
 - Boutique page (`/collection`) rebuilt as a mobile-first luxe marketplace:
   - en-tête frameless
@@ -50,7 +50,8 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
   - clic sur une carte ouvre la fiche produit dédiée
   - carrousel swipe latéral sur chaque visuel produit (si plusieurs photos)
   - fiche produit (`/collection/:productId`) avec selection de taille obligatoire
-  - blocs repliables sur fiche produit: `Description`, `Guide des tailles`, `Composition et entretien`, `Livraison, echanges et retours`
+  - blocs repliables sur fiche produit: `Description`, `Guide des tailles`, `Composition et entretien`, `Livraison, échanges et retours`
+  - lien `Retour boutique` place en haut a droite de la fiche produit
   - ajout panier par variante de taille (deux tailles d'un meme produit restent separees)
   - carrousel `Best-sellers` sans bord arrondi sur les visuels
 - Panneau panier global:
@@ -59,9 +60,9 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Sur-mesure contact form page
 - Command support contact page
 - Login page based on `Login1` (shadcn-style) connected to backend auth
-- Professional buyer account area on `/compte` with tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
+- Professional buyer account area on `/compte` with tabs: `Vue d'ensemble`, `Commandes`, `Coordonnées`, `Sécurité`
 - Account order history is read-only from backend data (no manual order creation from profile)
-- Themed `Footer7` with three footer columns: `Navigation`, `Assistance`, `Informations legales`
+- Themed `Footer7` with three footer columns: `Navigation`, `Assistance`, `Informations légales`
 
 ## Project layout
 
@@ -239,8 +240,8 @@ Supabase tables used:
 - Google button redirects browser to `{VITE_API_BASE_URL}/auth/google/start`
 - On password login success, response payload is stored in `localStorage` as `mm_auth_session`, then user is redirected to `/`
 - Profile icon routes to `/compte` when authenticated, otherwise `/login`
-- `/compte` is split in tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
-- `Coordonnees` can create/update profile data via backend `/account/profile`
+- `/compte` is split in tabs: `Vue d'ensemble`, `Commandes`, `Coordonnées`, `Sécurité`
+- `Coordonnées` can create/update profile data via backend `/account/profile`
 - `Commandes` lists account orders from backend `/account/orders` (read-only for buyers)
 - if account requests return `401/403`, frontend clears stale `mm_auth_session` and redirects to `/login`
 

@@ -1290,6 +1290,13 @@ function SurMesurePage() {
           à votre usage et au niveau de formalité recherché, qu'il s'agisse d'une tenue du quotidien,
           d'une occasion spéciale ou d'une pièce de cérémonie.
         </p>
+        <img
+          className="sur-mesure-image"
+          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1800&q=80"
+          alt="Silhouette de mode en atelier sur mesure"
+          loading="lazy"
+          decoding="async"
+        />
 
         {isAuthenticated ? (
           <form className="sur-mesure-request-form" onSubmit={handleRequestSubmit} onInput={handleRequestEdit}>

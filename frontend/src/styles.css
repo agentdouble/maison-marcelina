@@ -1811,12 +1811,21 @@ textarea:focus-visible,
   line-height: 1.5;
   letter-spacing: 0.01em;
   color: rgba(58, 34, 24, 0.86);
+  text-align: center;
+  justify-self: center;
+}
+
+.sur-mesure-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
 }
 
 .sur-mesure-access {
   display: grid;
   gap: 8px;
-  justify-items: start;
+  justify-items: center;
+  text-align: center;
 }
 
 .sur-mesure-access p {

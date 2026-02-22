@@ -121,6 +121,7 @@
 - On `/sur-mesure`, removing a redundant page title can keep focus on the compact value copy and request action.
 - On `/sur-mesure`, a frameless layout (without `form-panel`) avoids the `cadre dans cadre` effect and keeps the page cleaner.
 - On French-facing pages, accented UI copy improves readability and perceived quality.
+- On `/sur-mesure`, centering the value paragraph and adding one editorial image improves clarity without reintroducing card containers.
 
 ## errors to avoid
 
@@ -205,3 +206,4 @@
 - Do not stack a redundant `Sur mesure` page heading above already explicit intro copy when the page should stay concise.
 - Do not nest framed wrappers (`form-panel` + internal separated blocks) on `/sur-mesure`; keep one visual level.
 - Do not ship French interface text without accents when final copy is user-visible.
+- Do not add decorative image wrappers that create extra framing when the requested direction is frameless.

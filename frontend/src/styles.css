@@ -931,6 +931,7 @@ textarea:focus {
   display: grid;
   align-content: start;
   gap: 14px;
+  padding: 0;
 }
 
 .story-main {
@@ -1192,11 +1193,6 @@ textarea:focus {
 
   .story-view {
     padding-inline: 0;
-  }
-
-  .story-view .section-head {
-    padding-inline: clamp(14px, 2vw, 30px);
-    margin-bottom: 10px;
   }
 
   .story-main {

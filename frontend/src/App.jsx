@@ -480,10 +480,6 @@ function HomePage() {
 function NotreHistoirePage() {
   return (
     <section className="page-view story-view">
-      <header className="section-head">
-        <h1>Notre Histoire</h1>
-      </header>
-
       <Reveal className="story-main">
         <figure className="story-image">
           <img

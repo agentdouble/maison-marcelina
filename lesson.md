@@ -2,6 +2,8 @@
 
 ## successes
 
+- When a request targets copy inside a page, keep route/nav structure and only remove the targeted text element.
+- Making the story view full-bleed at the view class level keeps the edge-to-edge behavior scoped and predictable.
 - For split story layouts, a straight full-height image panel (without blob radius/shadow) creates a cleaner edge against the text column.
 - Compacting line-height and vertical gaps on editorial content improves density without sacrificing readability.
 - On editorial blocks, separating lead, body, signature, and closing claim styles gives a more coherent reading flow.
@@ -83,6 +85,7 @@
 
 ## errors to avoid
 
+- Do not interpret "remove text in a tab" as "delete the whole tab/page feature".
 - Do not keep organic liquid clipping on the story image when the requested direction is a straight full-height panel.
 - Do not over-space editorial paragraphs when a compact reading layout is requested.
 - Do not mix uppercase micro-typography with long narrative paragraphs on the same block; it breaks reading coherence.

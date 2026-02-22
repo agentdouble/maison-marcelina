@@ -59,7 +59,7 @@
 - Increasing header logo, nav labels, and utility icon sizes together preserves visual balance better than scaling only one element.
 - For hero animated titles on mobile, split/animate by words (not characters) to prevent mid-word line breaks.
 - Header tuning works best by reducing logo size slightly while increasing nav/icon sizes for clearer hierarchy.
-- A liquid separator at the hero bottom removes the harsh visual cut between immersive media and editorial sections.
+- For separator styling, keep it configurable because direction can switch between liquid and straight cut quickly.
 
 ## errors to avoid
 
@@ -97,4 +97,4 @@
 - Do not enlarge header logo without scaling nav/icon sizes, or hierarchy becomes inconsistent.
 - Do not animate hero titles per character on narrow screens when readable word wrapping is required.
 - Do not upscale logo and nav/icons in the same direction blindly; tune them inversely for balance.
-- Do not keep a hard straight edge under a liquid hero when the requested art direction is organic.
+- Do not force a liquid separator when the requested direction is a straight visual cut.

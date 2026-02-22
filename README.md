@@ -19,7 +19,6 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 - Header action icons for cart and `Login` (login kept at top-right)
 - Liquid visual design (glass surfaces, fluid highlights, soft moving blobs)
 - Full-viewport home shader slider (`lumina-interactive-list`) fed by the 3 collections
-- Liquid organic separator between hero slider and post-hero content
 - In-hero collection buttons remain frameless and visible (`Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
 - Home continuation after slider with:
   - `Piece signature` spotlight block (content aligned opposite image)

@@ -104,17 +104,17 @@ export const Footer7 = ({
   ];
 
   return (
-    <section className="py-12 md:py-16">
+    <section className="py-8 md:py-10">
       <div className="mx-auto w-full max-w-[1300px] px-3 md:px-5">
-        <div className="flex w-full flex-col justify-between gap-10 lg:flex-row lg:items-start lg:text-left">
-          <div className="flex w-full flex-col justify-between gap-5 lg:max-w-[340px] lg:items-start">
+        <div className="flex w-full flex-col justify-between gap-7 lg:flex-row lg:items-start lg:text-left">
+          <div className="flex w-full flex-col justify-between gap-4 lg:max-w-[340px] lg:items-start">
             <div className="flex items-center gap-3">
               <FooterNavLink href={logo.url}>
                 <img
                   src={logo.src}
                   alt={logo.alt}
                   title={logo.title}
-                  className="h-10 w-auto object-contain"
+                  className="h-9 w-auto object-contain"
                 />
               </FooterNavLink>
             </div>
@@ -134,13 +134,13 @@ export const Footer7 = ({
             </ul>
           </div>
 
-          <div className="grid w-full gap-8 sm:grid-cols-2 lg:max-w-[760px] lg:grid-cols-3 lg:gap-16">
+          <div className="grid w-full gap-6 sm:grid-cols-2 lg:max-w-[760px] lg:grid-cols-3 lg:gap-12">
             {footerColumns.map((section) => (
               <div key={section.title}>
-                <h3 className="mb-4 text-xs uppercase tracking-[0.12em] text-[#4e3024]">
+                <h3 className="mb-3 text-xs uppercase tracking-[0.12em] text-[#4e3024]">
                   {section.title}
                 </h3>
-                <ul className="m-0 list-none space-y-3 p-0 text-sm text-[#6a4d3f]">
+                <ul className="m-0 list-none space-y-2.5 p-0 text-sm text-[#6a4d3f]">
                   {section.links.map((link) => (
                     <li key={link.name} className="font-medium transition hover:text-[#4e3024]">
                       <FooterNavLink href={link.href}>{link.name}</FooterNavLink>
@@ -152,7 +152,7 @@ export const Footer7 = ({
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col justify-between gap-4 border-t border-[#6a4d3f24] py-6 text-xs uppercase tracking-[0.08em] text-[#6a4d3f] md:flex-row md:items-start">
+        <div className="mt-6 flex flex-col justify-between gap-3 border-t border-[#6a4d3f24] py-4 text-xs uppercase tracking-[0.08em] text-[#6a4d3f] md:flex-row md:items-start">
           <p>{copyright}</p>
         </div>
       </div>

@@ -104,7 +104,7 @@ export const Footer7 = ({
   ];
 
   return (
-    <section className="py-8 md:py-10">
+    <section className="py-7 md:py-8">
       <div className="mx-auto w-full max-w-[1300px] px-3 md:px-5">
         <div className="flex w-full flex-col justify-between gap-7 lg:flex-row lg:items-start lg:text-left">
           <div className="flex w-full flex-col justify-between gap-4 lg:max-w-[340px] lg:items-start">
@@ -152,8 +152,8 @@ export const Footer7 = ({
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col justify-between gap-3 border-t border-[#6a4d3f24] py-4 text-xs uppercase tracking-[0.08em] text-[#6a4d3f] md:flex-row md:items-start">
-          <p>{copyright}</p>
+        <div className="mt-2 flex flex-col justify-between gap-2 border-t border-[#6a4d3f24] py-2 text-xs uppercase tracking-[0.08em] text-[#6a4d3f] md:flex-row md:items-start">
+          <p className="m-0">{copyright}</p>
         </div>
       </div>
     </section>

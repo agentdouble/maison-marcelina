@@ -55,6 +55,7 @@
 - Reducing footer vertical paddings and gaps keeps legal/navigation content visible without excess empty space.
 - On mobile, centering signature visual + copy improves balance before switching to split left/right layout on larger screens.
 - Centering carousel card copy (title/price) improves visual balance on portrait product crops.
+- Footer copyright rows should use tight `mt/py` and reset paragraph margins to avoid artificial empty space.
 
 ## errors to avoid
 
@@ -88,3 +89,4 @@
 - Do not over-pad footer sections after adding multiple columns, or the page end feels disproportionately tall.
 - Do not keep desktop-left alignment rules on mobile for hero-adjacent split blocks; center first, then branch at tablet.
 - Do not leave carousel overlay copy left-aligned when the requested direction is centered emphasis.
+- Do not rely on default paragraph margins in compact footer rows; it creates unwanted bottom gap.

@@ -4,13 +4,97 @@
 
 - A single `start.sh` entrypoint keeps backend and frontend startup aligned.
 - Dynamic CORS from `.env` prevents hardcoded port regressions.
-- React frontend wired to backend health with request cancellation avoids stale state updates.
 - Keeping the frontend in Vite with a minimal file set preserves speed and readability.
 - Keeping a clean git flow (`main` as stable base, then `dev`, then feature branches) reduces integration risk.
+- Rewriting the existing `App.jsx` and `styles.css` for the brand mock kept the codebase lean (no extra component sprawl).
+- Defining a reusable visual system (CSS variables + section patterns) speeds up future UI iterations.
+- Adding React Router directly in `main.jsx` + route mapping in `App.jsx` keeps navigation centralized and predictable.
+- Reusing one durable logo asset in `frontend/public/` avoids brittle cross-folder imports.
+- Building all requested pages without backend coupling keeps the front refactor safe to ship.
+- Building the header mobile-first first (logo row + horizontal tab scroll) prevents desktop-first regressions.
+- Showing collections directly below the hero reduces friction versus an extra swipe step.
+- Keeping legal/social footer global avoids duplicating links across pages.
+- Replacing ad-hoc footer links with a dedicated legal strip improves production readiness.
+- Prefer SVG logo assets in `public/` for cleaner scaling and lighter delivery.
+- Mobile hamburger + auto-close on route change keeps nav compact without losing access.
+- A liquid glass design can be shipped with pure CSS (no extra UI dependency) if variables stay centralized.
+- IntersectionObserver-based reveal animations keep scroll effects smooth without heavy animation libraries.
+- Full-width page sections avoid the boxed feeling in web-app mode.
+- Keep header actions ordered by priority so login stays at far right across breakpoints.
+- Creating an SVG wrapper from a PNG is a fast fallback when vector tracing tools are missing, and keeps delivery unblocked.
+- Using `magick -fuzz 5% -trim` before exporting a text visual gives a tight, reliable crop around lettering.
+- For reliable rendering in web apps, prefer self-contained SVG assets (embedded image data) over external `href` file references.
+- Keeping main nav labels centered while preserving action icons in a separate right-aligned group improves clarity without changing routing.
+- Replacing text-based utility actions (cart) with icon buttons works best when `aria-label` is explicit to preserve accessibility.
+- For premium nav styling, text links with subtle active underline read cleaner than bordered pill tabs.
+- On mobile, a framed dropdown container keeps minimalist text nav readable without reintroducing heavy tab styling.
+- Frameless utility icons (cart/login) can look cleaner than capsule buttons when the header is already visually rich.
+- For a premium home experience, an interactive list + featured visual can replace a static grid without adding new dependencies.
+- Home collection autoplay must pause on hover/focus and cleanup intervals on unmount to avoid race conditions and duplicate timers.
+- Isolating a complex WebGL/GSAP slider in `src/components/ui` keeps `App.jsx` focused on routing and page composition.
+- In a Vite React JS app, importing a `.tsx` component can work at build time, but true TypeScript safety still needs dedicated TS tooling/config.
+- For immersive hero sliders, removing card borders/radius and page padding creates a cleaner full-bleed effect.
+- Removing numeric counters from the hero slider can reduce visual clutter when title navigation is already visible.
+- Centering hero copy and bottom navigation creates stronger visual hierarchy on animation-first homepages.
+- Frameless bottom nav labels paired with centered progress lines improve readability without heavy UI chrome.
+- Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
+- On homepages with a strong hero, placing `Piece signature` then `Best-sellers` then a compact trust band creates a clean conversion flow.
+- A hero slider should use full viewport height when it is the primary first impression block.
+- Keeping home collection buttons frameless (text + line) preserves the premium direction better than boxed controls.
+- Keeping post-hero home sections frameless preserves continuity with the immersive hero.
+- A liquid morph treatment works best on the image wrapper (not a card container) to keep the section frameless.
+- In split layouts, centering signature text vertically opposite the visual improves balance and readability.
+- For premium direction, `Decouvrir` works better as a frameless text CTA than as a pill button.
+- A shadcn-compatible setup can be added incrementally in a Vite JS app by enabling TS support and alias `@/*` without rewriting all pages.
+- Disabling Tailwind preflight avoids regressions when a mature handcrafted CSS theme already exists.
+- Moving best-sellers to an Embla-based carousel gives richer interaction than a static grid while keeping routing and data simple.
+- Replacing a minimal legal strip with a themed, data-driven footer component improves consistency while reusing existing route contracts.
+- Keeping footer copy concise preserves the brand tone and avoids explanatory text bloat.
+- Grouping legal links under one footer block (`Informations legales`) reduces visual noise on mobile.
+- Aligning `Informations legales` as a third footer column (same pattern as `Navigation`/`Assistance`) improves scanability.
+- Reducing footer vertical paddings and gaps keeps legal/navigation content visible without excess empty space.
+- On mobile, centering signature visual + copy improves balance before switching to split left/right layout on larger screens.
+- Centering carousel card copy (title/price) improves visual balance on portrait product crops.
+- Footer copyright rows should use tight `mt/py` and reset paragraph margins to avoid artificial empty space.
+- Increasing header logo, nav labels, and utility icon sizes together preserves visual balance better than scaling only one element.
+- For hero animated titles on mobile, split/animate by words (not characters) to prevent mid-word line breaks.
+- Header tuning works best by reducing logo size slightly while increasing nav/icon sizes for clearer hierarchy.
+- For separator styling, keep it configurable because direction can switch between liquid and straight cut quickly.
 
 ## errors to avoid
 
 - Do not commit machine artifacts (`.DS_Store`, virtual env folders, `node_modules`, local `.env`).
 - Do not bypass `uv` for backend dependency management or execution.
 - Do not hardcode backend/frontend ports in app code.
-- Do not trigger frontend API requests without cancellation on unmount.
+- Do not ship placeholder UI copy unrelated to brand content.
+- Do not keep empty scratch files in git history.
+- Do not overload top navigation when only a few tabs are needed.
+- Do not keep decorative controls if swipe interaction already covers the use case.
+- Do not assume PNG-to-SVG vector tracing will work locally without `potrace`/equivalent tooling installed.
+- Do not use long navigation labels with forced `white-space: nowrap` on mobile dropdowns, or labels will overflow.
+- Do not mix centered nav layout with left-aligned tab text, or headers look visually misaligned.
+- Do not remove all visual separation on mobile overlays, or navigation can become hard to perceive.
+- Do not overdecorate utility icons with badges/background pills when a minimalist header is expected.
+- Do not run home autoplay timers without proper cleanup logic, or multiple intervals can desync active state and UI.
+- Do not assume shadcn/Tailwind/TypeScript conventions already exist in a plain React project; verify structure before integrating shared components.
+- Do not recreate slide arrays inside render for WebGL-heavy components, or effects can reinitialize unnecessarily.
+- Do not batch unrelated edits into a single commit; keep commits scoped to one clear change.
+- Do not place dense descriptive paragraphs under the hero; keep post-hero blocks short and action-oriented.
+- Do not subtract header height from a hero meant to feel fully immersive; it breaks the full-screen impact.
+- Do not style home collection buttons as boxed pills/cards when the visual direction is frameless.
+- Do not wrap the post-hero home modules in card containers when the requested direction is edge-to-edge.
+- Do not apply liquid styling through added outer frames; apply it directly on the media shape.
+- Do not reuse generic pill button styles for signature CTAs when frameless controls are required.
+- Do not use `@/components/ui/*` imports without configuring Vite alias `@`, or builds will fail.
+- Do not integrate shadcn snippets in JS projects without adding TS/Tailwind support first.
+- Do not duplicate legal route definitions in footer data; map from existing legal page source of truth.
+- Do not spread legal links across multiple footer zones when a single grouped legal block is requested.
+- Do not hide legal links behind a separate bottom interaction when the request is a visible column list.
+- Do not over-pad footer sections after adding multiple columns, or the page end feels disproportionately tall.
+- Do not keep desktop-left alignment rules on mobile for hero-adjacent split blocks; center first, then branch at tablet.
+- Do not leave carousel overlay copy left-aligned when the requested direction is centered emphasis.
+- Do not rely on default paragraph margins in compact footer rows; it creates unwanted bottom gap.
+- Do not enlarge header logo without scaling nav/icon sizes, or hierarchy becomes inconsistent.
+- Do not animate hero titles per character on narrow screens when readable word wrapping is required.
+- Do not upscale logo and nav/icons in the same direction blindly; tune them inversely for balance.
+- Do not force a liquid separator when the requested direction is a straight visual cut.

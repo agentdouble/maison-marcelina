@@ -443,16 +443,13 @@ textarea:focus-visible,
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  padding: 12px;
+  padding: 0;
 }
 
 .trust-item {
-  padding: 10px 8px;
-  border-radius: 13px;
-  border: 1px solid rgba(78, 48, 36, 0.14);
-  background:
-    linear-gradient(180deg, rgba(142, 160, 138, 0.2), rgba(142, 160, 138, 0.06)),
-    rgba(251, 246, 237, 0.44);
+  padding: 8px 6px;
+  border: 0;
+  background: transparent;
   text-align: center;
   display: grid;
   gap: 3px;
@@ -632,11 +629,8 @@ textarea:focus-visible,
 
 .collection-card,
 .product-card,
-.signature-piece,
-.best-seller-card,
 .form-panel,
-.cgv-panel,
-.trust-band {
+.cgv-panel {
   border-radius: 18px;
   border: 0;
   background:
@@ -647,9 +641,7 @@ textarea:focus-visible,
 }
 
 .collection-card,
-.product-card,
-.signature-piece,
-.best-seller-card {
+.product-card {
   overflow: hidden;
 }
 
@@ -947,7 +939,7 @@ textarea:focus {
 
   .trust-band {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    padding: 13px;
+    padding: 0;
   }
 
   .slider-wrapper {
@@ -1044,7 +1036,7 @@ textarea:focus {
   }
 
   .trust-band {
-    padding: 14px;
+    padding: 0;
   }
 
   .collection-grid {

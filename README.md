@@ -22,6 +22,7 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
   - `Piece signature` spotlight block
   - `Best-sellers` grid
   - trust band (`Livraison`, `Retours`, `Paiement`, `Support`)
+- Post-hero home blocks are intentionally frameless (no card container wrappers)
 - Scroll reveal animations and full-page web-app layout
 - Marketplace collections page
 - Boutique page with product cards

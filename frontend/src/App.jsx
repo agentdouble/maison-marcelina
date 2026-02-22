@@ -16,6 +16,7 @@ import { LuminaInteractiveList } from "./components/ui/lumina-interactive-list.t
 
 const navItems = [
   { to: "/", label: "Accueil" },
+  { to: "/notre-histoire", label: "Notre Histoire" },
   { to: "/collection", label: "Les collections" },
   { to: "/sur-mesure", label: "Sur mesure" },
 ];
@@ -100,6 +101,30 @@ const trustHighlights = [
   { title: "Support", value: "7j/7" },
 ];
 
+const storyParagraphs = [
+  "Maison Marcelina, c'est avant tout une histoire de transmission, de memoire et d'elegance intemporelle.",
+  "Le nom trouve son origine dans celui de Marceline, la soeur de ma grand-mere, une femme dont le souvenir evoque l'allure et le charisme discret.",
+  "Au-dela de l'apparence, Marceline incarnait une posture: une elegance qui sait se mettre en valeur, se faire ecouter et admirer.",
+  "Chaque detail apporte de la classe: un ourlet net, un tissu soigneusement choisi, une finition delicate, un motif assume.",
+  "Maison Marcelina n'est pas une femme figee dans une photo en noir et blanc. C'est une elegance qui vit avec son temps.",
+  "Choisir le nom Maison Marcelina, c'est rendre hommage aux femmes qui nous inspirent.",
+];
+
+const storySignature = [
+  "Toujours chic.",
+  "Toujours appretee.",
+  "Un brushing impeccable.",
+  "Un rouge a levres precis.",
+  "Une signature assumee.",
+];
+
+const storyPillars = [
+  "Des creations cousues main avec soin",
+  "Des pieces pensees pour durer",
+  "Une touche de chic dans le quotidien",
+  "Une douceur qui n'efface jamais le caractere",
+];
+
 const legalPages = [
   {
     path: "/mentions-legales",
@@ -163,6 +188,7 @@ const footerSections = [
     title: "Navigation",
     links: [
       { name: "Accueil", href: "/" },
+      { name: "Notre Histoire", href: "/notre-histoire" },
       { name: "Les collections", href: "/collection" },
       { name: "Sur mesure", href: "/sur-mesure" },
       { name: "Boutique", href: "/boutique" },
@@ -453,6 +479,43 @@ function HomePage() {
   );
 }
 
+function NotreHistoirePage() {
+  return (
+    <section className="page-view story-view">
+      <header className="section-head">
+        <h1>Notre Histoire</h1>
+      </header>
+
+      <Reveal className="cgv-panel story-panel">
+        <p className="story-lead">{storyParagraphs[0]}</p>
+        {storyParagraphs.slice(1).map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+
+        <div className="story-signature" aria-label="Signature Marceline">
+          {storySignature.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </div>
+
+        <p className="story-claim">
+          Maison Marcelina n'est pas seulement une marque, c'est une elegance
+          cousue a la main.
+        </p>
+      </Reveal>
+
+      <Reveal as="section" className="story-values" delay={90}>
+        <h2>Aujourd'hui, Maison Marcelina</h2>
+        <ul>
+          {storyPillars.map((pillar) => (
+            <li key={pillar}>{pillar}</li>
+          ))}
+        </ul>
+      </Reveal>
+    </section>
+  );
+}
+
 function CollectionPage() {
   return (
     <section className="page-view">
@@ -665,6 +728,8 @@ export function App() {
       <div className="app-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/notre-histoire" element={<NotreHistoirePage />} />
+          <Route path="/histoire" element={<Navigate to="/notre-histoire" replace />} />
           <Route path="/collection" element={<CollectionPage />} />
           <Route path="/collections" element={<Navigate to="/collection" replace />} />
           <Route path="/marketplace" element={<Navigate to="/collection" replace />} />

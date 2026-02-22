@@ -168,15 +168,15 @@ textarea {
 
 .brand-link img {
   width: auto;
-  height: clamp(40px, 6vw, 50px);
+  height: clamp(36px, 5.6vw, 46px);
   max-width: 62vw;
   object-fit: contain;
   filter: drop-shadow(0 5px 12px rgba(78, 48, 36, 0.14));
 }
 
 .menu-toggle {
-  width: 34px;
-  height: 34px;
+  width: 35px;
+  height: 35px;
   border-radius: 999px;
   border: 1px solid rgba(78, 48, 36, 0.18);
   background:
@@ -207,14 +207,14 @@ textarea {
 }
 
 .menu-toggle svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
 }
 
 .profile-link svg,
 .cart-link svg {
-  width: 19px;
-  height: 19px;
+  width: 20px;
+  height: 20px;
 }
 
 .menu-toggle--open {
@@ -260,7 +260,7 @@ textarea {
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   white-space: normal;
@@ -893,12 +893,12 @@ textarea:focus {
   .menu-tab {
     text-align: center;
     white-space: nowrap;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .brand-link img {
-    max-width: 304px;
-    height: clamp(48px, 4.4vw, 60px);
+    max-width: 292px;
+    height: clamp(45px, 4vw, 56px);
   }
 
   .page-view {
@@ -995,8 +995,8 @@ textarea:focus {
   }
 
   .brand-link img {
-    max-width: 330px;
-    height: 56px;
+    max-width: 318px;
+    height: 52px;
   }
 
   .page-view {

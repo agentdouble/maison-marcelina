@@ -5,21 +5,20 @@ Base web app for Maison Marcelina with a Python backend and a React frontend.
 ## Stack
 
 - Backend: FastAPI (Python 3.11+) managed with `uv`
-- Frontend: React + Vite
+- Frontend: React + Vite + React Router
 - Orchestration: `start.sh` (single entrypoint)
 
 ## Current frontend scope (mock)
 
-The current frontend is a visual mock for product direction, inspired by the
-brand brief and Atelier R style cues.
+The frontend is a multi-page brand mock focused on couture and boutique flows.
 
-- Hero section with couture visual identity
-- "Les collections" section (Heritage, Riviera, Audacieuse)
-- "Shop the look" product grid (mock cards)
-- "Notre histoire" brand section
-- Instagram block and footer links
-
-This stage is static UI only (no cart/auth/checkout wiring yet).
+- Sticky top band with logo and navigation tabs
+- Full-screen home hero with collection photo
+- Marketplace collections page
+- Boutique page with product cards
+- Sur-mesure contact form page
+- Command support contact page
+- Login page
 
 ## Project layout
 
@@ -38,6 +37,8 @@ This stage is static UI only (no cart/auth/checkout wiring yet).
 │   ├── package.json
 │   ├── vite.config.js
 │   ├── index.html
+│   ├── public/
+│   │   └── logo-marcelina.png
 │   └── src/
 │       ├── App.jsx
 │       ├── main.jsx
@@ -83,6 +84,15 @@ Always run the app from the repository root:
 - Backend URL: `http://localhost:$BACKEND_PORT`
 - Health endpoint: `http://localhost:$BACKEND_PORT/health`
 - Frontend URL: `http://localhost:$FRONTEND_PORT`
+
+## Frontend routes
+
+- `/` home
+- `/collection` collections marketplace
+- `/sur-mesure` custom request form
+- `/contact` order issue form
+- `/boutique` boutique listing
+- `/login` login form
 
 ## Environment variables
 

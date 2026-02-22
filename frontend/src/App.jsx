@@ -1,216 +1,296 @@
+import { Link, NavLink, Navigate, Route, Routes } from "react-router-dom";
+
+const navItems = [
+  { to: "/", label: "Accueil" },
+  { to: "/collection", label: "Collection" },
+  { to: "/sur-mesure", label: "Sur mesure" },
+  { to: "/contact", label: "Contact" },
+  { to: "/boutique", label: "Boutique" },
+  { to: "/login", label: "Login" },
+];
+
 const collections = [
   {
-    title: "Marcelina Heritage",
-    subtitle: "Collection intemporelle",
-    description: "Vert sauge, beige, taupe, chocolat.",
-    tags: ["Base", "Classique", "Douce"],
-    tone: "heritage",
+    title: "Marceline Heritage",
+    season: "Collection de base",
+    palette: ["Vert sauge", "Beige", "Taupe", "Chocolat"],
+    image:
+      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Marcelina Riviera",
-    subtitle: "Collection estivale",
-    description: "Vichy, rayures, multicolore.",
-    tags: ["Vive", "Permanente", "Simple"],
-    tone: "riviera",
+    title: "Marceline Riviera",
+    season: "Collection permanente",
+    palette: ["Vichy", "Rayures", "Multicouleur"],
+    image:
+      "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Marcelina Audacieuse",
-    subtitle: "Collection caractere",
-    description: "Leopard, vache, rouge, noir.",
-    tags: ["Motifs", "Vive", "Statement"],
-    tone: "audacieuse",
+    title: "Marceline Audacieuse",
+    season: "Collection permanente",
+    palette: ["Leopard", "Vache", "Rouge", "Noir"],
+    image:
+      "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80",
   },
 ];
 
 const products = [
   {
-    name: "Robe Jeanne",
+    name: "Robe Heritage",
     price: "149 EUR",
     image:
-      "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1080&q=80",
+      "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1080&q=80",
   },
   {
-    name: "Ensemble Riviera",
-    price: "119 EUR",
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1080&q=80",
-  },
-  {
-    name: "Blouse Marceline",
+    name: "Top Riviera",
     price: "89 EUR",
     image:
-      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1080&q=80",
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1080&q=80",
   },
   {
-    name: "Jupe Heritage",
-    price: "99 EUR",
+    name: "Jupe Audacieuse",
+    price: "119 EUR",
     image:
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1080&q=80",
+      "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1080&q=80",
+  },
+  {
+    name: "Ensemble Atelier",
+    price: "179 EUR",
+    image:
+      "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1080&q=80",
   },
 ];
 
-const socialImages = [
-  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=900&q=80",
-];
-
-export function App() {
+function SiteHeader() {
   return (
-    <main className="site-shell">
-      <div className="ambient-layer" aria-hidden="true" />
+    <header className="site-header">
+      <Link className="brand-link" to="/" aria-label="Maison Marcelina">
+        <img src="/logo-marcelina.png" alt="Logo Maison Marcelina" />
+      </Link>
 
-      <p className="notice">Livraison offerte des 90 EUR</p>
+      <nav className="menu-tabs" aria-label="Navigation principale">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === "/"}
+            className={({ isActive }) =>
+              isActive ? "menu-tab menu-tab--active" : "menu-tab"
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+    </header>
+  );
+}
 
-      <header className="topbar">
-        <a className="brand" href="#">
-          Maison Marcelina
-        </a>
+function HomePage() {
+  const hero = collections[0];
 
-        <nav className="menu" aria-label="navigation principale">
-          <a href="#histoire">Notre histoire</a>
-          <a href="#collections">Les collections</a>
-          <a href="#contact">Contact</a>
-        </nav>
+  return (
+    <section className="page-view home-view">
+      <Link className="hero-collection" to="/collection">
+        <img src={hero.image} alt={hero.title} loading="eager" />
+        <div className="hero-overlay">
+          <p>{hero.season}</p>
+          <h1>{hero.title}</h1>
+          <span>{hero.palette.join(" / ")}</span>
+          <strong>Entrer</strong>
+        </div>
+      </Link>
+    </section>
+  );
+}
 
-        <a className="cart-link" href="#">
-          Panier <span>0</span>
-        </a>
+function CollectionPage() {
+  return (
+    <section className="page-view">
+      <header className="section-head">
+        <h1>Les collections</h1>
       </header>
 
-      <section className="hero reveal reveal--1" id="collections">
-        <div className="hero-copy">
-          <p className="eyebrow">Atelier couture</p>
-          <h1>Elegance cousue main</h1>
-          <p className="hero-line">Heritage. Riviera. Audacieuse.</p>
-
-          <div className="palette-row">
-            <span>Vert sauge</span>
-            <span>Beige</span>
-            <span>Taupe</span>
-            <span>Chocolat</span>
-          </div>
-
-          <div className="hero-actions">
-            <a href="#shop">Voir les pieces</a>
-            <a href="#histoire">La marque</a>
-          </div>
-        </div>
-
-        <div className="hero-gallery">
-          <figure className="hero-shot hero-shot--a">
-            <img
-              src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1400&q=80"
-              alt="Silhouette couture Maison Marcelina"
-            />
-          </figure>
-          <figure className="hero-shot hero-shot--b">
-            <img
-              src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=1000&q=80"
-              alt="Detail de texture textile"
-            />
-          </figure>
-          <figure className="hero-shot hero-shot--c">
-            <img
-              src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
-              alt="Piece Maison Marcelina en atelier"
-            />
-          </figure>
-        </div>
-      </section>
-
-      <section className="collections reveal reveal--2">
-        <div className="section-head">
-          <p>Les collections</p>
-          <h2>Trois univers couture</h2>
-        </div>
-
-        <div className="collection-grid">
-          {collections.map((collection) => (
-            <article
-              key={collection.title}
-              className={`collection-card collection-card--${collection.tone}`}
-            >
-              <p>{collection.subtitle}</p>
-              <h3>{collection.title}</h3>
-              <p>{collection.description}</p>
-              <div className="tag-row">
-                {collection.tags.map((tag) => (
+      <div className="collection-grid">
+        {collections.map((collection) => (
+          <article className="collection-card" key={collection.title}>
+            <img src={collection.image} alt={collection.title} loading="lazy" />
+            <div className="collection-content">
+              <p>{collection.season}</p>
+              <h2>{collection.title}</h2>
+              <div className="tag-list">
+                {collection.palette.map((tag) => (
                   <span key={tag}>{tag}</span>
                 ))}
               </div>
-            </article>
-          ))}
-        </div>
-      </section>
+              <Link to="/boutique">Voir en boutique</Link>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-      <section className="products reveal reveal--3" id="shop">
-        <div className="section-head section-head--split">
-          <div>
-            <p>Shop the look</p>
-            <h2>Selection du moment</h2>
-          </div>
-          <a href="#">Voir tout</a>
-        </div>
+function SurMesurePage() {
+  return (
+    <section className="page-view form-view">
+      <header className="section-head">
+        <h1>Sur mesure</h1>
+      </header>
 
-        <div className="product-grid">
-          {products.map((product) => (
-            <article key={product.name} className="product-card">
-              <img src={product.image} alt={product.name} loading="lazy" />
-              <div className="product-meta">
-                <h3>{product.name}</h3>
-                <p>{product.price}</p>
-              </div>
-              <button type="button">Ajouter</button>
-            </article>
-          ))}
-        </div>
-      </section>
+      <form className="form-panel" onSubmit={(event) => event.preventDefault()}>
+        <div className="field-row">
+          <label>
+            <span>Point de contact</span>
+            <select name="contactPoint" defaultValue="email" required>
+              <option value="email">Email</option>
+              <option value="telephone">Telephone</option>
+              <option value="instagram">Instagram</option>
+            </select>
+          </label>
 
-      <section className="story reveal reveal--4" id="histoire">
-        <div className="story-copy">
-          <p>Notre histoire</p>
-          <h2>Transmission, memoire, elegance</h2>
-          <p>
-            Le nom Maison Marcelina rend hommage a Marceline, silhouette chic
-            et assuree. Des pieces cousues main, pensees pour durer.
-          </p>
-        </div>
-        <ul className="story-list">
-          <li>Creations cousues main</li>
-          <li>Pieces pensees pour durer</li>
-          <li>Chic quotidien</li>
-          <li>Caractere assume</li>
-        </ul>
-      </section>
-
-      <section className="social reveal reveal--5" id="contact">
-        <div className="section-head section-head--split">
-          <div>
-            <p>Instagram</p>
-            <h2>@maisonmarcelina</h2>
-          </div>
-          <a href="#">Suivre</a>
+          <label>
+            <span>Projet souhaite</span>
+            <select name="projectType" defaultValue="robe" required>
+              <option value="robe">Robe</option>
+              <option value="ensemble">Ensemble</option>
+              <option value="jupe">Jupe</option>
+              <option value="autre">Autre</option>
+            </select>
+          </label>
         </div>
 
-        <div className="social-grid">
-          {socialImages.map((image, index) => (
-            <a className="social-card" href="#" key={image}>
-              <img src={image} alt={`Post Instagram ${index + 1}`} />
-            </a>
-          ))}
-        </div>
-      </section>
+        <div className="field-row">
+          <label>
+            <span>Nom</span>
+            <input type="text" name="name" placeholder="Nom" required />
+          </label>
 
-      <footer className="footer">
-        <p>Maison Marcelina</p>
-        <div>
-          <a href="#">Instagram</a>
-          <a href="#">Contact</a>
-          <a href="#">CGV</a>
-          <a href="#">Confidentialite</a>
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" placeholder="email@exemple.com" required />
+          </label>
         </div>
-      </footer>
+
+        <label>
+          <span>Ecriture libre</span>
+          <textarea
+            name="projectMessage"
+            placeholder="Silhouette, matiere, delai..."
+            required
+          />
+        </label>
+
+        <button type="submit">Envoyer</button>
+      </form>
+    </section>
+  );
+}
+
+function ContactPage() {
+  return (
+    <section className="page-view form-view">
+      <header className="section-head">
+        <h1>Contact commande</h1>
+      </header>
+
+      <form className="form-panel" onSubmit={(event) => event.preventDefault()}>
+        <div className="field-row">
+          <label>
+            <span>Numero de commande</span>
+            <input type="text" name="orderNumber" placeholder="MM-0000" required />
+          </label>
+
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" placeholder="email@exemple.com" required />
+          </label>
+        </div>
+
+        <label>
+          <span>Sujet</span>
+          <select name="issueType" defaultValue="livraison" required>
+            <option value="livraison">Livraison</option>
+            <option value="taille">Taille</option>
+            <option value="retour">Retour</option>
+            <option value="paiement">Paiement</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Message</span>
+          <textarea name="issueMessage" placeholder="Details du souci..." required />
+        </label>
+
+        <button type="submit">Envoyer</button>
+      </form>
+    </section>
+  );
+}
+
+function BoutiquePage() {
+  return (
+    <section className="page-view">
+      <header className="section-head">
+        <h1>Boutique</h1>
+      </header>
+
+      <div className="product-grid">
+        {products.map((product) => (
+          <article className="product-card" key={product.name}>
+            <img src={product.image} alt={product.name} loading="lazy" />
+            <div>
+              <h2>{product.name}</h2>
+              <p>{product.price}</p>
+            </div>
+            <button type="button">Ajouter</button>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function LoginPage() {
+  return (
+    <section className="page-view login-view">
+      <form className="form-panel form-panel--small" onSubmit={(event) => event.preventDefault()}>
+        <header className="section-head section-head--compact">
+          <h1>Login</h1>
+        </header>
+
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" placeholder="email@exemple.com" required />
+        </label>
+
+        <label>
+          <span>Mot de passe</span>
+          <input type="password" name="password" placeholder="Mot de passe" required />
+        </label>
+
+        <button type="submit">Connexion</button>
+      </form>
+    </section>
+  );
+}
+
+export function App() {
+  return (
+    <main className="app-shell">
+      <SiteHeader />
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/collection" element={<CollectionPage />} />
+        <Route path="/collections" element={<Navigate to="/collection" replace />} />
+        <Route path="/marketplace" element={<Navigate to="/collection" replace />} />
+        <Route path="/sur-mesure" element={<SurMesurePage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/boutique" element={<BoutiquePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </main>
   );
 }

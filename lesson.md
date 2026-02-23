@@ -2,6 +2,14 @@
 
 ## successes
 
+- Replacing storefront mocks with a single `/catalog/public` payload keeps home, collection, and product detail in sync without duplicate client fetch logic.
+- A dedicated `/catalog/admin` API plus focused admin tabs (`Ajouter/Modifier collection`, `Ajouter/Modifier produit`) keeps editing flows clearer and avoids long mixed forms.
+- Persisting per-size stock inside product size lines (`Taille: Quantite`) keeps admin inventory entry possible without breaking existing payload contracts (`size_guide` + `stock`).
+- For admin inventory UX, a structured `stock par taille` editor (rows + remove/add + auto total) is more reliable than free-form textarea input.
+- Replacing bare file inputs with a reusable upload button keeps admin actions cleaner and more consistent across collection/product forms.
+- Storing signature and best-sellers in a single `home_featured` row avoids multi-request flag races and keeps merchandising updates atomic.
+- Uploading media through backend `/catalog/admin/upload-image` lets admin workflows stay in-site while preserving centralized auth/error handling.
+- Converting multiline dashboard inputs into normalized arrays (`size_guide`, `composition_care`, `images`) keeps product detail rendering deterministic.
 - When French UI copy is touched, sweep the whole frontend (`App.jsx`, shared UI components, and auth fallback messages) in the same pass to keep accent usage consistent.
 - Header tab order should be driven from one `navItems` source so quick label-position requests (like moving `Notre Histoire` to the right of `Sur mesure`) stay low risk.
 - On product detail pages, placing `Retour boutique` as the first right-aligned element keeps navigation visible without competing with accordion rows.
@@ -17,6 +25,7 @@
 - Dynamic CORS from `.env` prevents hardcoded port regressions.
 - Keeping the frontend in Vite with a minimal file set preserves speed and readability.
 - Keeping a clean git flow (`main` as stable base, then `dev`, then feature branches) reduces integration risk.
+- Merging `dev` into a feature branch before opening the PR surfaces conflicts early and keeps review unblock.
 - Supabase Auth backend implementation is cleaner when wrapped in a dedicated service module instead of mixing SDK calls directly in routes.
 - Google OAuth PKCE is stable when `state` and `code_verifier` are validated in backend callback flow.
 - Rewriting the existing `App.jsx` and `styles.css` for the brand mock kept the codebase lean (no extra component sprawl).
@@ -136,6 +145,11 @@
 
 ## errors to avoid
 
+- Do not keep home/catalog content hardcoded once Supabase tables are the source of truth, or admin edits will never appear in production pages.
+- Do not model signature/best-sellers as scattered booleans updated in multiple requests when one persisted config row can prevent race-prone partial updates.
+- Do not allow image upload flows without strict file type/size validation, or storage and frontend rendering can break in production.
+- Do not expose admin write endpoints without an explicit admin membership check (`admin_users`), even if the user is authenticated.
+- Do not parse product arrays from free-form text without trimming/deduplication, or product detail accordions and media carousels become inconsistent.
 - Do not fix accents only on one page when equivalent labels/messages exist in shared components or account/auth flows.
 - Do not update footer navigation order when the request explicitly targets header tab placement.
 - Do not keep `Retour boutique` below the shipping/returns accordion when the requested UX is a top-right back action.
@@ -148,6 +162,7 @@
 - Do not invent brand-story wording when `ressources/maison-marcelina.md` already defines the source narrative.
 - Do not commit machine artifacts (`.DS_Store`, virtual env folders, `node_modules`, local `.env`).
 - Do not bypass `uv` for backend dependency management or execution.
+- Do not open a PR from a dirty branch or without syncing `dev` first (`pull --ff-only` + local merge), or integration risks rise.
 - Do not hardcode backend/frontend ports in app code.
 - Do not trigger frontend API requests without cancellation on unmount.
 - Do not rely on a shared in-memory OAuth verifier across requests; it creates race conditions during concurrent login attempts.
@@ -220,6 +235,17 @@
 - Do not keep write-capable order endpoints on customer account APIs when the UI is meant to be read-only; it creates trust and data integrity issues.
 - Do not nest framed containers in `/compte` (`cadres dans cadres`); keep one visual level and rely on spacing/lines.
 - Do not keep stale local sessions after backend auth rejection on `/account/*`; force re-auth to avoid endless `403` loops.
+- Do not ship the catalog dashboard to a new Supabase project before applying tables, RLS policies, and storage policies; admin writes and image uploads will fail.
+- Do not grant admin access by guesswork (email assumptions); insert explicit `auth.users.id` records in `public.admin_users` and verify with a join.
+- Do not rely only on a global stock input when size-level inventory is required; capture a per-size breakdown and derive a consistent total.
+- Do not keep free-form stock-by-size textareas once non-technical admin users need day-to-day inventory edits; use constrained row inputs.
+- Do not treat a non-empty catalog payload as "ready" when home images are missing; validate content quality (active images/products), not only array length.
+- Do not let storefront pages render empty while admin data is being seeded; keep a deterministic mock fallback for slides, featured block, and boutique products.
+- Do not rename an admin area in navigation without keeping a route alias for the previous path, or saved links/bookmarks will break.
+- Do not keep collection management edit-only once catalog is DB-driven; admin must be able to create a collection with title, description, and media directly in the admin UI.
+- Do not require at least 2 loaded hero textures before rendering; with one active collection image the home hero must still display.
+- Do not label critical admin actions with generic "Enregistrer" only; for merchandising controls (best-sellers), use explicit action text and a visible empty-state when no active products exist.
+- Do not expose slug fields in admin content forms when backend already generates and enforces unique slugs; it adds friction and invalid-input risk for non-technical users.
 - Do not ask for contact email on `/sur-mesure` when auth is available; gate with login and use account identity instead.
 - Do not remove the sur-mesure request form after adding auth gating, or logged-in users lose the main action.
 - Do not describe only atelier phases on `/sur-mesure` when users need to quickly understand customization options.

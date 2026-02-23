@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Link,
   NavLink,
@@ -20,6 +20,16 @@ import {
   listAccountOrders,
   updateAccountProfile,
 } from "./lib/auth.ts";
+import {
+  createAdminCollection,
+  createAdminProduct,
+  getAdminCatalog,
+  getPublicCatalog,
+  updateAdminCollection,
+  updateAdminFeatured,
+  updateAdminProduct,
+  uploadAdminImage,
+} from "./lib/catalog.ts";
 
 const AUTH_SESSION_STORAGE_KEY = "mm_auth_session";
 
@@ -127,244 +137,12 @@ function getOrderStatusTone(status) {
   return "neutral";
 }
 
-const navItems = [
+const BASE_NAV_ITEMS = [
   { to: "/", label: "Accueil" },
   { to: "/collection", label: "Les collections" },
   { to: "/sur-mesure", label: "Sur mesure" },
   { to: "/notre-histoire", label: "Notre Histoire" },
 ];
-
-const collections = [
-  {
-    title: "Marceline Heritage",
-    season: "Collection de base",
-    palette: ["Vert sauge", "Beige", "Taupe", "Chocolat"],
-    image:
-      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    title: "Marceline Riviera",
-    season: "Collection permanente",
-    palette: ["Vichy", "Rayures", "Multicouleur"],
-    image:
-      "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    title: "Marceline Audacieuse",
-    season: "Collection permanente",
-    palette: ["Léopard", "Vache", "Rouge", "Noir"],
-    image:
-      "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80",
-  },
-];
-
-const luminaHomeSlides = collections.map((collection) => ({
-  title: collection.title,
-  description: `${collection.season} | ${collection.palette.join(" / ")}`,
-  media: collection.image,
-}));
-
-const products = [
-  {
-    id: "robe-heritage",
-    name: "Robe Heritage",
-    priceValue: 149,
-    image:
-      "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1080&q=80",
-  },
-  {
-    id: "top-riviera",
-    name: "Top Riviera",
-    priceValue: 89,
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1080&q=80",
-  },
-  {
-    id: "jupe-audacieuse",
-    name: "Jupe Audacieuse",
-    priceValue: 119,
-    image:
-      "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1080&q=80",
-  },
-  {
-    id: "ensemble-atelier",
-    name: "Ensemble Atelier",
-    priceValue: 179,
-    image:
-      "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1080&q=80",
-  },
-];
-
-const boutiqueProductMedia = {
-  "robe-heritage": [
-    "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1080&q=80",
-    "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1080&q=80",
-  ],
-  "top-riviera": [
-    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1080&q=80",
-    "https://images.unsplash.com/photo-1503341338985-b35f5a53c6f2?auto=format&fit=crop&w=1080&q=80",
-  ],
-  "jupe-audacieuse": [
-    "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1080&q=80",
-    "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1080&q=80",
-  ],
-  "ensemble-atelier": [
-    "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1080&q=80",
-    "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1080&q=80",
-  ],
-};
-
-const collectionMarketplaceProducts = [
-  {
-    id: "heritage-ivoire",
-    name: "Robe Ivoire",
-    price: 189,
-    line: "Marceline Heritage",
-    image:
-      "https://images.unsplash.com/photo-1467632499275-7a693a761056?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "heritage-sauge",
-    name: "Veste Sauge",
-    price: 164,
-    line: "Marceline Heritage",
-    image:
-      "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "heritage-taupe",
-    name: "Jupe Taupe",
-    price: 132,
-    line: "Marceline Heritage",
-    image:
-      "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "heritage-sable",
-    name: "Chemise Sable",
-    price: 118,
-    line: "Marceline Heritage",
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "riviera-azur",
-    name: "Robe Azur",
-    price: 176,
-    line: "Marceline Riviera",
-    image:
-      "https://images.unsplash.com/photo-1503341338985-b35f5a53c6f2?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "riviera-ecume",
-    name: "Top Écume",
-    price: 96,
-    line: "Marceline Riviera",
-    image:
-      "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "riviera-vichy",
-    name: "Jupe Vichy",
-    price: 128,
-    line: "Marceline Riviera",
-    image:
-      "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "riviera-ligne",
-    name: "Pantalon Ligne",
-    price: 142,
-    line: "Marceline Riviera",
-    image:
-      "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "audacieuse-noir",
-    name: "Robe Noir Atelier",
-    price: 212,
-    line: "Marceline Audacieuse",
-    image:
-      "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "audacieuse-rouge",
-    name: "Top Rouge",
-    price: 102,
-    line: "Marceline Audacieuse",
-    image:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "audacieuse-leopard",
-    name: "Jupe Léopard",
-    price: 158,
-    line: "Marceline Audacieuse",
-    image:
-      "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: "audacieuse-corset",
-    name: "Corset Nuit",
-    price: 184,
-    line: "Marceline Audacieuse",
-    image:
-      "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80",
-  },
-];
-
-const marketplaceProductMedia = {
-  "heritage-ivoire": [
-    "https://images.unsplash.com/photo-1467632499275-7a693a761056?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "heritage-sauge": [
-    "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "heritage-taupe": [
-    "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "heritage-sable": [
-    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "riviera-azur": [
-    "https://images.unsplash.com/photo-1503341338985-b35f5a53c6f2?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "riviera-ecume": [
-    "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1467632499275-7a693a761056?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "riviera-vichy": [
-    "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "riviera-ligne": [
-    "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "audacieuse-noir": [
-    "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1503341338985-b35f5a53c6f2?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "audacieuse-rouge": [
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "audacieuse-leopard": [
-    "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1465406325903-9d93ee82f613?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "audacieuse-corset": [
-    "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1200&q=80",
-  ],
-};
-
-const marketplaceProductSizes = ["34", "36", "38", "40", "42"];
 
 const defaultProductSizeGuide = [
   "34: poitrine 80-84 cm",
@@ -374,58 +152,12 @@ const defaultProductSizeGuide = [
   "42: poitrine 96-100 cm",
 ];
 
-const marketplaceProductDetailByLine = {
-  "Marceline Heritage": {
-    description: "Coupe structurée, ligne nette, port quotidien atelier.",
-    compositionCare: [
-      "100% coton",
-      "Doublure viscose",
-      "Lavage main à froid",
-      "Séchage à plat",
-    ],
-  },
-  "Marceline Riviera": {
-    description: "Coupe fluide, mouvement léger, esprit été couture.",
-    compositionCare: [
-      "72% viscose, 28% lin",
-      "Lavage doux à 30 degrés",
-      "Repassage température basse",
-      "Pas de sèche-linge",
-    ],
-  },
-  "Marceline Audacieuse": {
-    description: "Volume affirmé, coupe modelée, silhouette forte.",
-    compositionCare: [
-      "68% coton, 30% polyester, 2% élasthanne",
-      "Lavage à l'envers à 30 degrés",
-      "Repassage sur envers",
-      "Nettoyage à sec possible",
-    ],
-  },
-};
-
 const defaultShippingAndReturns = [
   "Préparation sous 24/48h",
   "Livraison 2 à 4 jours ouvrés",
   "Échange sous 14 jours",
   "Retour via page Contact",
 ];
-
-const signaturePiece = {
-  name: "Robe Signature Atelier",
-  capsule: "Édition Maison",
-  price: "189 EUR",
-  image:
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80",
-};
-
-const bestSellerGalleryItems = products.slice(0, 4).map((product) => ({
-  id: product.name.toLowerCase().replace(/\s+/g, "-"),
-  title: product.name,
-  description: formatMarketplacePrice(product.priceValue),
-  href: "/collection",
-  image: boutiqueProductMedia[product.id]?.[0] ?? product.image,
-}));
 
 const trustHighlights = [
   { title: "Livraison offerte", value: "Dès 120 EUR" },
@@ -511,6 +243,135 @@ const legalPages = [
       "Support mobile et écrans standards.",
       "Signalement des blocages via Contact.",
     ],
+  },
+];
+
+const emptyPublicCatalog = {
+  collections: [],
+  products: [],
+  featured: {
+    signature_product_id: null,
+    best_seller_product_ids: [],
+  },
+};
+
+const mockCatalogCollections = [
+  {
+    id: "mock-collection-heritage",
+    slug: "marceline-heritage",
+    title: "Marceline Heritage",
+    description: "Collection de base | Vert sauge / Beige / Taupe / Chocolat",
+    image_url:
+      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1600&q=80",
+    sort_order: 0,
+    is_active: true,
+  },
+  {
+    id: "mock-collection-riviera",
+    slug: "marceline-riviera",
+    title: "Marceline Riviera",
+    description: "Collection permanente | Vichy / Rayures / Multicouleur",
+    image_url:
+      "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=1600&q=80",
+    sort_order: 1,
+    is_active: true,
+  },
+  {
+    id: "mock-collection-audacieuse",
+    slug: "marceline-audacieuse",
+    title: "Marceline Audacieuse",
+    description: "Collection permanente | Leopard / Vache / Rouge / Noir",
+    image_url:
+      "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80",
+    sort_order: 2,
+    is_active: true,
+  },
+];
+
+const mockCatalogProducts = [
+  {
+    id: "mock-product-robe-signature",
+    slug: "robe-signature-atelier",
+    name: "Robe Signature Atelier",
+    collection_id: "mock-collection-heritage",
+    collection: {
+      id: "mock-collection-heritage",
+      slug: "marceline-heritage",
+      title: "Marceline Heritage",
+    },
+    price: 189,
+    description: "Robe taillee main, coupe fluide et maintien net.",
+    size_guide: defaultProductSizeGuide,
+    stock: 8,
+    composition_care: ["80% coton", "20% viscose", "Lavage delicat 30C"],
+    images: [
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1467632499275-7a693a761056?auto=format&fit=crop&w=1200&q=80",
+    ],
+    is_active: true,
+  },
+  {
+    id: "mock-product-top-riviera",
+    slug: "top-riviera",
+    name: "Top Riviera",
+    collection_id: "mock-collection-riviera",
+    collection: {
+      id: "mock-collection-riviera",
+      slug: "marceline-riviera",
+      title: "Marceline Riviera",
+    },
+    price: 96,
+    description: "Top structure pour silhouette nette au quotidien.",
+    size_guide: defaultProductSizeGuide,
+    stock: 14,
+    composition_care: ["100% coton", "Lavage 30C", "Repassage doux"],
+    images: [
+      "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
+    ],
+    is_active: true,
+  },
+  {
+    id: "mock-product-jupe-audacieuse",
+    slug: "jupe-audacieuse",
+    name: "Jupe Audacieuse",
+    collection_id: "mock-collection-audacieuse",
+    collection: {
+      id: "mock-collection-audacieuse",
+      slug: "marceline-audacieuse",
+      title: "Marceline Audacieuse",
+    },
+    price: 158,
+    description: "Jupe taille haute, ligne marquee et tombant precis.",
+    size_guide: defaultProductSizeGuide,
+    stock: 10,
+    composition_care: ["65% polyester", "35% coton", "Nettoyage delicat"],
+    images: [
+      "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1200&q=80",
+    ],
+    is_active: true,
+  },
+  {
+    id: "mock-product-ensemble-atelier",
+    slug: "ensemble-atelier",
+    name: "Ensemble Atelier",
+    collection_id: "mock-collection-heritage",
+    collection: {
+      id: "mock-collection-heritage",
+      slug: "marceline-heritage",
+      title: "Marceline Heritage",
+    },
+    price: 179,
+    description: "Ensemble couture avec structure souple et finitions propres.",
+    size_guide: defaultProductSizeGuide,
+    stock: 6,
+    composition_care: ["70% lin", "30% coton", "Lavage main recommande"],
+    images: [
+      "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1200&q=80",
+    ],
+    is_active: true,
   },
 ];
 
@@ -637,6 +498,10 @@ function SiteHeader({ cartCount = 0, cartOpen = false, onToggleCart }) {
   const isAuthenticated = Boolean(readStoredAuthSession());
   const authRoute = isAuthenticated ? "/compte" : "/login";
   const authLabel = isAuthenticated ? "Compte" : "Login";
+  const navItems = useMemo(
+    () => buildHeaderNavItems(isAuthenticated),
+    [isAuthenticated],
+  );
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -783,32 +648,90 @@ function Reveal({ as: Tag = "div", className = "", delay = 0, children, ...rest 
 }
 
 function formatMarketplacePrice(price) {
-  return `${price} EUR`;
+  const parsed = Number(price);
+  if (!Number.isFinite(parsed)) {
+    return "-";
+  }
+  return `${parsed % 1 === 0 ? parsed.toFixed(0) : parsed.toFixed(2)} EUR`;
 }
 
 function getCartItemId(item) {
   return item.cartItemId ?? item.id;
 }
 
+function buildHeaderNavItems(isAuthenticated) {
+  return isAuthenticated
+    ? [...BASE_NAV_ITEMS, { to: "/admin", label: "Admin" }]
+    : BASE_NAV_ITEMS;
+}
+
+function getProductCollectionName(product) {
+  if (
+    product &&
+    product.collection &&
+    typeof product.collection === "object" &&
+    typeof product.collection.title === "string" &&
+    product.collection.title.trim().length > 0
+  ) {
+    return product.collection.title.trim();
+  }
+  return "Collection";
+}
+
+function normalizeSizeGuideLine(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  const separatorIndex = trimmed.indexOf(":");
+  if (separatorIndex < 0) {
+    return trimmed;
+  }
+
+  const sizeLabel = trimmed.slice(0, separatorIndex).trim();
+  const rightPart = trimmed.slice(separatorIndex + 1).trim();
+  if (!sizeLabel) {
+    return trimmed;
+  }
+
+  return /^\d+$/.test(rightPart) ? sizeLabel : trimmed;
+}
+
 function getProductDetailSections(product) {
-  const detailContent =
-    marketplaceProductDetailByLine[product.line] ?? marketplaceProductDetailByLine["Marceline Heritage"];
+  const description =
+    typeof product.description === "string" && product.description.trim().length > 0
+      ? product.description.trim()
+      : "Description a venir";
+  const sizeGuide =
+    Array.isArray(product.size_guide) && product.size_guide.length > 0
+      ? product.size_guide.map(normalizeSizeGuideLine).filter((line) => line.length > 0)
+      : defaultProductSizeGuide;
+  const resolvedSizeGuide = sizeGuide.length > 0 ? sizeGuide : defaultProductSizeGuide;
+  const compositionCare =
+    Array.isArray(product.composition_care) && product.composition_care.length > 0
+      ? product.composition_care
+      : ["Composition et entretien a venir"];
 
   return [
     {
       id: "description",
       title: "Description",
-      lines: [detailContent.description],
+      lines: [description],
     },
     {
       id: "size-guide",
       title: "Guide des tailles",
-      lines: defaultProductSizeGuide,
+      lines: resolvedSizeGuide,
     },
     {
       id: "composition-care",
       title: "Composition et entretien",
-      lines: detailContent.compositionCare,
+      lines: compositionCare,
     },
     {
       id: "shipping-returns",
@@ -819,7 +742,260 @@ function getProductDetailSections(product) {
 }
 
 function getMarketplaceImages(product) {
-  return marketplaceProductMedia[product.id] ?? [product.image];
+  if (!product || !Array.isArray(product.images)) {
+    return ["/logo-marcelina.svg"];
+  }
+  const images = product.images.filter(
+    (image) => typeof image === "string" && image.trim().length > 0,
+  );
+  return images.length > 0 ? images : ["/logo-marcelina.svg"];
+}
+
+function getSignatureProduct(products, featured) {
+  const signatureId =
+    featured &&
+    typeof featured === "object" &&
+    typeof featured.signature_product_id === "string"
+      ? featured.signature_product_id
+      : null;
+  if (!signatureId) {
+    return null;
+  }
+  return products.find((product) => product.id === signatureId) ?? null;
+}
+
+function getBestSellerProducts(products, featured) {
+  const bestSellerIds =
+    featured &&
+    typeof featured === "object" &&
+    Array.isArray(featured.best_seller_product_ids)
+      ? featured.best_seller_product_ids
+      : [];
+  if (bestSellerIds.length === 0) {
+    return [];
+  }
+  const byId = new Map(products.map((product) => [product.id, product]));
+  return bestSellerIds
+    .map((productId) => byId.get(productId))
+    .filter((product) => product && product.is_active);
+}
+
+function buildBestSellerGalleryItems(products, featured) {
+  return getBestSellerProducts(products, featured).map((product) => ({
+    id: `${product.id}`,
+    title: product.name,
+    description: formatMarketplacePrice(product.price),
+    href: `/collection/${product.slug}`,
+    image: getMarketplaceImages(product)[0] ?? "",
+  }));
+}
+
+function buildLuminaSlides(collections) {
+  return collections
+    .filter((collection) => collection.is_active && collection.image_url)
+    .map((collection) => ({
+      title: collection.title,
+      description: collection.description,
+      media: collection.image_url,
+    }));
+}
+
+function getProductSizeOptions(product) {
+  const sizeGuide =
+    Array.isArray(product.size_guide) && product.size_guide.length > 0
+      ? product.size_guide
+      : [];
+  const options = sizeGuide
+    .map((value) => {
+      if (typeof value !== "string") {
+        return "";
+      }
+      const raw = value.split(":")[0] ?? value;
+      return raw.trim();
+    })
+    .filter((value) => value.length > 0);
+
+  return options.length > 0 ? Array.from(new Set(options)) : ["34", "36", "38", "40", "42"];
+}
+
+function splitMultilineValue(value) {
+  if (typeof value !== "string") {
+    return [];
+  }
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+}
+
+function parseSizeStockEntries(value) {
+  const lines = splitMultilineValue(value);
+  const bySize = new Map();
+
+  for (const line of lines) {
+    const separatorIndex = line.indexOf(":");
+    if (separatorIndex < 0) {
+      continue;
+    }
+
+    const size = line.slice(0, separatorIndex).trim();
+    const rawStock = line.slice(separatorIndex + 1).trim();
+    const parsedStock = Number.parseInt(rawStock, 10);
+    if (!size || Number.isNaN(parsedStock) || parsedStock < 0) {
+      continue;
+    }
+
+    bySize.set(size, parsedStock);
+  }
+
+  return Array.from(bySize.entries()).map(([size, stock]) => ({ size, stock }));
+}
+
+function serializeSizeStockEntries(entries) {
+  return entries.map((entry) => `${entry.size}: ${entry.stock}`);
+}
+
+function extractSizeStockTextFromGuide(sizeGuide) {
+  if (!Array.isArray(sizeGuide) || sizeGuide.length === 0) {
+    return "";
+  }
+  const entries = parseSizeStockEntries(sizeGuide.join("\n"));
+  return serializeSizeStockEntries(entries).join("\n");
+}
+
+function buildProductSizingPayload(sizeGuideValue, stockValue, stockBySizeValue) {
+  const stockEntries = parseSizeStockEntries(stockBySizeValue);
+  if (stockEntries.length > 0) {
+    return {
+      sizeGuide: serializeSizeStockEntries(stockEntries),
+      stock: stockEntries.reduce((total, entry) => total + entry.stock, 0),
+    };
+  }
+
+  return {
+    sizeGuide: splitMultilineValue(sizeGuideValue),
+    stock: Math.max(Number.parseInt(stockValue, 10) || 0, 0),
+  };
+}
+
+function parseSizeStockRowsForEditor(value) {
+  const lines = splitMultilineValue(value);
+  if (lines.length === 0) {
+    return [{ size: "", stock: "" }];
+  }
+
+  return lines.map((line) => {
+    const separatorIndex = line.indexOf(":");
+    if (separatorIndex < 0) {
+      return {
+        size: line.trim(),
+        stock: "",
+      };
+    }
+
+    return {
+      size: line.slice(0, separatorIndex).trim(),
+      stock: line.slice(separatorIndex + 1).trim(),
+    };
+  });
+}
+
+function serializeSizeStockRowsForEditor(rows) {
+  return rows
+    .map((row) => {
+      const size = typeof row.size === "string" ? row.size.trim() : "";
+      const stock = typeof row.stock === "string" ? row.stock.trim() : "";
+      if (!size && !stock) {
+        return ":";
+      }
+      return `${size}: ${stock}`;
+    })
+    .join("\n");
+}
+
+function buildProductImages(primaryImage, galleryValue) {
+  const images = splitMultilineValue(galleryValue);
+  const normalizedPrimary =
+    typeof primaryImage === "string" && primaryImage.trim().length > 0
+      ? primaryImage.trim()
+      : "";
+
+  const merged = normalizedPrimary ? [normalizedPrimary, ...images] : images;
+  return Array.from(new Set(merged));
+}
+
+function hasActiveCollectionImage(collections) {
+  return collections.some(
+    (collection) =>
+      collection &&
+      collection.is_active &&
+      typeof collection.image_url === "string" &&
+      collection.image_url.trim().length > 0,
+  );
+}
+
+function hasActiveProducts(products) {
+  return products.some((product) => product && product.is_active);
+}
+
+function buildFeaturedFromProducts(products) {
+  const activeProducts = products.filter((product) => product && product.is_active);
+  return {
+    signature_product_id: activeProducts[0]?.id ?? null,
+    best_seller_product_ids: activeProducts.slice(0, 4).map((product) => product.id),
+  };
+}
+
+function buildCatalogWithFallback(payload) {
+  const collections = Array.isArray(payload?.collections) ? payload.collections : [];
+  const products = Array.isArray(payload?.products) ? payload.products : [];
+  const featured = payload?.featured && typeof payload.featured === "object" ? payload.featured : {};
+
+  const resolvedCollections = hasActiveCollectionImage(collections)
+    ? collections
+    : mockCatalogCollections;
+  const resolvedProducts = hasActiveProducts(products) ? products : mockCatalogProducts;
+
+  const activeProductIds = new Set(
+    resolvedProducts
+      .filter((product) => product && product.is_active && typeof product.id === "string")
+      .map((product) => product.id),
+  );
+
+  const signatureId =
+    typeof featured.signature_product_id === "string" &&
+    activeProductIds.has(featured.signature_product_id)
+      ? featured.signature_product_id
+      : null;
+
+  const bestSellerIds = Array.isArray(featured.best_seller_product_ids)
+    ? Array.from(
+        new Set(
+          featured.best_seller_product_ids.filter(
+            (productId) =>
+              typeof productId === "string" && activeProductIds.has(productId),
+          ),
+        ),
+      )
+    : [];
+
+  if (signatureId || bestSellerIds.length > 0) {
+    return {
+      collections: resolvedCollections,
+      products: resolvedProducts,
+      featured: {
+        signature_product_id: signatureId ?? bestSellerIds[0] ?? null,
+        best_seller_product_ids:
+          bestSellerIds.length > 0 ? bestSellerIds : signatureId ? [signatureId] : [],
+      },
+    };
+  }
+
+  return {
+    collections: resolvedCollections,
+    products: resolvedProducts,
+    featured: buildFeaturedFromProducts(resolvedProducts),
+  };
 }
 
 function ProductImageSwiper({ images, alt }) {
@@ -1003,34 +1179,46 @@ function CartPanel({ open, items, total, onClose, onQuantityChange, onRemoveItem
   );
 }
 
-function HomePage() {
+function HomePage({ collections, products, featured, isCatalogLoading }) {
+  const slides = useMemo(() => buildLuminaSlides(collections), [collections]);
+  const signatureProduct = useMemo(
+    () => getSignatureProduct(products, featured),
+    [products, featured],
+  );
+  const bestSellerGalleryItems = useMemo(
+    () => buildBestSellerGalleryItems(products, featured),
+    [products, featured],
+  );
+  const signatureImage = signatureProduct ? getMarketplaceImages(signatureProduct)[0] : "";
+  const signatureCollection = signatureProduct ? getProductCollectionName(signatureProduct) : "";
+
   return (
     <section className="page-view home-view">
-      <LuminaInteractiveList slides={luminaHomeSlides} />
+      <LuminaInteractiveList slides={slides} />
 
       <div className="home-sections">
-        <Reveal as="article" className="signature-piece">
-          <div className="signature-visual">
-            <img
-              src={signaturePiece.image}
-              alt={signaturePiece.name}
-              loading="lazy"
-            />
-          </div>
-          <div className="signature-content">
-            <p className="signature-eyebrow">Pièce signature</p>
-            <h2>{signaturePiece.name}</h2>
-            <p className="signature-meta">{signaturePiece.capsule}</p>
-            <p className="signature-price">{signaturePiece.price}</p>
-            <Link className="home-cta signature-cta" to="/collection">
-              Découvrir
-            </Link>
-          </div>
-        </Reveal>
+        {signatureProduct ? (
+          <Reveal as="article" className="signature-piece">
+            <div className="signature-visual">
+              <img src={signatureImage} alt={signatureProduct.name} loading="lazy" />
+            </div>
+            <div className="signature-content">
+              <p className="signature-eyebrow">Piece signature</p>
+              <h2>{signatureProduct.name}</h2>
+              <p className="signature-meta">{signatureCollection}</p>
+              <p className="signature-price">{formatMarketplacePrice(signatureProduct.price)}</p>
+              <Link className="home-cta signature-cta" to={`/collection/${signatureProduct.slug}`}>
+                Decouvrir
+              </Link>
+            </div>
+          </Reveal>
+        ) : null}
 
-        <Reveal as="section" className="best-sellers-block" delay={70}>
-          <Gallery4 title="Best-sellers" items={bestSellerGalleryItems} />
-        </Reveal>
+        {bestSellerGalleryItems.length > 0 ? (
+          <Reveal as="section" className="best-sellers-block" delay={70}>
+            <Gallery4 title="Best-sellers" items={bestSellerGalleryItems} />
+          </Reveal>
+        ) : null}
 
         <Reveal
           as="section"
@@ -1045,6 +1233,8 @@ function HomePage() {
             </article>
           ))}
         </Reveal>
+
+        {isCatalogLoading ? <p className="account-loading">Chargement...</p> : null}
       </div>
     </section>
   );
@@ -1093,25 +1283,29 @@ function NotreHistoirePage() {
   );
 }
 
-function CollectionPage() {
+function CollectionPage({ products, isCatalogLoading }) {
   const [activeCollection, setActiveCollection] = useState("Toutes");
   const navigate = useNavigate();
   const pointerStartRef = useRef({ x: 0, y: 0 });
+  const activeProducts = useMemo(
+    () => products.filter((product) => product.is_active),
+    [products],
+  );
 
   const collectionFilters = useMemo(
-    () => ["Toutes", ...new Set(collectionMarketplaceProducts.map((product) => product.line))],
-    []
+    () => ["Toutes", ...new Set(activeProducts.map((product) => getProductCollectionName(product)))],
+    [activeProducts],
   );
 
   const visibleProducts = useMemo(() => {
     if (activeCollection === "Toutes") {
-      return collectionMarketplaceProducts;
+      return activeProducts;
     }
 
-    return collectionMarketplaceProducts.filter(
-      (product) => product.line === activeCollection
+    return activeProducts.filter(
+      (product) => getProductCollectionName(product) === activeCollection,
     );
-  }, [activeCollection]);
+  }, [activeCollection, activeProducts]);
 
   const handleCardPointerDown = (event) => {
     pointerStartRef.current = {
@@ -1171,15 +1365,15 @@ function CollectionPage() {
         </aside>
 
         <div className="collection-marketplace-grid">
-          {visibleProducts.map((product, index) => (
+          {visibleProducts.map((product) => (
             <article
               className="collection-marketplace-card"
               key={product.id}
               role="link"
               tabIndex={0}
               onPointerDown={handleCardPointerDown}
-              onPointerUp={(event) => handleCardPointerUp(event, product.id)}
-              onKeyDown={(event) => handleCardKeyDown(event, product.id)}
+              onPointerUp={(event) => handleCardPointerUp(event, product.slug)}
+              onKeyDown={(event) => handleCardKeyDown(event, product.slug)}
             >
               <div className="collection-marketplace-media">
                 <span className="collection-card-eyebrow" aria-hidden="true">
@@ -1205,19 +1399,22 @@ function CollectionPage() {
           ))}
         </div>
       </div>
+      {isCatalogLoading ? <p className="account-loading">Chargement...</p> : null}
+      {!isCatalogLoading && visibleProducts.length === 0 ? (
+        <p className="account-empty">Aucun produit</p>
+      ) : null}
     </section>
   );
 }
 
-function ProductDetailPage({ onAddToCart }) {
+function ProductDetailPage({ products, onAddToCart }) {
   const { productId } = useParams();
   const [selectedSize, setSelectedSize] = useState("");
   const [openSectionId, setOpenSectionId] = useState(null);
 
   const product = useMemo(
-    () =>
-      collectionMarketplaceProducts.find((item) => item.id === productId) ?? null,
-    [productId]
+    () => products.find((item) => item.slug === productId && item.is_active) ?? null,
+    [productId, products],
   );
 
   useEffect(() => {
@@ -1230,6 +1427,7 @@ function ProductDetailPage({ onAddToCart }) {
   }
 
   const detailSections = getProductDetailSections(product);
+  const sizeOptions = getProductSizeOptions(product);
   const canAddToCart = selectedSize !== "";
 
   return (
@@ -1246,7 +1444,7 @@ function ProductDetailPage({ onAddToCart }) {
           <Link className="product-detail-back" to="/collection">
             Retour boutique
           </Link>
-          <p className="product-detail-line">{product.line}</p>
+          <p className="product-detail-line">{getProductCollectionName(product)}</p>
           <h1>{product.name}</h1>
           <p className="product-detail-price">{formatMarketplacePrice(product.price)}</p>
           <label className="product-detail-size-label" htmlFor="product-size">
@@ -1260,7 +1458,7 @@ function ProductDetailPage({ onAddToCart }) {
             required
           >
             <option value="">Choisir une taille</option>
-            {marketplaceProductSizes.map((size) => (
+            {sizeOptions.map((size) => (
               <option key={size} value={size}>
                 {size}
               </option>
@@ -1281,7 +1479,7 @@ function ProductDetailPage({ onAddToCart }) {
                 name: product.name,
                 size: selectedSize,
                 price: product.price,
-                image: getMarketplaceImages(product)[0] ?? product.image,
+                image: getMarketplaceImages(product)[0],
               });
             }}
           >
@@ -1964,6 +2162,1304 @@ function AccountPage() {
   );
 }
 
+function UploadFileButton({ label, disabled, onPickFile }) {
+  return (
+    <label
+      className={disabled ? "dashboard-upload dashboard-upload--modern is-disabled" : "dashboard-upload dashboard-upload--modern"}
+    >
+      <input
+        type="file"
+        accept="image/*"
+        disabled={disabled}
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) {
+            onPickFile(file);
+          }
+          event.target.value = "";
+        }}
+      />
+      <span>{label}</span>
+    </label>
+  );
+}
+
+function SizeStockEditor({ value, onChange, disabled }) {
+  const rows = useMemo(() => parseSizeStockRowsForEditor(value), [value]);
+  const validEntries = useMemo(() => parseSizeStockEntries(value), [value]);
+  const total = useMemo(
+    () => validEntries.reduce((accumulator, entry) => accumulator + entry.stock, 0),
+    [validEntries],
+  );
+
+  const setRowAt = (index, updater) => {
+    const nextRows = rows.map((row, rowIndex) =>
+      rowIndex === index ? { ...row, ...updater } : row,
+    );
+    onChange(serializeSizeStockRowsForEditor(nextRows));
+  };
+
+  const addRow = () => {
+    const nextRows = [...rows, { size: "", stock: "" }];
+    onChange(serializeSizeStockRowsForEditor(nextRows));
+  };
+
+  const removeRow = (index) => {
+    const nextRows = rows.filter((_, rowIndex) => rowIndex !== index);
+    if (nextRows.length === 0) {
+      onChange("");
+      return;
+    }
+    onChange(serializeSizeStockRowsForEditor(nextRows));
+  };
+
+  return (
+    <div className="size-stock-editor">
+      <div className="size-stock-head">
+        <span>Stock par taille</span>
+        <strong>{total}</strong>
+      </div>
+      <div className="size-stock-grid">
+        {rows.map((row, index) => (
+          <div className="size-stock-row" key={`${row.size}-${row.stock}-${index}`}>
+            <input
+              type="text"
+              className="size-stock-input"
+              value={row.size}
+              placeholder="Taille"
+              disabled={disabled}
+              onChange={(event) =>
+                setRowAt(index, {
+                  size: event.target.value,
+                })
+              }
+            />
+            <input
+              type="number"
+              className="size-stock-input"
+              min={0}
+              step="1"
+              value={row.stock}
+              placeholder="Stock"
+              disabled={disabled}
+              onChange={(event) =>
+                setRowAt(index, {
+                  stock: event.target.value,
+                })
+              }
+            />
+            <button
+              type="button"
+              className="size-stock-remove"
+              disabled={disabled || rows.length <= 1}
+              aria-label={`Supprimer la taille ${index + 1}`}
+              onClick={() => removeRow(index)}
+            >
+              Retirer
+            </button>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="size-stock-add"
+        disabled={disabled}
+        onClick={addRow}
+      >
+        Ajouter une taille
+      </button>
+    </div>
+  );
+}
+
+function AdminPage({ onCatalogRefresh }) {
+  const navigate = useNavigate();
+  const session = readStoredAuthSession();
+  const accessToken =
+    session && typeof session.access_token === "string" ? session.access_token : "";
+
+  const [activeTab, setActiveTab] = useState("collections-add");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  const [collections, setCollections] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  const [collectionDrafts, setCollectionDrafts] = useState({});
+  const [newCollectionDraft, setNewCollectionDraft] = useState({
+    title: "",
+    description: "",
+    image_url: "",
+    sort_order: "",
+    is_active: true,
+  });
+  const [selectedProductId, setSelectedProductId] = useState("");
+  const [productDraft, setProductDraft] = useState({
+    name: "",
+    collection_id: "",
+    price: "0",
+    description: "",
+    size_guide: "",
+    stock_by_size: "",
+    stock: "0",
+    composition_care: "",
+    image_url: "",
+    gallery_urls: "",
+    is_active: true,
+  });
+  const [newProductDraft, setNewProductDraft] = useState({
+    name: "",
+    collection_id: "",
+    price: "",
+    description: "",
+    size_guide: "",
+    stock_by_size: "",
+    stock: "0",
+    composition_care: "",
+    image_url: "",
+    gallery_urls: "",
+    is_active: true,
+  });
+  const [featuredDraft, setFeaturedDraft] = useState({
+    signature_product_id: "",
+    best_seller_product_ids: [],
+  });
+
+  const loadRequestRef = useRef(null);
+  const actionRequestRef = useRef(null);
+  const uploadRequestRef = useRef(null);
+
+  const toCollectionDraft = (collection) => ({
+    title: collection.title ?? "",
+    description: collection.description ?? "",
+    image_url: collection.image_url ?? "",
+    sort_order: `${collection.sort_order ?? 0}`,
+    is_active: Boolean(collection.is_active),
+  });
+
+  const toProductDraft = (product) => {
+    const rawSizeGuide = Array.isArray(product.size_guide) ? product.size_guide : [];
+    const stockBySizeText = extractSizeStockTextFromGuide(rawSizeGuide);
+    const sizeGuideText =
+      stockBySizeText.length > 0
+        ? rawSizeGuide
+            .map((line) => {
+              if (typeof line !== "string") {
+                return "";
+              }
+              const separatorIndex = line.indexOf(":");
+              if (separatorIndex < 0) {
+                return line.trim();
+              }
+              return line.slice(0, separatorIndex).trim();
+            })
+            .filter((line) => line.length > 0)
+            .join("\n")
+        : rawSizeGuide.join("\n");
+
+    return {
+      name: product.name ?? "",
+      collection_id: product.collection_id ?? "",
+      price: `${product.price ?? 0}`,
+      description: product.description ?? "",
+      size_guide: sizeGuideText,
+      stock_by_size: stockBySizeText,
+      stock: `${product.stock ?? 0}`,
+      composition_care: Array.isArray(product.composition_care)
+        ? product.composition_care.join("\n")
+        : "",
+      image_url: getMarketplaceImages(product)[0] ?? "",
+      gallery_urls: Array.isArray(product.images) ? product.images.join("\n") : "",
+      is_active: Boolean(product.is_active),
+    };
+  };
+
+  const syncDashboardState = (payload) => {
+    const nextCollections = Array.isArray(payload.collections) ? payload.collections : [];
+    const nextProducts = Array.isArray(payload.products) ? payload.products : [];
+    const nextFeatured =
+      payload.featured && typeof payload.featured === "object"
+        ? payload.featured
+        : { signature_product_id: null, best_seller_product_ids: [] };
+
+    setCollections(nextCollections);
+    setProducts(nextProducts);
+    setCollectionDrafts(
+      nextCollections.reduce((accumulator, collection) => {
+        accumulator[collection.id] = toCollectionDraft(collection);
+        return accumulator;
+      }, {}),
+    );
+    setNewCollectionDraft((current) => ({
+      ...current,
+      sort_order:
+        typeof current.sort_order === "string" && current.sort_order.trim().length > 0
+          ? current.sort_order
+          : `${nextCollections.length}`,
+    }));
+    setFeaturedDraft({
+      signature_product_id:
+        typeof nextFeatured.signature_product_id === "string"
+          ? nextFeatured.signature_product_id
+          : "",
+      best_seller_product_ids: Array.isArray(nextFeatured.best_seller_product_ids)
+        ? nextFeatured.best_seller_product_ids
+        : [],
+    });
+
+    setSelectedProductId((current) => {
+      if (current && nextProducts.some((product) => product.id === current)) {
+        return current;
+      }
+      return nextProducts[0]?.id ?? "";
+    });
+    setNewProductDraft((current) => ({
+      ...current,
+      collection_id: current.collection_id || nextCollections[0]?.id || "",
+    }));
+  };
+
+  useEffect(() => {
+    return () => {
+      loadRequestRef.current?.abort();
+      actionRequestRef.current?.abort();
+      uploadRequestRef.current?.abort();
+    };
+  }, []);
+
+  const refreshDashboard = async () => {
+    if (!accessToken) {
+      setIsLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    loadRequestRef.current?.abort();
+    loadRequestRef.current = controller;
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const payload = await getAdminCatalog({
+        accessToken,
+        signal: controller.signal,
+      });
+      if (loadRequestRef.current !== controller) {
+        return;
+      }
+      syncDashboardState(payload);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      if (loadRequestRef.current !== controller) {
+        return;
+      }
+      if (
+        error instanceof ApiRequestError &&
+        (error.status === 401 || error.status === 403)
+      ) {
+        setErrorMessage("Acces admin requis");
+      } else {
+        setErrorMessage(error instanceof Error ? error.message : "Chargement admin impossible");
+      }
+    } finally {
+      if (loadRequestRef.current === controller) {
+        loadRequestRef.current = null;
+        setIsLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!accessToken) {
+      navigate("/login", { replace: true });
+      return;
+    }
+    refreshDashboard();
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (!selectedProductId) {
+      return;
+    }
+    const selectedProduct = products.find((product) => product.id === selectedProductId);
+    if (!selectedProduct) {
+      return;
+    }
+    setProductDraft(toProductDraft(selectedProduct));
+  }, [selectedProductId, products]);
+
+  const runAdminMutation = async (task, successLabel, onSuccess) => {
+    if (isSubmitting) {
+      return;
+    }
+
+    const controller = new AbortController();
+    actionRequestRef.current?.abort();
+    actionRequestRef.current = controller;
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      await task(controller.signal);
+      if (actionRequestRef.current !== controller) {
+        return;
+      }
+
+      await refreshDashboard();
+      await onCatalogRefresh().catch(() => undefined);
+      if (typeof onSuccess === "function") {
+        onSuccess();
+      }
+      setSuccessMessage(successLabel);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      if (actionRequestRef.current !== controller) {
+        return;
+      }
+      if (
+        error instanceof ApiRequestError &&
+        (error.status === 401 || error.status === 403)
+      ) {
+        setErrorMessage("Acces admin requis");
+      } else {
+        setErrorMessage(error instanceof Error ? error.message : "Operation impossible");
+      }
+    } finally {
+      if (actionRequestRef.current === controller) {
+        actionRequestRef.current = null;
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const uploadImageAndApply = async (scope, file, onApply) => {
+    if (!file || isSubmitting) {
+      return;
+    }
+
+    const controller = new AbortController();
+    uploadRequestRef.current?.abort();
+    uploadRequestRef.current = controller;
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const payload = await uploadAdminImage({
+        accessToken,
+        scope,
+        file,
+        signal: controller.signal,
+      });
+      if (uploadRequestRef.current !== controller) {
+        return;
+      }
+      onApply(payload.image_url);
+      setSuccessMessage("Image importee");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      if (uploadRequestRef.current !== controller) {
+        return;
+      }
+      if (
+        error instanceof ApiRequestError &&
+        (error.status === 401 || error.status === 403)
+      ) {
+        setErrorMessage("Acces admin requis");
+      } else {
+        setErrorMessage(error instanceof Error ? error.message : "Upload image impossible");
+      }
+    } finally {
+      if (uploadRequestRef.current === controller) {
+        uploadRequestRef.current = null;
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  if (!accessToken) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const activeProducts = products.filter((product) => product.is_active);
+  const canCreateCollection =
+    newCollectionDraft.title.trim().length > 0 &&
+    newCollectionDraft.description.trim().length > 0 &&
+    newCollectionDraft.image_url.trim().length > 0;
+  const newProductSizeStockEntries = parseSizeStockEntries(newProductDraft.stock_by_size);
+  const isNewProductStockAuto = newProductSizeStockEntries.length > 0;
+  const newProductStockTotal = newProductSizeStockEntries.reduce(
+    (accumulator, entry) => accumulator + entry.stock,
+    0,
+  );
+  const productSizeStockEntries = parseSizeStockEntries(productDraft.stock_by_size);
+  const isProductStockAuto = productSizeStockEntries.length > 0;
+  const productStockTotal = productSizeStockEntries.reduce(
+    (accumulator, entry) => accumulator + entry.stock,
+    0,
+  );
+  const adminTabs = [
+    { id: "collections-add", label: "Ajouter une collection" },
+    { id: "collections-edit", label: "Modifier une collection" },
+    { id: "products-add", label: "Ajouter un produit" },
+    { id: "products-edit", label: "Modifier un produit" },
+  ];
+
+  return (
+    <section className="page-view account-view dashboard-view">
+      <div className="dashboard-shell">
+        <div className="account-tabs dashboard-tabs" role="tablist" aria-label="Admin">
+          {adminTabs.map((tab) => (
+            <button
+              type="button"
+              role="tab"
+              id={`admin-tab-${tab.id}`}
+              key={tab.id}
+              aria-selected={activeTab === tab.id}
+              aria-controls={`admin-panel-${tab.id}`}
+              className={
+                activeTab === tab.id
+                  ? "account-tab dashboard-tab account-tab--active"
+                  : "account-tab dashboard-tab"
+              }
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {isLoading ? <p className="account-loading">Chargement...</p> : null}
+
+        {activeTab === "collections-add" ? (
+          <div
+            className="dashboard-grid"
+            role="tabpanel"
+            id="admin-panel-collections-add"
+            aria-labelledby="admin-tab-collections-add"
+          >
+            <section className="dashboard-block">
+              <h2>Ajouter une collection</h2>
+              <div className="dashboard-card">
+                <label>
+                  <span>Titre</span>
+                  <input
+                    type="text"
+                    value={newCollectionDraft.title}
+                    onChange={(event) =>
+                      setNewCollectionDraft((current) => ({
+                        ...current,
+                        title: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Description</span>
+                  <textarea
+                    value={newCollectionDraft.description}
+                    onChange={(event) =>
+                      setNewCollectionDraft((current) => ({
+                        ...current,
+                        description: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Image</span>
+                  <input
+                    type="text"
+                    value={newCollectionDraft.image_url}
+                    onChange={(event) =>
+                      setNewCollectionDraft((current) => ({
+                        ...current,
+                        image_url: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <div className="dashboard-inline-actions">
+                  <UploadFileButton
+                    label="Ajouter un fichier"
+                    disabled={isSubmitting}
+                    onPickFile={(file) => {
+                      uploadImageAndApply("collections", file, (imageUrl) => {
+                        setNewCollectionDraft((current) => ({
+                          ...current,
+                          image_url: imageUrl,
+                        }));
+                      });
+                    }}
+                  />
+                  {newCollectionDraft.image_url ? (
+                    <img src={newCollectionDraft.image_url} alt={newCollectionDraft.title} loading="lazy" />
+                  ) : null}
+                </div>
+                <div className="dashboard-inline-actions">
+                  <label>
+                    <span>Ordre</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={newCollectionDraft.sort_order}
+                      onChange={(event) =>
+                        setNewCollectionDraft((current) => ({
+                          ...current,
+                          sort_order: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="dashboard-toggle">
+                    <input
+                      type="checkbox"
+                      checked={newCollectionDraft.is_active}
+                      onChange={(event) =>
+                        setNewCollectionDraft((current) => ({
+                          ...current,
+                          is_active: event.target.checked,
+                        }))
+                      }
+                    />
+                    <span>Visible</span>
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  className="account-submit-btn"
+                  disabled={isSubmitting || !canCreateCollection}
+                  onClick={() =>
+                    runAdminMutation(
+                      (signal) =>
+                        createAdminCollection({
+                          accessToken,
+                          signal,
+                          title: newCollectionDraft.title,
+                          description: newCollectionDraft.description,
+                          image_url: newCollectionDraft.image_url,
+                          sort_order: Number.parseInt(newCollectionDraft.sort_order, 10) || 0,
+                          is_active: newCollectionDraft.is_active,
+                        }),
+                      "Collection ajoutee",
+                      () =>
+                        setNewCollectionDraft({
+                          title: "",
+                          description: "",
+                          image_url: "",
+                          sort_order: "",
+                          is_active: true,
+                        }),
+                    )
+                  }
+                >
+                  Ajouter
+                </button>
+              </div>
+            </section>
+          </div>
+        ) : null}
+
+        {activeTab === "collections-edit" ? (
+          <div
+            className="dashboard-grid"
+            role="tabpanel"
+            id="admin-panel-collections-edit"
+            aria-labelledby="admin-tab-collections-edit"
+          >
+            <section className="dashboard-block">
+              <h2>Collections accueil</h2>
+              <div className="dashboard-collection-grid">
+                {collections.map((collection) => {
+                  const draft = collectionDrafts[collection.id];
+                  if (!draft) {
+                    return null;
+                  }
+
+                  return (
+                    <article className="dashboard-card" key={collection.id}>
+                      <label>
+                        <span>Titre</span>
+                        <input
+                          type="text"
+                          value={draft.title}
+                          onChange={(event) =>
+                            setCollectionDrafts((current) => ({
+                              ...current,
+                              [collection.id]: {
+                                ...current[collection.id],
+                                title: event.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      </label>
+                      <label>
+                        <span>Description</span>
+                        <textarea
+                          value={draft.description}
+                          onChange={(event) =>
+                            setCollectionDrafts((current) => ({
+                              ...current,
+                              [collection.id]: {
+                                ...current[collection.id],
+                                description: event.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      </label>
+                      <label>
+                        <span>Image</span>
+                        <input
+                          type="text"
+                          value={draft.image_url}
+                          onChange={(event) =>
+                            setCollectionDrafts((current) => ({
+                              ...current,
+                              [collection.id]: {
+                                ...current[collection.id],
+                                image_url: event.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      </label>
+                      <div className="dashboard-inline-actions">
+                        <UploadFileButton
+                          label="Ajouter un fichier"
+                          disabled={isSubmitting}
+                          onPickFile={(file) => {
+                            uploadImageAndApply("collections", file, (imageUrl) => {
+                              setCollectionDrafts((current) => ({
+                                ...current,
+                                [collection.id]: {
+                                  ...current[collection.id],
+                                  image_url: imageUrl,
+                                },
+                              }));
+                            });
+                          }}
+                        />
+                        <img src={draft.image_url} alt={draft.title} loading="lazy" />
+                      </div>
+                      <div className="dashboard-inline-actions">
+                        <label>
+                          <span>Ordre</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={draft.sort_order}
+                            onChange={(event) =>
+                              setCollectionDrafts((current) => ({
+                                ...current,
+                                [collection.id]: {
+                                  ...current[collection.id],
+                                  sort_order: event.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        </label>
+                        <label className="dashboard-toggle">
+                          <input
+                            type="checkbox"
+                            checked={draft.is_active}
+                            onChange={(event) =>
+                              setCollectionDrafts((current) => ({
+                                ...current,
+                                [collection.id]: {
+                                  ...current[collection.id],
+                                  is_active: event.target.checked,
+                                },
+                              }))
+                            }
+                          />
+                          <span>Visible</span>
+                        </label>
+                      </div>
+                      <button
+                        type="button"
+                        className="account-submit-btn"
+                        disabled={isSubmitting}
+                        onClick={() =>
+                          runAdminMutation(
+                            (signal) =>
+                              updateAdminCollection(collection.id, {
+                                accessToken,
+                                signal,
+                                title: draft.title,
+                                description: draft.description,
+                                image_url: draft.image_url,
+                                sort_order: Number.parseInt(draft.sort_order, 10) || 0,
+                                is_active: draft.is_active,
+                              }),
+                            "Collection enregistree",
+                          )
+                        }
+                      >
+                        Enregistrer
+                      </button>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="dashboard-block">
+              <h2>Piece signature et best-sellers</h2>
+              <div className="dashboard-card">
+                <label>
+                  <span>Piece signature</span>
+                  <select
+                    value={featuredDraft.signature_product_id}
+                    onChange={(event) =>
+                      setFeaturedDraft((current) => ({
+                        ...current,
+                        signature_product_id: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Aucune</option>
+                    {activeProducts.map((product) => (
+                      <option value={product.id} key={product.id}>
+                        {product.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                {activeProducts.length === 0 ? (
+                  <p className="account-empty">Aucun produit actif</p>
+                ) : null}
+
+                <div className="dashboard-best-sellers-list">
+                  {activeProducts.map((product) => {
+                      const isChecked = featuredDraft.best_seller_product_ids.includes(product.id);
+
+                      return (
+                        <label className="dashboard-toggle" key={product.id}>
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(event) =>
+                              setFeaturedDraft((current) => {
+                                if (event.target.checked) {
+                                  return {
+                                    ...current,
+                                    best_seller_product_ids: [
+                                      ...current.best_seller_product_ids,
+                                      product.id,
+                                    ],
+                                  };
+                                }
+                                return {
+                                  ...current,
+                                  best_seller_product_ids:
+                                    current.best_seller_product_ids.filter(
+                                      (item) => item !== product.id,
+                                    ),
+                                };
+                              })
+                            }
+                          />
+                          <span>{product.name}</span>
+                        </label>
+                      );
+                    })}
+                </div>
+
+                <button
+                  type="button"
+                  className="account-submit-btn"
+                  disabled={isSubmitting || activeProducts.length === 0}
+                  onClick={() =>
+                    runAdminMutation(
+                      (signal) =>
+                        updateAdminFeatured({
+                          accessToken,
+                          signal,
+                          signature_product_id: featuredDraft.signature_product_id || null,
+                          best_seller_product_ids: featuredDraft.best_seller_product_ids,
+                        }),
+                      "Selection best-sellers enregistree",
+                    )
+                  }
+                >
+                  Enregistrer best-sellers
+                </button>
+              </div>
+            </section>
+          </div>
+        ) : null}
+
+        {activeTab === "products-add" ? (
+          <div
+            className="dashboard-grid"
+            role="tabpanel"
+            id="admin-panel-products-add"
+            aria-labelledby="admin-tab-products-add"
+          >
+            <section className="dashboard-block">
+              <h2>Ajouter un produit</h2>
+              <div className="dashboard-card">
+                <label>
+                  <span>Nom</span>
+                  <input
+                    type="text"
+                    value={newProductDraft.name}
+                    onChange={(event) =>
+                      setNewProductDraft((current) => ({
+                        ...current,
+                        name: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Collection</span>
+                  <select
+                    value={newProductDraft.collection_id}
+                    onChange={(event) =>
+                      setNewProductDraft((current) => ({
+                        ...current,
+                        collection_id: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Choisir</option>
+                    {collections.map((collection) => (
+                      <option key={collection.id} value={collection.id}>
+                        {collection.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="dashboard-inline-actions">
+                  <label>
+                    <span>Prix</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={newProductDraft.price}
+                      onChange={(event) =>
+                        setNewProductDraft((current) => ({
+                          ...current,
+                          price: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <label>
+                    <span>{isNewProductStockAuto ? "Stock total (auto)" : "Stock total"}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step="1"
+                      value={isNewProductStockAuto ? `${newProductStockTotal}` : newProductDraft.stock}
+                      disabled={isSubmitting || isNewProductStockAuto}
+                      onChange={(event) =>
+                        setNewProductDraft((current) => ({
+                          ...current,
+                          stock: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                </div>
+                <label>
+                  <span>Description</span>
+                  <textarea
+                    value={newProductDraft.description}
+                    onChange={(event) =>
+                      setNewProductDraft((current) => ({
+                        ...current,
+                        description: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Tailles (une ligne par taille)</span>
+                  <textarea
+                    value={newProductDraft.size_guide}
+                    onChange={(event) =>
+                      setNewProductDraft((current) => ({
+                        ...current,
+                        size_guide: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <SizeStockEditor
+                  value={newProductDraft.stock_by_size}
+                  disabled={isSubmitting}
+                  onChange={(nextValue) =>
+                    setNewProductDraft((current) => ({
+                      ...current,
+                      stock_by_size: nextValue,
+                    }))
+                  }
+                />
+                <label>
+                  <span>Composition et entretien (une ligne par element)</span>
+                  <textarea
+                    value={newProductDraft.composition_care}
+                    onChange={(event) =>
+                      setNewProductDraft((current) => ({
+                        ...current,
+                        composition_care: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Image principale</span>
+                  <input
+                    type="text"
+                    value={newProductDraft.image_url}
+                    onChange={(event) =>
+                      setNewProductDraft((current) => ({
+                        ...current,
+                        image_url: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Galerie (une URL par ligne)</span>
+                  <textarea
+                    value={newProductDraft.gallery_urls}
+                    onChange={(event) =>
+                      setNewProductDraft((current) => ({
+                        ...current,
+                        gallery_urls: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <div className="dashboard-inline-actions">
+                  <UploadFileButton
+                    label="Ajouter un fichier"
+                    disabled={isSubmitting}
+                    onPickFile={(file) => {
+                      uploadImageAndApply("products", file, (imageUrl) => {
+                        setNewProductDraft((current) => ({
+                          ...current,
+                          image_url: imageUrl,
+                          gallery_urls: [imageUrl, current.gallery_urls]
+                            .filter((value) => value && value.trim().length > 0)
+                            .join("\n"),
+                        }));
+                      });
+                    }}
+                  />
+                  {newProductDraft.image_url ? (
+                    <img src={newProductDraft.image_url} alt="Nouveau produit" loading="lazy" />
+                  ) : null}
+                </div>
+                <label className="dashboard-toggle">
+                  <input
+                    type="checkbox"
+                    checked={newProductDraft.is_active}
+                    onChange={(event) =>
+                      setNewProductDraft((current) => ({
+                        ...current,
+                        is_active: event.target.checked,
+                      }))
+                    }
+                  />
+                  <span>Visible</span>
+                </label>
+                <button
+                  type="button"
+                  className="account-submit-btn"
+                  disabled={isSubmitting}
+                  onClick={() => {
+                    const sizingPayload = buildProductSizingPayload(
+                      newProductDraft.size_guide,
+                      newProductDraft.stock,
+                      newProductDraft.stock_by_size,
+                    );
+
+                    runAdminMutation(
+                      (signal) =>
+                        createAdminProduct({
+                          accessToken,
+                          signal,
+                          name: newProductDraft.name,
+                          collection_id: newProductDraft.collection_id,
+                          price: Number.parseFloat(newProductDraft.price) || 0,
+                          description: newProductDraft.description,
+                          size_guide: sizingPayload.sizeGuide,
+                          stock: sizingPayload.stock,
+                          composition_care: splitMultilineValue(newProductDraft.composition_care),
+                          images: buildProductImages(
+                            newProductDraft.image_url,
+                            newProductDraft.gallery_urls,
+                          ),
+                          is_active: newProductDraft.is_active,
+                        }),
+                      "Produit ajoute",
+                    );
+                  }}
+                >
+                  Ajouter
+                </button>
+              </div>
+            </section>
+          </div>
+        ) : null}
+
+        {activeTab === "products-edit" ? (
+          <div
+            className="dashboard-grid"
+            role="tabpanel"
+            id="admin-panel-products-edit"
+            aria-labelledby="admin-tab-products-edit"
+          >
+            <section className="dashboard-block">
+              <h2>Modifier un produit</h2>
+              <div className="dashboard-card">
+                <label>
+                  <span>Produit</span>
+                  <select
+                    value={selectedProductId}
+                    onChange={(event) => setSelectedProductId(event.target.value)}
+                  >
+                    {products.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span>Nom</span>
+                  <input
+                    type="text"
+                    value={productDraft.name}
+                    onChange={(event) =>
+                      setProductDraft((current) => ({
+                        ...current,
+                        name: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Collection</span>
+                  <select
+                    value={productDraft.collection_id}
+                    onChange={(event) =>
+                      setProductDraft((current) => ({
+                        ...current,
+                        collection_id: event.target.value,
+                      }))
+                    }
+                  >
+                    {collections.map((collection) => (
+                      <option key={collection.id} value={collection.id}>
+                        {collection.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="dashboard-inline-actions">
+                  <label>
+                    <span>Prix</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={productDraft.price}
+                      onChange={(event) =>
+                        setProductDraft((current) => ({
+                          ...current,
+                          price: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <label>
+                    <span>{isProductStockAuto ? "Stock total (auto)" : "Stock total"}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step="1"
+                      value={isProductStockAuto ? `${productStockTotal}` : productDraft.stock}
+                      disabled={isSubmitting || isProductStockAuto}
+                      onChange={(event) =>
+                        setProductDraft((current) => ({
+                          ...current,
+                          stock: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                </div>
+                <label>
+                  <span>Description</span>
+                  <textarea
+                    value={productDraft.description}
+                    onChange={(event) =>
+                      setProductDraft((current) => ({
+                        ...current,
+                        description: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Tailles (une ligne par taille)</span>
+                  <textarea
+                    value={productDraft.size_guide}
+                    onChange={(event) =>
+                      setProductDraft((current) => ({
+                        ...current,
+                        size_guide: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <SizeStockEditor
+                  value={productDraft.stock_by_size}
+                  disabled={isSubmitting}
+                  onChange={(nextValue) =>
+                    setProductDraft((current) => ({
+                      ...current,
+                      stock_by_size: nextValue,
+                    }))
+                  }
+                />
+                <label>
+                  <span>Composition et entretien (une ligne par element)</span>
+                  <textarea
+                    value={productDraft.composition_care}
+                    onChange={(event) =>
+                      setProductDraft((current) => ({
+                        ...current,
+                        composition_care: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Image principale</span>
+                  <input
+                    type="text"
+                    value={productDraft.image_url}
+                    onChange={(event) =>
+                      setProductDraft((current) => ({
+                        ...current,
+                        image_url: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Galerie (une URL par ligne)</span>
+                  <textarea
+                    value={productDraft.gallery_urls}
+                    onChange={(event) =>
+                      setProductDraft((current) => ({
+                        ...current,
+                        gallery_urls: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <div className="dashboard-inline-actions">
+                  <UploadFileButton
+                    label="Ajouter un fichier"
+                    disabled={isSubmitting}
+                    onPickFile={(file) => {
+                      uploadImageAndApply("products", file, (imageUrl) => {
+                        setProductDraft((current) => ({
+                          ...current,
+                          image_url: imageUrl,
+                          gallery_urls: [imageUrl, current.gallery_urls]
+                            .filter((value) => value && value.trim().length > 0)
+                            .join("\n"),
+                        }));
+                      });
+                    }}
+                  />
+                  {productDraft.image_url ? (
+                    <img src={productDraft.image_url} alt={productDraft.name} loading="lazy" />
+                  ) : null}
+                </div>
+                <label className="dashboard-toggle">
+                  <input
+                    type="checkbox"
+                    checked={productDraft.is_active}
+                    onChange={(event) =>
+                      setProductDraft((current) => ({
+                        ...current,
+                        is_active: event.target.checked,
+                      }))
+                    }
+                  />
+                  <span>Visible</span>
+                </label>
+                <button
+                  type="button"
+                  className="account-submit-btn"
+                  disabled={isSubmitting || !selectedProductId}
+                  onClick={() => {
+                    const sizingPayload = buildProductSizingPayload(
+                      productDraft.size_guide,
+                      productDraft.stock,
+                      productDraft.stock_by_size,
+                    );
+
+                    runAdminMutation(
+                      (signal) =>
+                        updateAdminProduct(selectedProductId, {
+                          accessToken,
+                          signal,
+                          name: productDraft.name,
+                          collection_id: productDraft.collection_id,
+                          price: Number.parseFloat(productDraft.price) || 0,
+                          description: productDraft.description,
+                          size_guide: sizingPayload.sizeGuide,
+                          stock: sizingPayload.stock,
+                          composition_care: splitMultilineValue(productDraft.composition_care),
+                          images: buildProductImages(
+                            productDraft.image_url,
+                            productDraft.gallery_urls,
+                          ),
+                          is_active: productDraft.is_active,
+                        }),
+                      "Produit enregistre",
+                    );
+                  }}
+                >
+                  Enregistrer
+                </button>
+              </div>
+            </section>
+          </div>
+        ) : null}
+
+        {errorMessage ? <p className="account-feedback account-feedback--error">{errorMessage}</p> : null}
+        {successMessage ? <p className="account-feedback account-feedback--success">{successMessage}</p> : null}
+      </div>
+    </section>
+  );
+}
+
 function PanierPage({ cartItems, cartTotal, onQuantityChange, onRemoveItem }) {
   return (
     <section className="page-view form-view">
@@ -2029,6 +3525,12 @@ function SiteFooter() {
 export function App() {
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [catalogData, setCatalogData] = useState(() =>
+    buildCatalogWithFallback(emptyPublicCatalog),
+  );
+  const [isCatalogLoading, setIsCatalogLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState(null);
+  const catalogRequestRef = useRef(null);
   const location = useLocation();
   const hideFooter = location.pathname === "/login";
 
@@ -2041,6 +3543,38 @@ export function App() {
     () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
     [cartItems]
   );
+
+  const refreshPublicCatalog = useCallback(async () => {
+    const controller = new AbortController();
+    catalogRequestRef.current?.abort();
+    catalogRequestRef.current = controller;
+    setIsCatalogLoading(true);
+    setCatalogError(null);
+
+    try {
+      const payload = await getPublicCatalog({
+        signal: controller.signal,
+      });
+      if (catalogRequestRef.current !== controller) {
+        return;
+      }
+      setCatalogData(buildCatalogWithFallback(payload));
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      if (catalogRequestRef.current !== controller) {
+        return;
+      }
+      setCatalogError(error instanceof Error ? error.message : "Lecture catalogue impossible");
+      setCatalogData(buildCatalogWithFallback(emptyPublicCatalog));
+    } finally {
+      if (catalogRequestRef.current === controller) {
+        catalogRequestRef.current = null;
+        setIsCatalogLoading(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleEsc = (event) => {
@@ -2055,6 +3589,14 @@ export function App() {
       window.removeEventListener("keydown", handleEsc);
     };
   }, []);
+
+  useEffect(() => {
+    refreshPublicCatalog();
+
+    return () => {
+      catalogRequestRef.current?.abort();
+    };
+  }, [refreshPublicCatalog]);
 
   useEffect(() => {
     if (!cartOpen) {
@@ -2127,14 +3669,38 @@ export function App() {
       />
 
       <div className="app-content">
+        {catalogError ? <p className="account-feedback account-feedback--error">{catalogError}</p> : null}
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/"
+            element={
+              <HomePage
+                collections={catalogData.collections}
+                products={catalogData.products}
+                featured={catalogData.featured}
+                isCatalogLoading={isCatalogLoading}
+              />
+            }
+          />
           <Route path="/notre-histoire" element={<NotreHistoirePage />} />
           <Route path="/histoire" element={<Navigate to="/notre-histoire" replace />} />
-          <Route path="/collection" element={<CollectionPage />} />
+          <Route
+            path="/collection"
+            element={
+              <CollectionPage
+                products={catalogData.products}
+                isCatalogLoading={isCatalogLoading}
+              />
+            }
+          />
           <Route
             path="/collection/:productId"
-            element={<ProductDetailPage onAddToCart={handleAddToCart} />}
+            element={
+              <ProductDetailPage
+                products={catalogData.products}
+                onAddToCart={handleAddToCart}
+              />
+            }
           />
           <Route path="/collections" element={<Navigate to="/collection" replace />} />
           <Route path="/marketplace" element={<Navigate to="/collection" replace />} />
@@ -2154,6 +3720,11 @@ export function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/compte" element={<AccountPage />} />
+          <Route
+            path="/admin"
+            element={<AdminPage onCatalogRefresh={refreshPublicCatalog} />}
+          />
+          <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
           {legalPages.map((page) => (
             <Route
               key={page.path}

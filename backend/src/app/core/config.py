@@ -13,6 +13,7 @@ class Settings:
     cors_origins: list[str]
     supabase_url: str
     supabase_anon_key: str
+    supabase_storage_bucket: str
     supabase_google_redirect_url: str
     auth_cookie_secure: bool
 
@@ -53,6 +54,9 @@ def get_settings() -> Settings:
         cors_origins=cors_origins,
         supabase_url=os.getenv("SUPABASE_URL", "").strip(),
         supabase_anon_key=os.getenv("SUPABASE_ANON_KEY", "").strip(),
+        supabase_storage_bucket=os.getenv(
+            "SUPABASE_STORAGE_BUCKET", "maison-marcelina"
+        ).strip(),
         supabase_google_redirect_url=os.getenv(
             "SUPABASE_GOOGLE_REDIRECT_URL",
             f"http://localhost:{backend_port}/auth/google/callback",

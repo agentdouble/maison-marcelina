@@ -14,11 +14,15 @@ Application web Maison Marcelina avec backend FastAPI (`uv`) et frontend React/V
 
 - Home, histoire, collection, fiche produit, panier, contact, sur-mesure
 - Authentification + compte client (`/compte`)
+- Header avec navigation principale, icônes profil/panier, menu mobile (fermeture outside click + `Escape`)
 - Catalogue prioritairement Supabase avec fallback mock automatique:
   - collections homepage depuis DB, fallback mock si aucune image active
   - hero home compatible avec 1 seule collection active (pas besoin de 2 images pour afficher le visuel)
   - pièce signature / best-sellers depuis DB, fallback automatique si non définis
   - produits boutique depuis DB, fallback mock si aucun produit actif
+- Boutique `/collection` orientée marketplace avec filtres par collection, grille responsive et ouverture fiche produit par carte
+- Fiche produit `/collection/:productId` avec retour boutique en haut, taille obligatoire, et ajout panier par variante de taille
+- Sur-mesure avec login gate: formulaire disponible pour compte connecté, redirection vers `/login` sinon
 - Admin (`/admin`, alias `/dashboard`):
   - onglet `Ajouter une collection`:
     - ajout collection home (titre, description, image, ordre, visibilité)
@@ -38,6 +42,7 @@ Application web Maison Marcelina avec backend FastAPI (`uv`) et frontend React/V
     - stock total manuel conservé quand le stock par taille est vide
     - bouton `Ajouter un fichier` modernisé pour l'upload image
   - les slugs produits/collections sont gérés automatiquement côté backend
+- Footer thématique `Footer7` avec colonnes `Navigation`, `Assistance`, `Informations légales`
 
 ## Project layout
 
@@ -111,18 +116,19 @@ Toujours lancer depuis la racine:
 
 ## Frontend routes
 
-- `/`
-- `/notre-histoire` (alias `/histoire`)
-- `/collection`
-- `/collection/:productId`
-- `/collections` (alias vers `/collection`)
-- `/marketplace` (alias vers `/collection`)
-- `/boutique` (alias vers `/collection`)
-- `/sur-mesure`
-- `/contact`
-- `/panier`
-- `/login`
-- `/compte`
+- `/` home
+- `/notre-histoire` page histoire
+- `/histoire` alias vers `/notre-histoire`
+- `/collection` boutique marketplace
+- `/collection/:productId` fiche produit
+- `/collections` alias vers `/collection`
+- `/marketplace` alias vers `/collection`
+- `/sur-mesure` formulaire sur-mesure (auth requise)
+- `/contact` page contact
+- `/boutique` redirection vers `/collection`
+- `/panier` page panier
+- `/login` page login
+- `/compte` espace compte (Vue d'ensemble, Commandes, Coordonnées, Sécurité)
 - `/admin` (alias `/dashboard`)
 - `/mentions-legales`
 - `/cgv`
@@ -188,6 +194,16 @@ Admin (requiert `Authorization: Bearer <access_token>` + user admin):
 - `PUT /catalog/admin/products/{product_id}`
 - `PUT /catalog/admin/featured`
 - `POST /catalog/admin/upload-image` (multipart: `scope`, `file`)
+
+### Frontend auth behavior
+
+- `/login` utilise `src/components/ui/login-1.tsx`
+- email/password appelle `POST {VITE_API_BASE_URL}/auth/login`
+- création de compte appelle `POST {VITE_API_BASE_URL}/auth/signup`
+- Google OAuth redirige vers `{VITE_API_BASE_URL}/auth/google/start`
+- la session login est stockée dans `localStorage` (`mm_auth_session`)
+- l’icône profil pointe vers `/compte` si authentifié, sinon `/login`
+- en cas de `401/403` sur `/account/*`, la session locale est purgee et l’app redirige vers `/login`
 
 ## Supabase setup (catalog + admin)
 

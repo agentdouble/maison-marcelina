@@ -1063,7 +1063,9 @@ textarea:focus-visible,
 
 .product-detail-back {
   width: fit-content;
-  margin-top: 2px;
+  margin: 0 0 2px;
+  justify-self: end;
+  align-self: start;
   color: rgba(78, 48, 36, 0.84);
   text-decoration: none;
   font-size: 11px;
@@ -1806,6 +1808,74 @@ textarea:focus-visible,
 
 .account-feedback--success {
   color: rgba(58, 86, 63, 0.94);
+}
+
+.sur-mesure-panel {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.sur-mesure-intro {
+  margin: 0;
+  max-width: 74ch;
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: rgba(58, 34, 24, 0.86);
+  text-align: center;
+  justify-self: center;
+}
+
+.sur-mesure-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.sur-mesure-access {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+}
+
+.sur-mesure-access p {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(78, 48, 36, 0.82);
+}
+
+.sur-mesure-request-form {
+  display: grid;
+  gap: 12px;
+}
+
+.sur-mesure-feedback {
+  margin: 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(58, 86, 63, 0.94);
+}
+
+.sur-mesure-action {
+  width: fit-content;
+  color: rgba(78, 48, 36, 0.9);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid currentColor;
+}
+
+.sur-mesure-action:hover {
+  opacity: 0.72;
 }
 
 .dashboard-view {

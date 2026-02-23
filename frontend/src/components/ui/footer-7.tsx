@@ -53,7 +53,7 @@ const defaultSocialLinks = [
 ];
 
 const defaultLegalLinks = [
-  { name: "Mentions legales", href: "/mentions-legales" },
+  { name: "Mentions légales", href: "/mentions-legales" },
   { name: "CGV", href: "/cgv" },
 ];
 
@@ -97,7 +97,7 @@ export const Footer7 = ({
   const footerColumns = [
     ...sections,
     {
-      title: "Informations legales",
+      title: "Informations légales",
       links: legalLinks,
     },
   ];

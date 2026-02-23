@@ -10,6 +10,9 @@
 - Storing signature and best-sellers in a single `home_featured` row avoids multi-request flag races and keeps merchandising updates atomic.
 - Uploading media through backend `/catalog/admin/upload-image` lets admin workflows stay in-site while preserving centralized auth/error handling.
 - Converting multiline dashboard inputs into normalized arrays (`size_guide`, `composition_care`, `images`) keeps product detail rendering deterministic.
+- When French UI copy is touched, sweep the whole frontend (`App.jsx`, shared UI components, and auth fallback messages) in the same pass to keep accent usage consistent.
+- Header tab order should be driven from one `navItems` source so quick label-position requests (like moving `Notre Histoire` to the right of `Sur mesure`) stay low risk.
+- On product detail pages, placing `Retour boutique` as the first right-aligned element keeps navigation visible without competing with accordion rows.
 - When a request targets copy inside a page, keep route/nav structure and only remove the targeted text element.
 - Making the story view full-bleed at the view class level keeps the edge-to-edge behavior scoped and predictable.
 - For split story layouts, a straight full-height image panel (without blob radius/shadow) creates a cleaner edge against the text column.
@@ -131,6 +134,14 @@
 - On `/compte`, a flatter layout (separators and hierarchy) reads more premium than stacked framed cards.
 - Mapping Supabase `401/403` auth rejections to a clear account `401` response prevents ambiguous profile-save failures.
 - Clearing stale `mm_auth_session` and redirecting to `/login` on account auth rejection keeps buyer UX recoverable.
+- On `/sur-mesure`, replacing manual email capture with a login gate keeps request identity tied to the authenticated account.
+- On `/sur-mesure`, keep the request action available for authenticated users while gating anonymous users to `/login`.
+- On `/sur-mesure`, capability-focused copy (`ce que l'on peut personnaliser`) is clearer than internal process wording.
+- On `/sur-mesure`, a single compact paragraph explains possibilities faster than segmented step blocks.
+- On `/sur-mesure`, removing a redundant page title can keep focus on the compact value copy and request action.
+- On `/sur-mesure`, a frameless layout (without `form-panel`) avoids the `cadre dans cadre` effect and keeps the page cleaner.
+- On French-facing pages, accented UI copy improves readability and perceived quality.
+- On `/sur-mesure`, centering the value paragraph and adding one editorial image improves clarity without reintroducing card containers.
 
 ## errors to avoid
 
@@ -139,6 +150,9 @@
 - Do not allow image upload flows without strict file type/size validation, or storage and frontend rendering can break in production.
 - Do not expose admin write endpoints without an explicit admin membership check (`admin_users`), even if the user is authenticated.
 - Do not parse product arrays from free-form text without trimming/deduplication, or product detail accordions and media carousels become inconsistent.
+- Do not fix accents only on one page when equivalent labels/messages exist in shared components or account/auth flows.
+- Do not update footer navigation order when the request explicitly targets header tab placement.
+- Do not keep `Retour boutique` below the shipping/returns accordion when the requested UX is a top-right back action.
 - Do not interpret "remove text in a tab" as "delete the whole tab/page feature".
 - Do not keep organic liquid clipping on the story image when the requested direction is a straight full-height panel.
 - Do not over-space editorial paragraphs when a compact reading layout is requested.
@@ -232,3 +246,11 @@
 - Do not require at least 2 loaded hero textures before rendering; with one active collection image the home hero must still display.
 - Do not label critical admin actions with generic "Enregistrer" only; for merchandising controls (best-sellers), use explicit action text and a visible empty-state when no active products exist.
 - Do not expose slug fields in admin content forms when backend already generates and enforces unique slugs; it adds friction and invalid-input risk for non-technical users.
+- Do not ask for contact email on `/sur-mesure` when auth is available; gate with login and use account identity instead.
+- Do not remove the sur-mesure request form after adding auth gating, or logged-in users lose the main action.
+- Do not describe only atelier phases on `/sur-mesure` when users need to quickly understand customization options.
+- Do not fragment short value copy into multiple cards/steps when one compact text block communicates better.
+- Do not stack a redundant `Sur mesure` page heading above already explicit intro copy when the page should stay concise.
+- Do not nest framed wrappers (`form-panel` + internal separated blocks) on `/sur-mesure`; keep one visual level.
+- Do not ship French interface text without accents when final copy is user-visible.
+- Do not add decorative image wrappers that create extra framing when the requested direction is frameless.

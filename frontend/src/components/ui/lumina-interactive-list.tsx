@@ -685,18 +685,23 @@ export function Component({ slides = defaultSlides }: LuminaInteractiveListProps
         }
       }
 
-      if (!mounted || slideTextures.length < 2) {
+      if (!mounted || slideTextures.length === 0) {
         return;
       }
 
-      shaderMaterial.uniforms.uTexture1.value = slideTextures[0];
-      shaderMaterial.uniforms.uTexture2.value = slideTextures[1];
-      shaderMaterial.uniforms.uTexture1Size.value = slideTextures[0].userData.size;
-      shaderMaterial.uniforms.uTexture2Size.value = slideTextures[1].userData.size;
+      const firstTexture = slideTextures[0];
+      const secondTexture = slideTextures[1] ?? firstTexture;
+
+      shaderMaterial.uniforms.uTexture1.value = firstTexture;
+      shaderMaterial.uniforms.uTexture2.value = secondTexture;
+      shaderMaterial.uniforms.uTexture1Size.value = firstTexture.userData.size;
+      shaderMaterial.uniforms.uTexture2Size.value = secondTexture.userData.size;
       texturesLoaded = true;
-      sliderEnabled = true;
+      sliderEnabled = slideTextures.length > 1;
       updateShaderUniforms();
-      safeStartTimer(500);
+      if (sliderEnabled) {
+        safeStartTimer(500);
+      }
 
       const render = () => {
         if (!mounted) {

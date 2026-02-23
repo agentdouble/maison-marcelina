@@ -1,67 +1,43 @@
 # Maison Marcelina
 
-Base web app for Maison Marcelina with a Python backend and a React frontend.
+Application web Maison Marcelina avec backend FastAPI (`uv`) et frontend React/Vite.
 
 ## Stack
 
-- Backend: FastAPI (Python 3.11+) managed with `uv`
-- Frontend: React + Vite + React Router + Tailwind CSS utilities
-- UI primitives: shadcn-style structure in `src/components/ui`
-- TypeScript support enabled for UI components (`.tsx`, alias `@/*`)
-- Orchestration: `start.sh` (single entrypoint)
+- Backend: FastAPI (Python 3.11+), `uv`, `httpx`
+- Frontend: React + Vite + React Router
+- Auth: Supabase Auth (email/password + Google OAuth)
+- Data catalogue: Supabase Postgres + Supabase Storage
+- Démarrage local: `./start.sh` (backend + frontend)
 
-## Current frontend scope (mock)
+## Fonctionnel actuel
 
-The frontend is a multi-page brand mock focused on couture and boutique flows.
-
-- Compact sticky top band with large logo, profile icon, and mobile hamburger nav
-- Centered navigation tabs (`Accueil`, `Notre Histoire`, `Les collections`, `Sur mesure`)
-- Header actions keep cart visible; `Login` moves into the hamburger on mobile and stays as profile icon on desktop
-- Mobile header controls (logo, hamburger, cart) are intentionally scaled up for readability
-- Mobile hamburger closes on outside click and `Escape` for cleaner interaction
-- Liquid visual design (glass surfaces, fluid highlights, soft moving blobs)
-- Dedicated `Notre Histoire` page aligned with brand narrative from `ressources/maison-marcelina.md`, full-bleed and without redundant page title text, with a straight full-height left visual panel that stops at the text column boundary, plus compact typographic rhythm
-- Full-viewport home shader slider (`lumina-interactive-list`) fed by the 3 collections
-- In-hero collection buttons remain frameless and visible (`Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
-- Home continuation after slider with:
-  - `Piece signature` spotlight block (content aligned opposite image)
-  - animated `Best-sellers` carousel (`Gallery4` + Embla)
-  - trust band (`Livraison`, `Retours`, `Paiement`, `Support`)
-- Post-hero home blocks are intentionally frameless (no card container wrappers)
-- `Piece signature` image uses a liquid morph style (organic shape + soft highlights)
-- `Piece signature` CTA `Decouvrir` is frameless (no round/pill background)
-- Scroll reveal animations and full-page web-app layout
-- Boutique page (`/collection`) rebuilt as a mobile-first luxe marketplace:
-  - en-tête frameless
-  - bandeau latéral de filtres (`Collections` uniquement)
-  - filtres collection (`Toutes`, `Marceline Heritage`, `Marceline Riviera`, `Marceline Audacieuse`)
-  - filtrage front-only local sur collection
-  - grille produits responsive qui occupe toute la largeur disponible
-  - taille de cartes stable entre vue `Toutes` et vue filtrée
-  - en mode téléphone, grille inspirée catalogue (2 colonnes, visuels plats, meta compacte)
-  - en mode téléphone, coeur superposé sur le visuel produit (sans pastille couleur)
-  - en mode webapp, mur catalogue pleine largeur (5 colonnes) avec bande filtre discrète en tête
-  - en mode webapp, cartes produits plates (sans effet carte) et overlays visuels discrets
-  - noms des vêtements gardent la typographie éditoriale du site
-  - en boutique, le bouton `Ajouter` n’est pas affiché sur les cartes
-  - nom et prix sont alignés sur une seule ligne dans chaque carte
-  - cartes boutique affichées immédiatement (sans reveal différé par ligne)
-  - la boutique conserve le background global du site (pas de fond blanc local)
-  - clic sur une carte ouvre la fiche produit dédiée
-  - carrousel swipe latéral sur chaque visuel produit (si plusieurs photos)
-  - fiche produit (`/collection/:productId`) avec selection de taille obligatoire
-  - blocs repliables sur fiche produit: `Description`, `Guide des tailles`, `Composition et entretien`, `Livraison, echanges et retours`
-  - ajout panier par variante de taille (deux tailles d'un meme produit restent separees)
-  - carrousel `Best-sellers` sans bord arrondi sur les visuels
-- Panneau panier global:
-  - ouverture/fermeture depuis l’icône panier du header
-  - gestion des quantités, suppression et total
-- Sur-mesure contact form page
-- Command support contact page
-- Login page based on `Login1` (shadcn-style) connected to backend auth
-- Professional buyer account area on `/compte` with tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
-- Account order history is read-only from backend data (no manual order creation from profile)
-- Themed `Footer7` with three footer columns: `Navigation`, `Assistance`, `Informations legales`
+- Home, histoire, collection, fiche produit, panier, contact, sur-mesure
+- Authentification + compte client (`/compte`)
+- Catalogue prioritairement Supabase avec fallback mock automatique:
+  - collections homepage depuis DB, fallback mock si aucune image active
+  - hero home compatible avec 1 seule collection active (pas besoin de 2 images pour afficher le visuel)
+  - pièce signature / best-sellers depuis DB, fallback automatique si non définis
+  - produits boutique depuis DB, fallback mock si aucun produit actif
+- Admin (`/admin`, alias `/dashboard`):
+  - onglet `Ajouter une collection`:
+    - ajout collection home (titre, description, image, ordre, visibilité)
+    - upload image direct vers bucket Supabase
+  - onglet `Modifier une collection`:
+    - édition collections home (titre, description, image, ordre, visibilité)
+    - définition pièce signature + best-sellers (sélection parmi produits actifs)
+    - upload image direct vers bucket Supabase
+  - onglet `Ajouter un produit`:
+    - ajout produit
+    - stock par taille via éditeur (lignes `Taille` + `Quantite`, total auto)
+    - stock total manuel conservé quand le stock par taille est vide
+    - bouton `Ajouter un fichier` modernisé pour l'upload image
+  - onglet `Modifier un produit`:
+    - modification produit (prix, description, tailles, stock, composition/entretien, images, visibilité)
+    - stock par taille via éditeur (lignes `Taille` + `Quantite`, total auto)
+    - stock total manuel conservé quand le stock par taille est vide
+    - bouton `Ajouter un fichier` modernisé pour l'upload image
+  - les slugs produits/collections sont gérés automatiquement côté backend
 
 ## Project layout
 
@@ -72,58 +48,40 @@ The frontend is a multi-page brand mock focused on couture and boutique flows.
 │   ├── src/app/
 │   │   ├── api/account.py
 │   │   ├── api/auth.py
+│   │   ├── api/catalog.py
 │   │   ├── api/health.py
 │   │   ├── core/config.py
 │   │   ├── core/logging.py
 │   │   ├── services/supabase_account.py
 │   │   ├── services/supabase_auth.py
+│   │   ├── services/supabase_catalog.py
 │   │   └── main.py
 │   ├── tests/test_account.py
 │   ├── tests/test_auth.py
+│   ├── tests/test_catalog.py
 │   ├── tests/test_health.py
 │   └── uv.lock
 ├── frontend/
 │   ├── package.json
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
-│   ├── tsconfig.json
-│   ├── components.json
-│   ├── index.html
-│   ├── public/
-│   │   └── logo-marcelina.svg
-│   └── src/
-│       ├── App.jsx
-│       ├── components/
-│       │   └── ui/
-│       │       ├── button.tsx
-│       │       ├── carousel.tsx
-│       │       ├── card.tsx
-│       │       ├── footer-7.tsx
-│       │       ├── gallery4.tsx
-│       │       ├── input.tsx
-│       │       ├── login-1.tsx
-│       │       └── lumina-interactive-list.tsx
-│       ├── lib/
-│       │   ├── auth.ts
-│       │   └── utils.ts
-│       ├── main.jsx
-│       └── styles.css
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── lib/auth.ts
+│   │   ├── lib/catalog.ts
+│   │   └── styles.css
 ├── .env.example
-├── .gitignore
 ├── lesson.md
 └── start.sh
 ```
 
 ## Setup
 
-1. Copy env values:
+1. Copier l'env:
 
 ```bash
 cp .env.example .env
 ```
 
-2. Resolve backend dependencies:
+2. Installer backend:
 
 ```bash
 cd backend
@@ -131,7 +89,7 @@ uv lock
 cd ..
 ```
 
-3. Install frontend dependencies:
+3. Installer frontend:
 
 ```bash
 cd frontend
@@ -141,38 +99,40 @@ cd ..
 
 ## Run
 
-Always run the app from the repository root:
+Toujours lancer depuis la racine:
 
 ```bash
 ./start.sh
 ```
 
-- Backend URL: `http://localhost:$BACKEND_PORT`
-- Health endpoint: `http://localhost:$BACKEND_PORT/health`
-- Frontend URL: `http://localhost:$FRONTEND_PORT`
+- Backend: `http://localhost:$BACKEND_PORT`
+- Health: `http://localhost:$BACKEND_PORT/health`
+- Frontend: `http://localhost:$FRONTEND_PORT`
 
 ## Frontend routes
 
-- `/` home
-- `/notre-histoire` brand story page
-- `/histoire` legacy alias redirecting to `/notre-histoire`
-- `/collection` boutique marketplace
-- `/collection/:productId` fiche produit
-- `/sur-mesure` custom request form
-- `/contact` order issue form
-- `/boutique` redirection vers `/collection`
-- `/panier` cart page
-- `/login` login form
-- `/compte` buyer account area (overview, orders, profile data, security; requires authenticated session)
-- `/mentions-legales` legal notice page
-- `/cgv` conditions page
-- `/politique-remboursement` refund policy page
-- `/politique-cookies` cookies policy page
-- `/accessibilite` accessibility page
+- `/`
+- `/notre-histoire` (alias `/histoire`)
+- `/collection`
+- `/collection/:productId`
+- `/collections` (alias vers `/collection`)
+- `/marketplace` (alias vers `/collection`)
+- `/boutique` (alias vers `/collection`)
+- `/sur-mesure`
+- `/contact`
+- `/panier`
+- `/login`
+- `/compte`
+- `/admin` (alias `/dashboard`)
+- `/mentions-legales`
+- `/cgv`
+- `/politique-remboursement`
+- `/politique-cookies`
+- `/accessibilite`
 
 ## Environment variables
 
-Defined in `.env`:
+Définies dans `.env`:
 
 - `APP_ENV`
 - `APP_NAME`
@@ -184,67 +144,206 @@ Defined in `.env`:
 - `VITE_API_BASE_URL`
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
+- `SUPABASE_STORAGE_BUCKET`
 - `SUPABASE_GOOGLE_REDIRECT_URL`
 - `AUTH_COOKIE_SECURE`
 
-If `CORS_ORIGINS` is empty, it is built dynamically from `FRONTEND_HOST` and `FRONTEND_PORT`.
+Notes:
 
-If `VITE_API_BASE_URL` is empty, `start.sh` sets it to `http://127.0.0.1:$BACKEND_PORT`.
+- si `CORS_ORIGINS` est vide, `start.sh` le construit depuis `FRONTEND_HOST/PORT`
+- si `VITE_API_BASE_URL` est vide, `start.sh` force `http://127.0.0.1:$BACKEND_PORT`
+- si `SUPABASE_GOOGLE_REDIRECT_URL` est vide: `http://localhost:$BACKEND_PORT/auth/google/callback`
+- `SUPABASE_STORAGE_BUCKET` doit être un bucket **public** pour les images storefront
 
-If `SUPABASE_GOOGLE_REDIRECT_URL` is empty, backend defaults to:
-`http://localhost:$BACKEND_PORT/auth/google/callback`.
+## Backend API
 
-## Backend Auth API
+### Auth
 
 - `POST /auth/login`
-  - body: `{"email":"...", "password":"..."}`
-  - response: Supabase session payload (`access_token`, `refresh_token`, `user`, ...)
 - `POST /auth/signup`
-  - body: `{"email":"...", "password":"..."}`
-  - response: Supabase auth payload (`user`, optional session tokens depending on email confirmation policy)
-- Auth errors from Supabase are returned with their upstream HTTP status and message (for example `400`, `401`, `422`); transient/retryable errors are normalized to `503`.
 - `GET /auth/google/start`
-  - starts Google OAuth (PKCE)
-  - default behavior: HTTP redirect to Google
-  - optional: `?redirect=false` to receive JSON `{"authorization_url":"..."}`
 - `GET /auth/google/callback`
-  - exchanges Google auth code for a Supabase session
-  - expects `code` and `state` query params
 
-Google login requires enabling the Google provider in Supabase Auth and adding the callback URL in your Supabase redirect URLs allow list.
+### Account
 
-## Backend Account API
-
-All `/account/*` endpoints require `Authorization: Bearer <access_token>`.
-- invalid/expired bearer sessions are normalized to `401`
+Tous les endpoints `/account/*` requièrent `Authorization: Bearer <access_token>`.
 
 - `GET /account/profile`
-  - returns profile fields (`full_name`, `phone`, `address`) plus account email
 - `PUT /account/profile`
-  - body: `{"full_name":"...", "phone":"...", "address":"..."}`
-  - upserts user profile
 - `GET /account/orders`
-  - returns user orders list
 
-Supabase tables used:
+### Catalog
 
-- `public.customer_profiles` (1 row per user)
-- `public.customer_orders` (N rows per user)
+Public:
 
-## Login flow in frontend
+- `GET /catalog/public`
+  - retourne `collections`, `products`, `featured`
 
-- `/login` uses `src/components/ui/login-1.tsx`
-- Email/password submit calls `POST {VITE_API_BASE_URL}/auth/login`
-- Account creation submit calls `POST {VITE_API_BASE_URL}/auth/signup`
-- Google button redirects browser to `{VITE_API_BASE_URL}/auth/google/start`
-- On password login success, response payload is stored in `localStorage` as `mm_auth_session`, then user is redirected to `/`
-- Profile icon routes to `/compte` when authenticated, otherwise `/login`
-- `/compte` is split in tabs: `Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`
-- `Coordonnees` can create/update profile data via backend `/account/profile`
-- `Commandes` lists account orders from backend `/account/orders` (read-only for buyers)
-- if account requests return `401/403`, frontend clears stale `mm_auth_session` and redirects to `/login`
+Admin (requiert `Authorization: Bearer <access_token>` + user admin):
 
-## Commands
+- `GET /catalog/admin`
+- `POST /catalog/admin/collections`
+- `PUT /catalog/admin/collections/{collection_id}`
+- `POST /catalog/admin/products`
+- `PUT /catalog/admin/products/{product_id}`
+- `PUT /catalog/admin/featured`
+- `POST /catalog/admin/upload-image` (multipart: `scope`, `file`)
+
+## Supabase setup (catalog + admin)
+
+### 1) Tables
+
+Exécuter dans SQL editor Supabase:
+
+```sql
+create extension if not exists pgcrypto;
+
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.home_collections (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  title text not null,
+  description text not null,
+  image_url text not null,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.catalog_products (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  name text not null,
+  collection_id uuid not null references public.home_collections(id) on delete restrict,
+  price numeric(10,2) not null check (price >= 0),
+  description text not null default '',
+  size_guide text[] not null default '{}',
+  stock integer not null default 0 check (stock >= 0),
+  composition_care text[] not null default '{}',
+  images text[] not null default '{}',
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.home_featured (
+  id integer primary key check (id = 1),
+  signature_product_id uuid references public.catalog_products(id) on delete set null,
+  best_seller_product_ids uuid[] not null default '{}',
+  updated_at timestamptz not null default now()
+);
+
+insert into public.home_featured (id)
+values (1)
+on conflict (id) do nothing;
+```
+
+### 2) RLS policies
+
+```sql
+alter table public.admin_users enable row level security;
+alter table public.home_collections enable row level security;
+alter table public.catalog_products enable row level security;
+alter table public.home_featured enable row level security;
+
+drop policy if exists admin_users_select_self on public.admin_users;
+create policy admin_users_select_self
+on public.admin_users
+for select to authenticated
+using (auth.uid() = user_id);
+
+drop policy if exists home_collections_public_read on public.home_collections;
+create policy home_collections_public_read
+on public.home_collections
+for select
+using (is_active = true);
+
+drop policy if exists catalog_products_public_read on public.catalog_products;
+create policy catalog_products_public_read
+on public.catalog_products
+for select
+using (is_active = true);
+
+drop policy if exists home_featured_public_read on public.home_featured;
+create policy home_featured_public_read
+on public.home_featured
+for select
+using (true);
+
+drop policy if exists home_collections_admin_all on public.home_collections;
+create policy home_collections_admin_all
+on public.home_collections
+for all to authenticated
+using (exists (select 1 from public.admin_users a where a.user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users a where a.user_id = auth.uid()));
+
+drop policy if exists catalog_products_admin_all on public.catalog_products;
+create policy catalog_products_admin_all
+on public.catalog_products
+for all to authenticated
+using (exists (select 1 from public.admin_users a where a.user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users a where a.user_id = auth.uid()));
+
+drop policy if exists home_featured_admin_all on public.home_featured;
+create policy home_featured_admin_all
+on public.home_featured
+for all to authenticated
+using (exists (select 1 from public.admin_users a where a.user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users a where a.user_id = auth.uid()));
+```
+
+### 3) Bucket Storage
+
+Créer (ou mettre à jour) le bucket `SUPABASE_STORAGE_BUCKET` en **public**:
+
+```sql
+insert into storage.buckets (id, name, public)
+values ('maison-marcelina', 'maison-marcelina', true)
+on conflict (id) do update set public = true;
+```
+
+Policies `storage.objects`:
+
+```sql
+drop policy if exists catalog_bucket_public_read on storage.objects;
+create policy catalog_bucket_public_read
+on storage.objects
+for select
+using (bucket_id = 'maison-marcelina');
+
+drop policy if exists catalog_bucket_admin_insert on storage.objects;
+create policy catalog_bucket_admin_insert
+on storage.objects
+for insert to authenticated
+with check (
+  bucket_id = 'maison-marcelina'
+  and exists (select 1 from public.admin_users a where a.user_id = auth.uid())
+);
+
+drop policy if exists catalog_bucket_admin_update on storage.objects;
+create policy catalog_bucket_admin_update
+on storage.objects
+for update to authenticated
+using (
+  bucket_id = 'maison-marcelina'
+  and exists (select 1 from public.admin_users a where a.user_id = auth.uid())
+)
+with check (
+  bucket_id = 'maison-marcelina'
+  and exists (select 1 from public.admin_users a where a.user_id = auth.uid())
+);
+```
+
+Remplacer `'maison-marcelina'` par la valeur réelle de `SUPABASE_STORAGE_BUCKET` si nécessaire.
+
+Ajouter ensuite chaque admin dans `public.admin_users`.
+
+## Commandes utiles
 
 Backend tests:
 
@@ -253,7 +352,7 @@ cd backend
 uv run pytest
 ```
 
-Frontend production build:
+Frontend build:
 
 ```bash
 cd frontend

@@ -2,7 +2,7 @@
 
  Maison Marcelina, c’est avant tout une histoire de transmission, de mémoire et d’élégance intemporelle.
 
-Le  nom  trouve  son  origine  dans  celui  de  Marceline,  la  soeur  de  ma  grand-mère.  Une  femme  dont  le  souvenir  évoque  l’allure  et  le
+Le  nom  trouve  son  origine  dans  celui  de  Marceline,  la  sœur  de  ma  grand-mère.  Une  femme  dont  le  souvenir  évoque  l’allure  et  le
 charisme discret.
 
 Marceline, c’était l’élégance naturelle. Toujours chic. Toujours apprêtée.
@@ -13,7 +13,7 @@ Une fourrure portée avec assurance, comme une signature.
 Mais  au-delà  de  l’apparence,  Marceline  incarnait  une  posture.  Celle  d’une  femme  élégante  qui  sait  se  mettre  en  valeur,  se  faire
 écouter et admirer.
 
-Parce que chaque détail apporte de la classe. Un ourlet bien net. Un tissu soignement choisi. Une finition délicate. Un motif assumé.
+Parce que chaque détail apporte de la classe. Un ourlet bien net. Un tissu soigneusement choisi. Une finition délicate. Un motif assumé.
 
 Maison Marcelina n’est pas une femme figée dans une photo en noir et blanc. C’est une femme élégante qui vit avec son temps.
 
@@ -62,7 +62,7 @@ MOTIF AUDACIEUX
 
 PALETTE DE COULEUR :
 
-MOTIF LEOPARD
+MOTIF LÉOPARD
 MOTIF VACHE
 ROUGE
 NOIR

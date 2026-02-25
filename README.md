@@ -8,22 +8,30 @@ Application web Maison Marcelina avec backend FastAPI (`uv`) et frontend React/V
 - Frontend: React + Vite + React Router
 - Auth: Supabase Auth (email/password + Google OAuth)
 - Data catalogue: Supabase Postgres + Supabase Storage
+- Paiement: Stripe Checkout
 - Démarrage local: `./start.sh` (backend + frontend)
 
 ## Fonctionnel actuel
 
 - Home, histoire, collection, fiche produit, panier, contact, sur-mesure
+- Checkout Stripe depuis `/panier` (redirection Checkout + retour `/commande/confirmation` ou `/commande/annulee`)
+- Sur `/commande/confirmation`, synchronisation serveur de la session Stripe (`session_id`) pour confirmer l’enregistrement de la commande de façon idempotente
+- Panneau panier (clic icône panier) avec CTA `Passer au paiement` vers `/panier`
 - Authentification + compte client (`/compte`)
 - Header avec navigation principale, icônes profil/panier, menu mobile (fermeture outside click + `Escape`)
-- Catalogue prioritairement Supabase avec fallback mock automatique:
-  - collections homepage depuis DB, fallback mock si aucune image active
+- Lien `Admin` du header affiché uniquement après vérification backend des droits admin
+- Catalogue public 100% Supabase (sans fallback mock):
+  - collections homepage depuis DB
   - hero home compatible avec 1 seule collection active (pas besoin de 2 images pour afficher le visuel)
-  - pièce signature / best-sellers depuis DB, fallback automatique si non définis
-  - produits boutique depuis DB, fallback mock si aucun produit actif
+  - pièce signature / best-sellers depuis DB (fallback logique sur produits actifs si sélection absente)
+  - produits boutique depuis DB
 - Boutique `/collection` orientée marketplace avec filtres par collection, grille responsive et ouverture fiche produit par carte
 - Fiche produit `/collection/:productId` avec retour boutique en haut, taille obligatoire, et ajout panier par variante de taille
 - Sur-mesure avec login gate: formulaire disponible pour compte connecté, redirection vers `/login` sinon
 - Admin (`/admin`, alias `/dashboard`):
+  - onglet `Commandes en attente`:
+    - liste des commandes avec statut en attente/préparation
+    - mise à jour du statut (`En préparation`, `En attente`, `Expédiée`, `Livrée`, `Annulée`)
   - onglet `Ajouter une collection`:
     - ajout collection home (titre, description, image, ordre, visibilité)
     - upload image direct vers bucket Supabase
@@ -33,12 +41,12 @@ Application web Maison Marcelina avec backend FastAPI (`uv`) et frontend React/V
     - upload image direct vers bucket Supabase
   - onglet `Ajouter un produit`:
     - ajout produit
-    - stock par taille via éditeur (lignes `Taille` + `Quantite`, total auto)
+    - stock par taille via éditeur (lignes `Taille` + `Quantité`, total auto)
     - stock total manuel conservé quand le stock par taille est vide
     - bouton `Ajouter un fichier` modernisé pour l'upload image
   - onglet `Modifier un produit`:
     - modification produit (prix, description, tailles, stock, composition/entretien, images, visibilité)
-    - stock par taille via éditeur (lignes `Taille` + `Quantite`, total auto)
+    - stock par taille via éditeur (lignes `Taille` + `Quantité`, total auto)
     - stock total manuel conservé quand le stock par taille est vide
     - bouton `Ajouter un fichier` modernisé pour l'upload image
   - les slugs produits/collections sont gérés automatiquement côté backend
@@ -54,16 +62,19 @@ Application web Maison Marcelina avec backend FastAPI (`uv`) et frontend React/V
 │   │   ├── api/account.py
 │   │   ├── api/auth.py
 │   │   ├── api/catalog.py
+│   │   ├── api/checkout.py
 │   │   ├── api/health.py
 │   │   ├── core/config.py
 │   │   ├── core/logging.py
 │   │   ├── services/supabase_account.py
 │   │   ├── services/supabase_auth.py
 │   │   ├── services/supabase_catalog.py
+│   │   ├── services/stripe_checkout.py
 │   │   └── main.py
 │   ├── tests/test_account.py
 │   ├── tests/test_auth.py
 │   ├── tests/test_catalog.py
+│   ├── tests/test_checkout.py
 │   ├── tests/test_health.py
 │   └── uv.lock
 ├── frontend/
@@ -72,6 +83,7 @@ Application web Maison Marcelina avec backend FastAPI (`uv`) et frontend React/V
 │   │   ├── App.jsx
 │   │   ├── lib/auth.ts
 │   │   ├── lib/catalog.ts
+│   │   ├── lib/checkout.ts
 │   │   └── styles.css
 ├── .env.example
 ├── lesson.md
@@ -127,6 +139,8 @@ Toujours lancer depuis la racine:
 - `/contact` page contact
 - `/boutique` redirection vers `/collection`
 - `/panier` page panier
+- `/commande/confirmation` page confirmation paiement
+- `/commande/annulee` page annulation paiement
 - `/login` page login
 - `/compte` espace compte (Vue d'ensemble, Commandes, Coordonnées, Sécurité)
 - `/admin` (alias `/dashboard`)
@@ -150,9 +164,13 @@ Définies dans `.env`:
 - `VITE_API_BASE_URL`
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_STORAGE_BUCKET`
 - `SUPABASE_GOOGLE_REDIRECT_URL`
 - `AUTH_COOKIE_SECURE`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_CURRENCY`
+- `STRIPE_WEBHOOK_SECRET`
 
 Notes:
 
@@ -160,6 +178,10 @@ Notes:
 - si `VITE_API_BASE_URL` est vide, `start.sh` force `http://127.0.0.1:$BACKEND_PORT`
 - si `SUPABASE_GOOGLE_REDIRECT_URL` est vide: `http://localhost:$BACKEND_PORT/auth/google/callback`
 - `SUPABASE_STORAGE_BUCKET` doit être un bucket **public** pour les images storefront
+- `SUPABASE_SERVICE_ROLE_KEY` est requis pour que le webhook Stripe confirme les commandes dans `customer_orders` et pour la lecture/mise à jour admin des commandes
+- `STRIPE_SECRET_KEY` est requis pour créer une session checkout
+- `STRIPE_CURRENCY` est normalisée sur un code ISO 4217 sur 3 lettres (par défaut `eur`)
+- `STRIPE_WEBHOOK_SECRET` est requis pour vérifier la signature `Stripe-Signature`
 
 ## Backend API
 
@@ -188,12 +210,40 @@ Public:
 Admin (requiert `Authorization: Bearer <access_token>` + user admin):
 
 - `GET /catalog/admin`
+- `GET /catalog/admin/access`
+- `GET /catalog/admin/orders` (`pending_only=true|false`, défaut `true`)
+- `PUT /catalog/admin/orders/{order_id}`
 - `POST /catalog/admin/collections`
 - `PUT /catalog/admin/collections/{collection_id}`
 - `POST /catalog/admin/products`
 - `PUT /catalog/admin/products/{product_id}`
 - `PUT /catalog/admin/featured`
 - `POST /catalog/admin/upload-image` (multipart: `scope`, `file`)
+
+### Checkout
+
+- `POST /checkout/session`
+  - body: `items[]` (`product_id`, `quantity`, `size?`)
+  - prix reconstruits côté backend a partir du catalogue actif
+  - redirection Stripe vers `/commande/confirmation?session_id={CHECKOUT_SESSION_ID}` ou `/commande/annulee`
+- `POST /checkout/session/{session_id}/sync`
+  - relit la session Stripe côté serveur après redirection
+  - upsert idempotent dans `customer_orders` si `payment_status=paid`
+- `POST /checkout/webhook/stripe`
+  - vérification de signature Stripe (`Stripe-Signature`)
+  - confirmation finale serveur sur `checkout.session.completed` / `checkout.session.async_payment_succeeded`
+  - upsert idempotent dans `customer_orders` (conflit sur `order_number`)
+
+### Stripe webhook local
+
+1. lancer l'app avec `./start.sh`
+2. dans un autre terminal, connecter Stripe CLI:
+
+```bash
+stripe listen --forward-to http://127.0.0.1:${BACKEND_PORT}/checkout/webhook/stripe
+```
+
+3. récupérer le secret `whsec_...` affiché par Stripe CLI et le mettre dans `STRIPE_WEBHOOK_SECRET`
 
 ### Frontend auth behavior
 
@@ -203,7 +253,7 @@ Admin (requiert `Authorization: Bearer <access_token>` + user admin):
 - Google OAuth redirige vers `{VITE_API_BASE_URL}/auth/google/start`
 - la session login est stockée dans `localStorage` (`mm_auth_session`)
 - l’icône profil pointe vers `/compte` si authentifié, sinon `/login`
-- en cas de `401/403` sur `/account/*`, la session locale est purgee et l’app redirige vers `/login`
+- en cas de `401/403` sur `/account/*`, la session locale est purgée et l’app redirige vers `/login`
 
 ## Supabase setup (catalog + admin)
 
@@ -358,6 +408,15 @@ with check (
 Remplacer `'maison-marcelina'` par la valeur réelle de `SUPABASE_STORAGE_BUCKET` si nécessaire.
 
 Ajouter ensuite chaque admin dans `public.admin_users`.
+
+### 4) Webhook checkout idempotent
+
+Le webhook Stripe fait un upsert sur `customer_orders.order_number`.
+
+```sql
+create unique index if not exists customer_orders_order_number_uidx
+on public.customer_orders(order_number);
+```
 
 ## Commandes utiles
 

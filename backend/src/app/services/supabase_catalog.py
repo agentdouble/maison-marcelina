@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import secrets
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,7 @@ COLLECTIONS_TABLE = "home_collections"
 PRODUCTS_TABLE = "catalog_products"
 FEATURED_TABLE = "home_featured"
 ADMINS_TABLE = "admin_users"
+CUSTOMER_ORDERS_TABLE = "customer_orders"
 
 COLLECTION_SELECT = "id,slug,title,description,image_url,sort_order,is_active,created_at,updated_at"
 PRODUCT_SELECT = (
@@ -21,6 +23,9 @@ PRODUCT_SELECT = (
     "images,is_active,created_at,updated_at,collection:home_collections(id,slug,title)"
 )
 FEATURED_SELECT = "id,signature_product_id,best_seller_product_ids,updated_at"
+ORDER_SELECT = (
+    "id,user_id,order_number,status,total_amount,currency,items_count,ordered_at,created_at"
+)
 
 _SLUG_PATTERN = re.compile(r"[^a-z0-9]+")
 _ALLOWED_IMAGE_TYPES = {
@@ -67,6 +72,13 @@ def _ensure_supabase_configured(settings: Settings) -> None:
     if not settings.supabase_url or not settings.supabase_anon_key:
         raise SupabaseCatalogConfigurationError(
             "SUPABASE_URL and SUPABASE_ANON_KEY must be configured"
+        )
+
+
+def _ensure_supabase_service_configured(settings: Settings) -> None:
+    if not settings.supabase_url or not settings.supabase_service_role_key:
+        raise SupabaseCatalogConfigurationError(
+            "SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be configured"
         )
 
 
@@ -140,6 +152,57 @@ def _request_json(
     if response.status_code >= 400:
         if path.lstrip("/").startswith("auth/v1/user") and response.status_code in {401, 403}:
             raise SupabaseCatalogAuthError(_extract_error_message(response))
+        raise SupabaseCatalogApiError(
+            message=_extract_error_message(response),
+            status=response.status_code,
+        )
+
+    if not response.content:
+        return None
+
+    try:
+        return response.json()
+    except ValueError:
+        return None
+
+
+def _request_service_json(
+    settings: Settings,
+    *,
+    method: str,
+    path: str,
+    params: dict[str, str] | None = None,
+    json_payload: dict[str, Any] | list[dict[str, Any]] | None = None,
+    prefer: str | None = None,
+) -> Any:
+    _ensure_supabase_service_configured(settings)
+
+    url = f"{settings.supabase_url.rstrip('/')}/{path.lstrip('/')}"
+    headers = {
+        "apikey": settings.supabase_service_role_key,
+        "Authorization": f"Bearer {settings.supabase_service_role_key}",
+        "Accept": "application/json",
+    }
+    if json_payload is not None:
+        headers["Content-Type"] = "application/json"
+    if prefer:
+        headers["Prefer"] = prefer
+
+    try:
+        with httpx.Client(timeout=12.0) as client:
+            response = client.request(
+                method=method,
+                url=url,
+                headers=headers,
+                params=params,
+                json=json_payload,
+            )
+    except httpx.TimeoutException as exc:
+        raise SupabaseCatalogRetryableError("Supabase timeout") from exc
+    except httpx.HTTPError as exc:
+        raise SupabaseCatalogRetryableError("Supabase network error") from exc
+
+    if response.status_code >= 400:
         raise SupabaseCatalogApiError(
             message=_extract_error_message(response),
             status=response.status_code,
@@ -304,6 +367,45 @@ def _normalize_featured(row: dict[str, Any] | None) -> dict[str, Any]:
     }
 
 
+def _normalize_customer_order(row: dict[str, Any]) -> dict[str, Any]:
+    order_id = row.get("id")
+    normalized_id: int | None = None
+    if isinstance(order_id, int):
+        normalized_id = order_id
+    elif isinstance(order_id, str) and order_id.strip().isdigit():
+        normalized_id = int(order_id.strip())
+
+    raw_currency = _normalize_text(row.get("currency")).upper()
+    currency = raw_currency if len(raw_currency) == 3 and raw_currency.isalpha() else "EUR"
+    items_count = row.get("items_count") if isinstance(row.get("items_count"), int) else 0
+
+    return {
+        "id": normalized_id,
+        "user_id": _normalize_text(row.get("user_id")),
+        "order_number": _normalize_text(row.get("order_number")),
+        "status": _normalize_text(row.get("status")),
+        "total_amount": _normalize_price(row.get("total_amount")),
+        "currency": currency,
+        "items_count": max(items_count, 0),
+        "ordered_at": row.get("ordered_at"),
+        "created_at": row.get("created_at"),
+    }
+
+
+def _is_pending_order_status(status: Any) -> bool:
+    normalized = "".join(
+        char
+        for char in unicodedata.normalize("NFD", _normalize_text(status).lower())
+        if not unicodedata.combining(char)
+    )
+    if not normalized:
+        return False
+    return any(
+        token in normalized
+        for token in ("prepar", "attente", "cours", "transit", "pending")
+    )
+
+
 def _fetch_authenticated_user(settings: Settings, *, access_token: str) -> dict[str, Any]:
     payload = _request_json(
         settings,
@@ -459,7 +561,7 @@ def _build_unique_product_slug(
             return candidate
 
     raise SupabaseCatalogApiError(
-        message="Impossible de generer un slug unique",
+        message="Impossible de générer un slug unique",
         status=409,
     )
 
@@ -565,6 +667,99 @@ def get_admin_catalog(settings: Settings, *, access_token: str) -> dict[str, Any
     }
 
 
+def ensure_admin_access(settings: Settings, *, access_token: str) -> None:
+    _ensure_admin_user(settings, access_token=access_token)
+
+
+def list_admin_orders(
+    settings: Settings,
+    *,
+    access_token: str,
+    pending_only: bool,
+) -> list[dict[str, Any]]:
+    _ensure_admin_user(settings, access_token=access_token)
+
+    rows = _request_service_json(
+        settings,
+        method="GET",
+        path=f"/rest/v1/{CUSTOMER_ORDERS_TABLE}",
+        params={
+            "select": ORDER_SELECT,
+            "order": "ordered_at.desc,created_at.desc",
+        },
+    )
+    if not isinstance(rows, list):
+        return []
+
+    normalized: list[dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        normalized_order = _normalize_customer_order(row)
+        if normalized_order["id"] is None:
+            continue
+        if not normalized_order["order_number"]:
+            continue
+        normalized.append(normalized_order)
+
+    if not pending_only:
+        return normalized
+
+    return [order for order in normalized if _is_pending_order_status(order.get("status"))]
+
+
+def update_admin_order_status(
+    settings: Settings,
+    *,
+    access_token: str,
+    order_id: int,
+    status: str,
+) -> dict[str, Any]:
+    _ensure_admin_user(settings, access_token=access_token)
+
+    normalized_status = _normalize_text(status)
+    if not normalized_status:
+        raise SupabaseCatalogApiError(message="Statut commande invalide", status=422)
+
+    rows = _request_service_json(
+        settings,
+        method="GET",
+        path=f"/rest/v1/{CUSTOMER_ORDERS_TABLE}",
+        params={
+            "select": ORDER_SELECT,
+            "id": f"eq.{order_id}",
+            "limit": "1",
+        },
+    )
+    if not isinstance(rows, list) or not rows or not isinstance(rows[0], dict):
+        raise SupabaseCatalogApiError(message="Commande introuvable", status=404)
+
+    updated_rows = _request_service_json(
+        settings,
+        method="PATCH",
+        path=f"/rest/v1/{CUSTOMER_ORDERS_TABLE}",
+        params={
+            "select": ORDER_SELECT,
+            "id": f"eq.{order_id}",
+        },
+        prefer="return=representation",
+        json_payload={
+            "status": normalized_status,
+        },
+    )
+    if (
+        not isinstance(updated_rows, list)
+        or not updated_rows
+        or not isinstance(updated_rows[0], dict)
+    ):
+        raise SupabaseCatalogApiError(
+            message="Mise à jour commande invalide",
+            status=502,
+        )
+
+    return _normalize_customer_order(updated_rows[0])
+
+
 def create_collection(
     settings: Settings,
     *,
@@ -601,7 +796,7 @@ def create_collection(
     )
 
     if not isinstance(rows, list) or not rows or not isinstance(rows[0], dict):
-        raise SupabaseCatalogApiError(message="Creation collection invalide", status=502)
+        raise SupabaseCatalogApiError(message="Création collection invalide", status=502)
 
     return _normalize_collection(rows[0])
 
@@ -655,7 +850,7 @@ def update_collection(
     )
 
     if not isinstance(rows, list) or not rows or not isinstance(rows[0], dict):
-        raise SupabaseCatalogApiError(message="Mise a jour collection invalide", status=502)
+        raise SupabaseCatalogApiError(message="Mise à jour collection invalide", status=502)
 
     return _normalize_collection(rows[0])
 
@@ -712,7 +907,7 @@ def create_product(
     )
 
     if not isinstance(rows, list) or not rows or not isinstance(rows[0], dict):
-        raise SupabaseCatalogApiError(message="Creation produit invalide", status=502)
+        raise SupabaseCatalogApiError(message="Création produit invalide", status=502)
 
     return _normalize_product(rows[0])
 
@@ -798,7 +993,7 @@ def update_product(
     )
 
     if not isinstance(rows, list) or not rows or not isinstance(rows[0], dict):
-        raise SupabaseCatalogApiError(message="Mise a jour produit invalide", status=502)
+        raise SupabaseCatalogApiError(message="Mise à jour produit invalide", status=502)
 
     return _normalize_product(rows[0])
 
@@ -856,7 +1051,7 @@ def update_featured(
     )
 
     if not isinstance(rows, list) or not rows or not isinstance(rows[0], dict):
-        raise SupabaseCatalogApiError(message="Mise a jour featured invalide", status=502)
+        raise SupabaseCatalogApiError(message="Mise à jour featured invalide", status=502)
 
     return _normalize_featured(rows[0])
 
@@ -879,7 +1074,7 @@ def upload_admin_image(
 
     normalized_content_type = content_type.strip().lower() if isinstance(content_type, str) else ""
     if normalized_content_type not in _ALLOWED_IMAGE_TYPES:
-        raise SupabaseCatalogApiError(message="Type de fichier non supporte", status=415)
+        raise SupabaseCatalogApiError(message="Type de fichier non supporté", status=415)
 
     requested_scope = scope.strip().lower() if isinstance(scope, str) else ""
     safe_scope = "collections" if requested_scope == "collections" else "products"

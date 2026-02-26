@@ -81,6 +81,108 @@ def test_catalog_admin_forbidden(client: TestClient, monkeypatch: pytest.MonkeyP
     assert response.json() == {"detail": "Admin access required"}
 
 
+def test_catalog_admin_access_requires_bearer(client: TestClient) -> None:
+    response = client.get("/catalog/admin/access")
+
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Missing bearer token"}
+
+
+def test_catalog_admin_access_success(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    captured = {"token": ""}
+
+    def fake_ensure_admin_access(settings: object, *, access_token: str) -> None:
+        captured["token"] = access_token
+
+    monkeypatch.setattr("app.api.catalog.ensure_admin_access", fake_ensure_admin_access)
+
+    response = client.get(
+        "/catalog/admin/access",
+        headers={"Authorization": "Bearer access-token"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"is_admin": True}
+    assert captured["token"] == "access-token"
+
+
+def test_catalog_admin_orders_list_success(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_list_admin_orders(
+        settings: object,
+        *,
+        access_token: str,
+        pending_only: bool,
+    ) -> list[dict[str, object]]:
+        assert access_token == "access-token"
+        assert pending_only is True
+        return [
+            {
+                "id": 42,
+                "user_id": "d29f0f6e-45fe-4f90-b957-865c0f478f11",
+                "order_number": "MM-ABC123",
+                "status": "En preparation",
+                "total_amount": 149.0,
+                "currency": "EUR",
+                "items_count": 2,
+                "ordered_at": "2026-02-25T12:00:00+00:00",
+                "created_at": "2026-02-25T12:00:00+00:00",
+            }
+        ]
+
+    monkeypatch.setattr("app.api.catalog.list_admin_orders", fake_list_admin_orders)
+
+    response = client.get(
+        "/catalog/admin/orders",
+        headers={"Authorization": "Bearer access-token"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert "orders" in payload
+    assert payload["orders"][0]["order_number"] == "MM-ABC123"
+
+
+def test_catalog_admin_order_update_success(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_update_admin_order_status(
+        settings: object,
+        *,
+        access_token: str,
+        order_id: int,
+        status: str,
+    ) -> dict[str, object]:
+        assert access_token == "access-token"
+        assert order_id == 42
+        assert status == "Expediee"
+        return {
+            "id": order_id,
+            "user_id": "d29f0f6e-45fe-4f90-b957-865c0f478f11",
+            "order_number": "MM-ABC123",
+            "status": status,
+            "total_amount": 149.0,
+            "currency": "EUR",
+            "items_count": 2,
+            "ordered_at": "2026-02-25T12:00:00+00:00",
+            "created_at": "2026-02-25T12:00:00+00:00",
+        }
+
+    monkeypatch.setattr("app.api.catalog.update_admin_order_status", fake_update_admin_order_status)
+
+    response = client.put(
+        "/catalog/admin/orders/42",
+        headers={"Authorization": "Bearer access-token"},
+        json={"status": "Expediee"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "Expediee"
+
+
 def test_catalog_collection_create_success(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:

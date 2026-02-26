@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
 from pydantic import BaseModel, Field
 
 from app.core.config import Settings, get_settings
@@ -13,9 +13,12 @@ from app.services.supabase_catalog import (
     SupabaseCatalogRetryableError,
     create_collection,
     create_product,
+    ensure_admin_access,
     get_admin_catalog,
     get_public_catalog,
+    list_admin_orders,
     update_collection,
+    update_admin_order_status,
     update_featured,
     update_product,
     upload_admin_image,
@@ -72,6 +75,10 @@ class CatalogProductUpdateRequest(BaseModel):
 class CatalogFeaturedUpdateRequest(BaseModel):
     signature_product_id: str | None = Field(default=None, max_length=120)
     best_seller_product_ids: list[str] = Field(default_factory=list, max_length=20)
+
+
+class CatalogAdminOrderUpdateRequest(BaseModel):
+    status: str = Field(min_length=1, max_length=80)
 
 
 def _extract_access_token(authorization: str | None = Header(default=None)) -> str:
@@ -134,6 +141,58 @@ def catalog_admin_get(
         return get_admin_catalog(settings, access_token=access_token)
     except Exception as exc:
         _log_catalog_error("Catalog admin read", exc)
+        _raise_catalog_error(exc)
+
+
+@router.get("/admin/access")
+def catalog_admin_access_get(
+    access_token: str = Depends(_extract_access_token),
+    settings: Settings = Depends(get_settings),
+) -> dict[str, bool]:
+    try:
+        ensure_admin_access(settings, access_token=access_token)
+    except Exception as exc:
+        _log_catalog_error("Catalog admin access read", exc)
+        _raise_catalog_error(exc)
+
+    return {"is_admin": True}
+
+
+@router.get("/admin/orders")
+def catalog_admin_orders_get(
+    pending_only: bool = Query(default=True),
+    access_token: str = Depends(_extract_access_token),
+    settings: Settings = Depends(get_settings),
+) -> dict[str, list[dict[str, Any]]]:
+    try:
+        orders = list_admin_orders(
+            settings,
+            access_token=access_token,
+            pending_only=pending_only,
+        )
+    except Exception as exc:
+        _log_catalog_error("Catalog admin orders read", exc)
+        _raise_catalog_error(exc)
+
+    return {"orders": orders}
+
+
+@router.put("/admin/orders/{order_id}")
+def catalog_admin_order_update(
+    order_id: int,
+    payload: CatalogAdminOrderUpdateRequest,
+    access_token: str = Depends(_extract_access_token),
+    settings: Settings = Depends(get_settings),
+) -> dict[str, Any]:
+    try:
+        return update_admin_order_status(
+            settings,
+            access_token=access_token,
+            order_id=order_id,
+            status=payload.status,
+        )
+    except Exception as exc:
+        _log_catalog_error("Catalog admin order update", exc)
         _raise_catalog_error(exc)
 
 

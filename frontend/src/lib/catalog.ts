@@ -47,6 +47,18 @@ export interface CatalogPayload {
   featured: CatalogFeaturedPayload;
 }
 
+export interface AdminOrderPayload {
+  id: number | null;
+  user_id: string;
+  order_number: string;
+  status: string;
+  total_amount: number;
+  currency: string;
+  items_count: number;
+  ordered_at: string | null;
+  created_at: string | null;
+}
+
 interface CatalogRequestOptions {
   apiBaseUrl?: string;
   signal?: AbortSignal;
@@ -54,6 +66,10 @@ interface CatalogRequestOptions {
 
 interface CatalogAdminRequestOptions extends CatalogRequestOptions {
   accessToken: string;
+}
+
+interface ListAdminOrdersOptions extends CatalogAdminRequestOptions {
+  pendingOnly?: boolean;
 }
 
 interface CreateCollectionPayload {
@@ -103,6 +119,10 @@ interface UpdateProductPayload {
 interface UpdateFeaturedPayload {
   signature_product_id: string | null;
   best_seller_product_ids: string[];
+}
+
+interface UpdateAdminOrderStatusPayload {
+  status: string;
 }
 
 interface UploadImageOptions extends CatalogAdminRequestOptions {
@@ -213,6 +233,31 @@ function normalizeCatalogFeatured(value: unknown): CatalogFeaturedPayload {
   };
 }
 
+function normalizeAdminOrder(value: unknown): AdminOrderPayload {
+  const order = typeof value === "object" && value !== null ? value : {};
+  const data = order as Record<string, unknown>;
+  const rawId = data.id;
+  const parsedId = typeof rawId === "number" ? rawId : Number.parseInt(`${rawId ?? ""}`, 10);
+  const parsedTotal = Number(data.total_amount);
+  const parsedItems = Number.parseInt(`${data.items_count ?? ""}`, 10);
+  const rawCurrency =
+    typeof data.currency === "string" && /^[a-z]{3}$/i.test(data.currency.trim())
+      ? data.currency.trim().toUpperCase()
+      : "EUR";
+
+  return {
+    id: Number.isInteger(parsedId) ? parsedId : null,
+    user_id: typeof data.user_id === "string" ? data.user_id : "",
+    order_number: typeof data.order_number === "string" ? data.order_number : "",
+    status: typeof data.status === "string" ? data.status : "",
+    total_amount: Number.isFinite(parsedTotal) ? parsedTotal : 0,
+    currency: rawCurrency,
+    items_count: Number.isInteger(parsedItems) ? Math.max(parsedItems, 0) : 0,
+    ordered_at: typeof data.ordered_at === "string" ? data.ordered_at : null,
+    created_at: typeof data.created_at === "string" ? data.created_at : null,
+  };
+}
+
 function normalizeCatalogPayload(payload: unknown): CatalogPayload {
   const root = typeof payload === "object" && payload !== null ? payload : {};
   const data = root as Record<string, unknown>;
@@ -307,13 +352,92 @@ export async function getAdminCatalog({
   return normalizeCatalogPayload(payload);
 }
 
+export async function checkAdminAccess({
+  apiBaseUrl,
+  accessToken,
+  signal,
+}: CatalogAdminRequestOptions): Promise<boolean> {
+  const response = await fetch(`${resolveApiBaseUrl(apiBaseUrl)}/catalog/admin/access`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    signal,
+  });
+
+  const payload = await parseResponseBody(response);
+
+  if (response.status === 401 || response.status === 403) {
+    return false;
+  }
+  if (!response.ok) {
+    throw new ApiRequestError(
+      extractApiError(payload, "Vérification admin impossible"),
+      response.status,
+    );
+  }
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    "is_admin" in payload &&
+    typeof (payload as { is_admin?: unknown }).is_admin === "boolean"
+  ) {
+    return (payload as { is_admin: boolean }).is_admin;
+  }
+
+  return true;
+}
+
+export async function listAdminOrders({
+  apiBaseUrl,
+  accessToken,
+  signal,
+  pendingOnly = true,
+}: ListAdminOrdersOptions): Promise<AdminOrderPayload[]> {
+  const searchParams = new URLSearchParams();
+  searchParams.set("pending_only", pendingOnly ? "true" : "false");
+
+  const response = await fetch(
+    `${resolveApiBaseUrl(apiBaseUrl)}/catalog/admin/orders?${searchParams.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      signal,
+    },
+  );
+
+  const payload = await parseResponseBody(response);
+  if (!response.ok) {
+    throw new ApiRequestError(
+      extractApiError(payload, "Lecture commandes admin impossible"),
+      response.status,
+    );
+  }
+
+  if (typeof payload !== "object" || payload === null || !("orders" in payload)) {
+    return [];
+  }
+  const maybeOrders = (payload as { orders?: unknown }).orders;
+  if (!Array.isArray(maybeOrders)) {
+    return [];
+  }
+
+  return maybeOrders
+    .map((item) => normalizeAdminOrder(item))
+    .filter((item) => item.id !== null && item.order_number.length > 0);
+}
+
 export async function createAdminCollection(
   options: CatalogAdminRequestOptions & CreateCollectionPayload,
 ): Promise<CatalogCollectionPayload> {
   const payload = await adminJsonRequest<Record<string, unknown>>("/catalog/admin/collections", {
     ...options,
     method: "POST",
-    fallback: "Creation collection impossible",
+    fallback: "Création collection impossible",
     body: {
       title: options.title,
       description: options.description,
@@ -336,7 +460,7 @@ export async function updateAdminCollection(
     {
       ...options,
       method: "PUT",
-      fallback: "Mise a jour collection impossible",
+      fallback: "Mise à jour collection impossible",
       body: {
         title: options.title ?? null,
         description: options.description ?? null,
@@ -357,7 +481,7 @@ export async function createAdminProduct(
   const payload = await adminJsonRequest<Record<string, unknown>>("/catalog/admin/products", {
     ...options,
     method: "POST",
-    fallback: "Creation produit impossible",
+    fallback: "Création produit impossible",
     body: {
       name: options.name,
       collection_id: options.collection_id,
@@ -384,7 +508,7 @@ export async function updateAdminProduct(
     {
       ...options,
       method: "PUT",
-      fallback: "Mise a jour produit impossible",
+      fallback: "Mise à jour produit impossible",
       body: {
         name: options.name ?? null,
         collection_id: options.collection_id ?? null,
@@ -409,7 +533,7 @@ export async function updateAdminFeatured(
   const payload = await adminJsonRequest<Record<string, unknown>>("/catalog/admin/featured", {
     ...options,
     method: "PUT",
-    fallback: "Mise a jour best-sellers impossible",
+    fallback: "Mise à jour best-sellers impossible",
     body: {
       signature_product_id: options.signature_product_id,
       best_seller_product_ids: options.best_seller_product_ids,
@@ -417,6 +541,34 @@ export async function updateAdminFeatured(
   });
 
   return normalizeCatalogFeatured(payload);
+}
+
+export async function updateAdminOrderStatus(
+  orderId: number,
+  options: CatalogAdminRequestOptions & UpdateAdminOrderStatusPayload,
+): Promise<AdminOrderPayload> {
+  if (!Number.isInteger(orderId) || orderId <= 0) {
+    throw new ApiRequestError("Commande admin invalide", 422);
+  }
+  const normalizedStatus =
+    typeof options.status === "string" ? options.status.trim() : "";
+  if (normalizedStatus.length === 0) {
+    throw new ApiRequestError("Statut commande invalide", 422);
+  }
+
+  const payload = await adminJsonRequest<Record<string, unknown>>(
+    `/catalog/admin/orders/${orderId}`,
+    {
+      ...options,
+      method: "PUT",
+      fallback: "Mise à jour commande impossible",
+      body: {
+        status: normalizedStatus,
+      },
+    },
+  );
+
+  return normalizeAdminOrder(payload);
 }
 
 export async function uploadAdminImage({

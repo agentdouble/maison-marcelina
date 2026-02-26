@@ -21,15 +21,19 @@ import {
   updateAccountProfile,
 } from "./lib/auth.ts";
 import {
+  checkAdminAccess,
   createAdminCollection,
   createAdminProduct,
   getAdminCatalog,
   getPublicCatalog,
+  listAdminOrders,
   updateAdminCollection,
+  updateAdminOrderStatus,
   updateAdminFeatured,
   updateAdminProduct,
   uploadAdminImage,
 } from "./lib/catalog.ts";
+import { createCheckoutSession, syncCheckoutSessionOrder } from "./lib/checkout.ts";
 
 const AUTH_SESSION_STORAGE_KEY = "mm_auth_session";
 
@@ -106,11 +110,39 @@ function formatOrderItems(itemsCount) {
   return `${itemsCount} article${itemsCount > 1 ? "s" : ""}`;
 }
 
-function getOrderStatusTone(status) {
+function normalizeStatusValue(status) {
   if (typeof status !== "string") {
-    return "neutral";
+    return "";
   }
-  const normalized = status.trim().toLowerCase();
+  return status
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+const ORDER_STATUS_LABELS = {
+  "en preparation": "En préparation",
+  "en attente": "En attente",
+  expediee: "Expédiée",
+  livree: "Livrée",
+  annulee: "Annulée",
+};
+
+function formatOrderStatusLabel(status) {
+  if (typeof status !== "string") {
+    return "-";
+  }
+  const cleaned = status.trim();
+  if (!cleaned) {
+    return "-";
+  }
+  const normalized = normalizeStatusValue(cleaned);
+  return ORDER_STATUS_LABELS[normalized] ?? cleaned;
+}
+
+function getOrderStatusTone(status) {
+  const normalized = normalizeStatusValue(status);
   if (!normalized) {
     return "neutral";
   }
@@ -255,124 +287,12 @@ const emptyPublicCatalog = {
   },
 };
 
-const mockCatalogCollections = [
-  {
-    id: "mock-collection-heritage",
-    slug: "marceline-heritage",
-    title: "Marceline Heritage",
-    description: "Collection de base | Vert sauge / Beige / Taupe / Chocolat",
-    image_url:
-      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1600&q=80",
-    sort_order: 0,
-    is_active: true,
-  },
-  {
-    id: "mock-collection-riviera",
-    slug: "marceline-riviera",
-    title: "Marceline Riviera",
-    description: "Collection permanente | Vichy / Rayures / Multicouleur",
-    image_url:
-      "https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=1600&q=80",
-    sort_order: 1,
-    is_active: true,
-  },
-  {
-    id: "mock-collection-audacieuse",
-    slug: "marceline-audacieuse",
-    title: "Marceline Audacieuse",
-    description: "Collection permanente | Leopard / Vache / Rouge / Noir",
-    image_url:
-      "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80",
-    sort_order: 2,
-    is_active: true,
-  },
-];
-
-const mockCatalogProducts = [
-  {
-    id: "mock-product-robe-signature",
-    slug: "robe-signature-atelier",
-    name: "Robe Signature Atelier",
-    collection_id: "mock-collection-heritage",
-    collection: {
-      id: "mock-collection-heritage",
-      slug: "marceline-heritage",
-      title: "Marceline Heritage",
-    },
-    price: 189,
-    description: "Robe taillee main, coupe fluide et maintien net.",
-    size_guide: defaultProductSizeGuide,
-    stock: 8,
-    composition_care: ["80% coton", "20% viscose", "Lavage delicat 30C"],
-    images: [
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80",
-      "https://images.unsplash.com/photo-1467632499275-7a693a761056?auto=format&fit=crop&w=1200&q=80",
-    ],
-    is_active: true,
-  },
-  {
-    id: "mock-product-top-riviera",
-    slug: "top-riviera",
-    name: "Top Riviera",
-    collection_id: "mock-collection-riviera",
-    collection: {
-      id: "mock-collection-riviera",
-      slug: "marceline-riviera",
-      title: "Marceline Riviera",
-    },
-    price: 96,
-    description: "Top structure pour silhouette nette au quotidien.",
-    size_guide: defaultProductSizeGuide,
-    stock: 14,
-    composition_care: ["100% coton", "Lavage 30C", "Repassage doux"],
-    images: [
-      "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
-    ],
-    is_active: true,
-  },
-  {
-    id: "mock-product-jupe-audacieuse",
-    slug: "jupe-audacieuse",
-    name: "Jupe Audacieuse",
-    collection_id: "mock-collection-audacieuse",
-    collection: {
-      id: "mock-collection-audacieuse",
-      slug: "marceline-audacieuse",
-      title: "Marceline Audacieuse",
-    },
-    price: 158,
-    description: "Jupe taille haute, ligne marquee et tombant precis.",
-    size_guide: defaultProductSizeGuide,
-    stock: 10,
-    composition_care: ["65% polyester", "35% coton", "Nettoyage delicat"],
-    images: [
-      "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1200&q=80",
-    ],
-    is_active: true,
-  },
-  {
-    id: "mock-product-ensemble-atelier",
-    slug: "ensemble-atelier",
-    name: "Ensemble Atelier",
-    collection_id: "mock-collection-heritage",
-    collection: {
-      id: "mock-collection-heritage",
-      slug: "marceline-heritage",
-      title: "Marceline Heritage",
-    },
-    price: 179,
-    description: "Ensemble couture avec structure souple et finitions propres.",
-    size_guide: defaultProductSizeGuide,
-    stock: 6,
-    composition_care: ["70% lin", "30% coton", "Lavage main recommande"],
-    images: [
-      "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1542295669297-4d352b042bca?auto=format&fit=crop&w=1200&q=80",
-    ],
-    is_active: true,
-  },
+const adminOrderStatusOptions = [
+  "En preparation",
+  "En attente",
+  "Expediee",
+  "Livree",
+  "Annulee",
 ];
 
 function getFooterSections(isAuthenticated) {
@@ -492,16 +412,65 @@ function ChevronRightIcon({ open = false }) {
 
 function SiteHeader({ cartCount = 0, cartOpen = false, onToggleCart }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [canAccessAdmin, setCanAccessAdmin] = useState(false);
   const location = useLocation();
   const headerRef = useRef(null);
+  const adminAccessRequestRef = useRef(null);
   const menuClass = mobileMenuOpen ? "menu-tabs menu-tabs--open" : "menu-tabs";
-  const isAuthenticated = Boolean(readStoredAuthSession());
+  const authSession = readStoredAuthSession();
+  const accessToken =
+    authSession && typeof authSession.access_token === "string"
+      ? authSession.access_token.trim()
+      : "";
+  const isAuthenticated = accessToken.length > 0;
   const authRoute = isAuthenticated ? "/compte" : "/login";
   const authLabel = isAuthenticated ? "Compte" : "Login";
   const navItems = useMemo(
-    () => buildHeaderNavItems(isAuthenticated),
-    [isAuthenticated],
+    () => buildHeaderNavItems(canAccessAdmin),
+    [canAccessAdmin],
   );
+
+  useEffect(() => {
+    if (!accessToken) {
+      adminAccessRequestRef.current?.abort();
+      adminAccessRequestRef.current = null;
+      setCanAccessAdmin(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    adminAccessRequestRef.current?.abort();
+    adminAccessRequestRef.current = controller;
+
+    checkAdminAccess({
+      accessToken,
+      signal: controller.signal,
+    })
+      .then((isAdmin) => {
+        if (adminAccessRequestRef.current !== controller) {
+          return;
+        }
+        setCanAccessAdmin(Boolean(isAdmin));
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        if (adminAccessRequestRef.current !== controller) {
+          return;
+        }
+        setCanAccessAdmin(false);
+      })
+      .finally(() => {
+        if (adminAccessRequestRef.current === controller) {
+          adminAccessRequestRef.current = null;
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [accessToken]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -659,10 +628,32 @@ function getCartItemId(item) {
   return item.cartItemId ?? item.id;
 }
 
-function buildHeaderNavItems(isAuthenticated) {
-  return isAuthenticated
-    ? [...BASE_NAV_ITEMS, { to: "/admin", label: "Admin" }]
-    : BASE_NAV_ITEMS;
+function createCheckoutIdempotencyKey() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `mm-${crypto.randomUUID()}`;
+  }
+  return `mm-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+}
+
+function mapCartItemsToCheckoutLines(cartItems) {
+  return cartItems
+    .filter(
+      (item) =>
+        item &&
+        typeof item.id === "string" &&
+        item.id.trim().length > 0 &&
+        Number.isInteger(item.quantity) &&
+        item.quantity > 0,
+    )
+    .map((item) => ({
+      product_id: item.id.trim(),
+      quantity: item.quantity,
+      size: typeof item.size === "string" && item.size.trim().length > 0 ? item.size.trim() : null,
+    }));
+}
+
+function buildHeaderNavItems(canAccessAdmin) {
+  return canAccessAdmin ? [...BASE_NAV_ITEMS, { to: "/admin", label: "Admin" }] : BASE_NAV_ITEMS;
 }
 
 function getProductCollectionName(product) {
@@ -924,20 +915,6 @@ function buildProductImages(primaryImage, galleryValue) {
   return Array.from(new Set(merged));
 }
 
-function hasActiveCollectionImage(collections) {
-  return collections.some(
-    (collection) =>
-      collection &&
-      collection.is_active &&
-      typeof collection.image_url === "string" &&
-      collection.image_url.trim().length > 0,
-  );
-}
-
-function hasActiveProducts(products) {
-  return products.some((product) => product && product.is_active);
-}
-
 function buildFeaturedFromProducts(products) {
   const activeProducts = products.filter((product) => product && product.is_active);
   return {
@@ -946,18 +923,13 @@ function buildFeaturedFromProducts(products) {
   };
 }
 
-function buildCatalogWithFallback(payload) {
+function buildPublicCatalog(payload) {
   const collections = Array.isArray(payload?.collections) ? payload.collections : [];
   const products = Array.isArray(payload?.products) ? payload.products : [];
   const featured = payload?.featured && typeof payload.featured === "object" ? payload.featured : {};
 
-  const resolvedCollections = hasActiveCollectionImage(collections)
-    ? collections
-    : mockCatalogCollections;
-  const resolvedProducts = hasActiveProducts(products) ? products : mockCatalogProducts;
-
   const activeProductIds = new Set(
-    resolvedProducts
+    products
       .filter((product) => product && product.is_active && typeof product.id === "string")
       .map((product) => product.id),
   );
@@ -981,8 +953,8 @@ function buildCatalogWithFallback(payload) {
 
   if (signatureId || bestSellerIds.length > 0) {
     return {
-      collections: resolvedCollections,
-      products: resolvedProducts,
+      collections,
+      products,
       featured: {
         signature_product_id: signatureId ?? bestSellerIds[0] ?? null,
         best_seller_product_ids:
@@ -992,9 +964,9 @@ function buildCatalogWithFallback(payload) {
   }
 
   return {
-    collections: resolvedCollections,
-    products: resolvedProducts,
-    featured: buildFeaturedFromProducts(resolvedProducts),
+    collections,
+    products,
+    featured: buildFeaturedFromProducts(products),
   };
 }
 
@@ -1095,43 +1067,50 @@ function CartItemsList({ items, onQuantityChange, onRemoveItem }) {
     <div className="cart-items-list">
       {items.map((item) => {
         const cartItemId = getCartItemId(item);
+        const lineTotal = item.price * item.quantity;
 
         return (
           <article className="cart-item-row" key={cartItemId}>
             <img src={item.image} alt={item.name} loading="lazy" />
 
-            <div className="cart-item-meta">
-              <h2>{item.name}</h2>
-              {item.size ? <p className="cart-item-size">Taille {item.size}</p> : null}
-              <p>{formatMarketplacePrice(item.price)}</p>
-            </div>
-
-            <div className="cart-item-actions">
-              <div className="cart-qty">
+            <div className="cart-item-main">
+              <div className="cart-item-head">
+                <h2>{item.name}</h2>
                 <button
                   type="button"
-                  aria-label={`Retirer une unité de ${item.name}`}
-                  onClick={() => onQuantityChange(cartItemId, -1)}
+                  className="cart-remove"
+                  onClick={() => onRemoveItem(cartItemId)}
                 >
-                  -
-                </button>
-                <span>{item.quantity}</span>
-                <button
-                  type="button"
-                  aria-label={`Ajouter une unité de ${item.name}`}
-                  onClick={() => onQuantityChange(cartItemId, 1)}
-                >
-                  +
+                  Retirer
                 </button>
               </div>
 
-              <button
-                type="button"
-                className="cart-remove"
-                onClick={() => onRemoveItem(cartItemId)}
-              >
-                Supprimer
-              </button>
+              <div className="cart-item-meta">
+                {item.size ? <p className="cart-item-size">Taille {item.size}</p> : null}
+                <p className="cart-item-unit">{formatMarketplacePrice(item.price)}</p>
+              </div>
+
+              <div className="cart-item-actions">
+                <div className="cart-qty">
+                  <button
+                    type="button"
+                    aria-label={`Retirer une unité de ${item.name}`}
+                    onClick={() => onQuantityChange(cartItemId, -1)}
+                  >
+                    −
+                  </button>
+                  <span>{item.quantity}</span>
+                  <button
+                    type="button"
+                    aria-label={`Ajouter une unité de ${item.name}`}
+                    onClick={() => onQuantityChange(cartItemId, 1)}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <p className="cart-item-total">{formatMarketplacePrice(lineTotal)}</p>
+              </div>
             </div>
           </article>
         );
@@ -1141,6 +1120,10 @@ function CartItemsList({ items, onQuantityChange, onRemoveItem }) {
 }
 
 function CartPanel({ open, items, total, onClose, onQuantityChange, onRemoveItem }) {
+  const navigate = useNavigate();
+  const canProceedToCheckout = items.length > 0;
+  const itemCount = items.reduce((count, item) => count + item.quantity, 0);
+
   if (!open) {
     return null;
   }
@@ -1171,8 +1154,29 @@ function CartPanel({ open, items, total, onClose, onQuantityChange, onRemoveItem
         </div>
 
         <footer className="cart-panel-foot">
-          <p>Total</p>
-          <strong>{formatMarketplacePrice(total)}</strong>
+          <div className="cart-panel-total">
+            <p>Total TTC</p>
+            <strong>{formatMarketplacePrice(total)}</strong>
+          </div>
+          <div className="cart-panel-total-meta">
+            <span>{itemCount} article{itemCount > 1 ? "s" : ""}</span>
+            <span>Paiement sécurisé</span>
+          </div>
+          <button
+            type="button"
+            className="product-detail-add-button cart-panel-checkout"
+            disabled={!canProceedToCheckout}
+            onClick={() => {
+              if (!canProceedToCheckout) {
+                return;
+              }
+              onClose();
+              navigate("/panier");
+            }}
+          >
+            <span className="cart-checkout-label">Passer au paiement</span>
+            <span className="cart-checkout-amount">{formatMarketplacePrice(total)}</span>
+          </button>
         </footer>
       </aside>
     </div>
@@ -1203,7 +1207,7 @@ function HomePage({ collections, products, featured, isCatalogLoading }) {
               <img src={signatureImage} alt={signatureProduct.name} loading="lazy" />
             </div>
             <div className="signature-content">
-              <p className="signature-eyebrow">Piece signature</p>
+              <p className="signature-eyebrow">Pièce signature</p>
               <h2>{signatureProduct.name}</h2>
               <p className="signature-meta">{signatureCollection}</p>
               <p className="signature-price">{formatMarketplacePrice(signatureProduct.price)}</p>
@@ -1407,7 +1411,7 @@ function CollectionPage({ products, isCatalogLoading }) {
   );
 }
 
-function ProductDetailPage({ products, onAddToCart }) {
+function ProductDetailPage({ products, isCatalogLoading, onAddToCart }) {
   const { productId } = useParams();
   const [selectedSize, setSelectedSize] = useState("");
   const [openSectionId, setOpenSectionId] = useState(null);
@@ -1421,6 +1425,14 @@ function ProductDetailPage({ products, onAddToCart }) {
     setSelectedSize("");
     setOpenSectionId(null);
   }, [productId]);
+
+  if (!product && isCatalogLoading) {
+    return (
+      <section className="page-view product-detail-view">
+        <p className="account-loading">Chargement...</p>
+      </section>
+    );
+  }
 
   if (!product) {
     return <Navigate to="/collection" replace />;
@@ -1554,13 +1566,6 @@ function SurMesurePage() {
           à votre usage et au niveau de formalité recherché, qu'il s'agisse d'une tenue du quotidien,
           d'une occasion spéciale ou d'une pièce de cérémonie.
         </p>
-        <img
-          className="sur-mesure-image"
-          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1800&q=80"
-          alt="Silhouette de mode en atelier sur mesure"
-          loading="lazy"
-          decoding="async"
-        />
         {isAuthenticated ? (
           <form className="sur-mesure-request-form" onSubmit={handleRequestSubmit} onInput={handleRequestEdit}>
             <div className="field-row">
@@ -1690,7 +1695,6 @@ function AccountPage() {
     user && typeof user.email === "string" && user.email.trim().length > 0
       ? user.email.trim()
       : "Non renseigné";
-  const clientId = user && typeof user.id === "string" ? user.id : "";
   const createdAt = user && typeof user.created_at === "string" ? user.created_at : "";
   const lastSignInAt =
     user && typeof user.last_sign_in_at === "string" ? user.last_sign_in_at : "";
@@ -1715,7 +1719,7 @@ function AccountPage() {
     return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
   }, 0);
   const inProgressOrders = orders.filter((order) => {
-    const status = typeof order.status === "string" ? order.status.toLowerCase() : "";
+    const status = normalizeStatusValue(order.status);
     return (
       status.includes("cours") ||
       status.includes("attente") ||
@@ -1966,10 +1970,6 @@ function AccountPage() {
                   <h3>Actions</h3>
                   <div className="account-kv-grid">
                     <div className="account-kv">
-                      <span>Client ID</span>
-                      <strong>{formatClientId(clientId)}</strong>
-                    </div>
-                    <div className="account-kv">
                       <span>Mise à jour profil</span>
                       <strong>{formatAccountDate(profileUpdatedAt)}</strong>
                     </div>
@@ -2030,7 +2030,7 @@ function AccountPage() {
                           <span
                             className={`account-status account-status--${getOrderStatusTone(statusLabel)}`}
                           >
-                            {statusLabel}
+                            {formatOrderStatusLabel(statusLabel)}
                           </span>
                         </div>
                         <div className="account-order-grid">
@@ -2278,7 +2278,7 @@ function AdminPage({ onCatalogRefresh }) {
   const accessToken =
     session && typeof session.access_token === "string" ? session.access_token : "";
 
-  const [activeTab, setActiveTab] = useState("collections-add");
+  const [activeTab, setActiveTab] = useState("orders-pending");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -2286,6 +2286,8 @@ function AdminPage({ onCatalogRefresh }) {
 
   const [collections, setCollections] = useState([]);
   const [products, setProducts] = useState([]);
+  const [adminOrders, setAdminOrders] = useState([]);
+  const [adminOrderStatusDrafts, setAdminOrderStatusDrafts] = useState({});
 
   const [collectionDrafts, setCollectionDrafts] = useState({});
   const [newCollectionDraft, setNewCollectionDraft] = useState({
@@ -2421,6 +2423,26 @@ function AdminPage({ onCatalogRefresh }) {
     }));
   };
 
+  const syncOrdersState = (ordersPayload) => {
+    const nextOrders = Array.isArray(ordersPayload) ? ordersPayload : [];
+    setAdminOrders(nextOrders);
+    setAdminOrderStatusDrafts(
+      nextOrders.reduce((accumulator, order) => {
+        const orderId = typeof order.id === "number" ? order.id : null;
+        if (orderId === null) {
+          return accumulator;
+        }
+
+        const status =
+          typeof order.status === "string" && order.status.trim().length > 0
+            ? order.status.trim()
+            : "En preparation";
+        accumulator[orderId] = status;
+        return accumulator;
+      }, {}),
+    );
+  };
+
   useEffect(() => {
     return () => {
       loadRequestRef.current?.abort();
@@ -2442,14 +2464,22 @@ function AdminPage({ onCatalogRefresh }) {
     setErrorMessage(null);
 
     try {
-      const payload = await getAdminCatalog({
-        accessToken,
-        signal: controller.signal,
-      });
+      const [catalogPayload, ordersPayload] = await Promise.all([
+        getAdminCatalog({
+          accessToken,
+          signal: controller.signal,
+        }),
+        listAdminOrders({
+          accessToken,
+          pendingOnly: true,
+          signal: controller.signal,
+        }),
+      ]);
       if (loadRequestRef.current !== controller) {
         return;
       }
-      syncDashboardState(payload);
+      syncDashboardState(catalogPayload);
+      syncOrdersState(ordersPayload);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;
@@ -2461,7 +2491,7 @@ function AdminPage({ onCatalogRefresh }) {
         error instanceof ApiRequestError &&
         (error.status === 401 || error.status === 403)
       ) {
-        setErrorMessage("Acces admin requis");
+        setErrorMessage("Accès admin requis");
       } else {
         setErrorMessage(error instanceof Error ? error.message : "Chargement admin impossible");
       }
@@ -2527,9 +2557,9 @@ function AdminPage({ onCatalogRefresh }) {
         error instanceof ApiRequestError &&
         (error.status === 401 || error.status === 403)
       ) {
-        setErrorMessage("Acces admin requis");
+        setErrorMessage("Accès admin requis");
       } else {
-        setErrorMessage(error instanceof Error ? error.message : "Operation impossible");
+        setErrorMessage(error instanceof Error ? error.message : "Opération impossible");
       }
     } finally {
       if (actionRequestRef.current === controller) {
@@ -2562,7 +2592,7 @@ function AdminPage({ onCatalogRefresh }) {
         return;
       }
       onApply(payload.image_url);
-      setSuccessMessage("Image importee");
+      setSuccessMessage("Image importée");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;
@@ -2574,7 +2604,7 @@ function AdminPage({ onCatalogRefresh }) {
         error instanceof ApiRequestError &&
         (error.status === 401 || error.status === 403)
       ) {
-        setErrorMessage("Acces admin requis");
+        setErrorMessage("Accès admin requis");
       } else {
         setErrorMessage(error instanceof Error ? error.message : "Upload image impossible");
       }
@@ -2608,6 +2638,7 @@ function AdminPage({ onCatalogRefresh }) {
     0,
   );
   const adminTabs = [
+    { id: "orders-pending", label: "Commandes en attente" },
     { id: "collections-add", label: "Ajouter une collection" },
     { id: "collections-edit", label: "Modifier une collection" },
     { id: "products-add", label: "Ajouter un produit" },
@@ -2639,6 +2670,126 @@ function AdminPage({ onCatalogRefresh }) {
         </div>
 
         {isLoading ? <p className="account-loading">Chargement...</p> : null}
+
+        {activeTab === "orders-pending" ? (
+          <div
+            className="dashboard-grid"
+            role="tabpanel"
+            id="admin-panel-orders-pending"
+            aria-labelledby="admin-tab-orders-pending"
+          >
+            <section className="dashboard-block">
+              <h2>Commandes en attente</h2>
+              {adminOrders.length === 0 ? (
+                <p className="account-empty">Aucune commande en attente</p>
+              ) : (
+                <ul className="account-orders">
+                  {adminOrders.map((order, index) => {
+                    const orderId = typeof order.id === "number" ? order.id : null;
+                    const orderNumber =
+                      typeof order.order_number === "string" && order.order_number.trim()
+                        ? order.order_number.trim()
+                        : "Commande";
+                    const statusLabel =
+                      typeof order.status === "string" && order.status.trim()
+                        ? order.status.trim()
+                        : "En preparation";
+                    const statusDraft =
+                      orderId !== null &&
+                      typeof adminOrderStatusDrafts[orderId] === "string" &&
+                      adminOrderStatusDrafts[orderId].trim().length > 0
+                        ? adminOrderStatusDrafts[orderId]
+                        : statusLabel;
+                    const statusOptions = adminOrderStatusOptions.includes(statusDraft)
+                      ? adminOrderStatusOptions
+                      : [statusDraft, ...adminOrderStatusOptions];
+
+                    return (
+                      <li
+                        className="account-order-item"
+                        key={orderId ?? `${orderNumber}-${statusLabel}-${index}`}
+                      >
+                        <div className="account-order-top">
+                          <strong>{orderNumber}</strong>
+                          <span
+                            className={`account-status account-status--${getOrderStatusTone(statusLabel)}`}
+                          >
+                            {formatOrderStatusLabel(statusLabel)}
+                          </span>
+                        </div>
+                        <div className="account-order-grid">
+                          <div className="account-order-cell">
+                            <span>Date</span>
+                            <strong>{formatAccountDate(order.ordered_at)}</strong>
+                          </div>
+                          <div className="account-order-cell">
+                            <span>Total</span>
+                            <strong>{formatOrderTotal(order.total_amount, order.currency)}</strong>
+                          </div>
+                          <div className="account-order-cell">
+                            <span>Articles</span>
+                            <strong>{formatOrderItems(order.items_count)}</strong>
+                          </div>
+                          <div className="account-order-cell">
+                            <span>Client</span>
+                            <strong>{formatClientId(order.user_id)}</strong>
+                          </div>
+                        </div>
+                        <div className="dashboard-inline-actions">
+                          <label>
+                            <span>Statut</span>
+                            <select
+                              value={statusDraft}
+                              disabled={isSubmitting || orderId === null}
+                              onChange={(event) => {
+                                if (orderId === null) {
+                                  return;
+                                }
+                                setAdminOrderStatusDrafts((current) => ({
+                                  ...current,
+                                  [orderId]: event.target.value,
+                                }));
+                              }}
+                            >
+                              {statusOptions.map((statusOption) => (
+                                <option value={statusOption} key={`${orderNumber}-${statusOption}`}>
+                                  {formatOrderStatusLabel(statusOption)}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <button
+                            type="button"
+                            className="account-submit-btn"
+                            disabled={
+                              isSubmitting || orderId === null || statusDraft.trim().length === 0
+                            }
+                            onClick={() => {
+                              if (orderId === null) {
+                                return;
+                              }
+                              runAdminMutation(
+                                (signal) =>
+                                  updateAdminOrderStatus(orderId, {
+                                    accessToken,
+                                    signal,
+                                    status: statusDraft,
+                                  }),
+                                "Commande enregistrée",
+                              );
+                            }}
+                          >
+                            Mettre à jour
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+          </div>
+        ) : null}
 
         {activeTab === "collections-add" ? (
           <div
@@ -2903,7 +3054,7 @@ function AdminPage({ onCatalogRefresh }) {
                                 sort_order: Number.parseInt(draft.sort_order, 10) || 0,
                                 is_active: draft.is_active,
                               }),
-                            "Collection enregistree",
+                            "Collection enregistrée",
                           )
                         }
                       >
@@ -2916,10 +3067,10 @@ function AdminPage({ onCatalogRefresh }) {
             </section>
 
             <section className="dashboard-block">
-              <h2>Piece signature et best-sellers</h2>
+              <h2>Pièce signature et best-sellers</h2>
               <div className="dashboard-card">
                 <label>
-                  <span>Piece signature</span>
+                  <span>Pièce signature</span>
                   <select
                     value={featuredDraft.signature_product_id}
                     onChange={(event) =>
@@ -2991,7 +3142,7 @@ function AdminPage({ onCatalogRefresh }) {
                           signature_product_id: featuredDraft.signature_product_id || null,
                           best_seller_product_ids: featuredDraft.best_seller_product_ids,
                         }),
-                      "Selection best-sellers enregistree",
+                      "Sélection best-sellers enregistrée",
                     )
                   }
                 >
@@ -3460,22 +3611,205 @@ function AdminPage({ onCatalogRefresh }) {
   );
 }
 
-function PanierPage({ cartItems, cartTotal, onQuantityChange, onRemoveItem }) {
+function PanierPage({
+  cartItems,
+  cartTotal,
+  onQuantityChange,
+  onRemoveItem,
+  onCheckout,
+  isCheckoutLoading,
+  checkoutError,
+}) {
+  const location = useLocation();
+  const itemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+  const paymentStatus = useMemo(() => {
+    const status = new URLSearchParams(location.search).get("payment");
+    if (status === "success" || status === "cancel") {
+      return status;
+    }
+    return null;
+  }, [location.search]);
+  const paymentSuccess = paymentStatus === "success";
+  const paymentCanceled = paymentStatus === "cancel";
+  const canCheckout = cartItems.length > 0 && !isCheckoutLoading;
+
   return (
     <section className="page-view form-view">
-      <header className="section-head">
+      <header className="section-head cart-page-head">
         <h1>Panier</h1>
+        <p>{itemCount} article{itemCount > 1 ? "s" : ""}</p>
       </header>
 
       <Reveal className="cgv-panel cart-page-panel">
+        {paymentSuccess ? (
+          <p className="account-feedback account-feedback--success">Paiement confirmé</p>
+        ) : null}
+        {paymentCanceled ? (
+          <p className="account-feedback account-feedback--error">Paiement annulé</p>
+        ) : null}
+        {checkoutError ? (
+          <p className="account-feedback account-feedback--error">{checkoutError}</p>
+        ) : null}
         <CartItemsList
           items={cartItems}
           onQuantityChange={onQuantityChange}
           onRemoveItem={onRemoveItem}
         />
         <div className="cart-page-total">
-          <p>Total</p>
+          <div className="cart-page-total-meta">
+            <p>Sous-total</p>
+            <span>{itemCount} article{itemCount > 1 ? "s" : ""}</span>
+          </div>
           <strong>{formatMarketplacePrice(cartTotal)}</strong>
+        </div>
+        <button
+          type="button"
+          className="product-detail-add-button cart-checkout-button"
+          disabled={!canCheckout}
+          onClick={onCheckout}
+        >
+          <span className="cart-checkout-label">
+            {isCheckoutLoading ? "Redirection..." : "Payer maintenant"}
+          </span>
+          {isCheckoutLoading ? null : (
+            <span className="cart-checkout-amount">{formatMarketplacePrice(cartTotal)}</span>
+          )}
+        </button>
+        <p className="cart-page-trust">Paiement sécurisé</p>
+      </Reveal>
+    </section>
+  );
+}
+
+function CheckoutConfirmationPage({ onPaymentConfirmed }) {
+  const location = useLocation();
+  const session = readStoredAuthSession();
+  const accessToken =
+    session && typeof session.access_token === "string" ? session.access_token.trim() : "";
+  const [isSyncing, setIsSyncing] = useState(true);
+  const [syncError, setSyncError] = useState(null);
+  const [syncPayload, setSyncPayload] = useState(null);
+  const paymentConfirmedRef = useRef(false);
+
+  const sessionId = useMemo(() => {
+    const rawValue = new URLSearchParams(location.search).get("session_id");
+    return typeof rawValue === "string" ? rawValue.trim() : "";
+  }, [location.search]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    if (!sessionId) {
+      setIsSyncing(false);
+      setSyncError("Session de paiement introuvable");
+      setSyncPayload(null);
+      return () => {
+        controller.abort();
+      };
+    }
+
+    setIsSyncing(true);
+    setSyncError(null);
+    setSyncPayload(null);
+
+    syncCheckoutSessionOrder({
+      sessionId,
+      accessToken: accessToken || undefined,
+      signal: controller.signal,
+    })
+      .then((payload) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        setSyncPayload(payload);
+        if (payload.payment_status === "paid" && !paymentConfirmedRef.current) {
+          paymentConfirmedRef.current = true;
+          onPaymentConfirmed();
+        }
+      })
+      .catch((error) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        setSyncError(error instanceof Error ? error.message : "Vérification paiement impossible");
+      })
+      .finally(() => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        setIsSyncing(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [accessToken, onPaymentConfirmed, sessionId]);
+
+  const feedbackMessage = useMemo(() => {
+    if (isSyncing) {
+      return "Vérification commande...";
+    }
+    if (syncError) {
+      return syncError;
+    }
+    if (syncPayload?.order_recorded) {
+      const orderNumber =
+        typeof syncPayload.order_number === "string" && syncPayload.order_number.trim().length > 0
+          ? syncPayload.order_number.trim()
+          : "";
+      return orderNumber ? `Commande enregistrée ${orderNumber}` : "Commande enregistrée";
+    }
+    if (syncPayload?.payment_status === "paid") {
+      return "Paiement confirmé";
+    }
+    return "Paiement en attente";
+  }, [isSyncing, syncError, syncPayload]);
+
+  return (
+    <section className="page-view form-view">
+      <header className="section-head">
+        <h1>Paiement confirmé</h1>
+      </header>
+
+      <Reveal className="cgv-panel cart-page-panel">
+        <p
+          className={
+            syncError
+              ? "account-feedback account-feedback--error"
+              : "account-feedback account-feedback--success"
+          }
+        >
+          {feedbackMessage}
+        </p>
+        <div className="account-actions">
+          <Link className="account-secondary-link" to="/compte">
+            Mes commandes
+          </Link>
+          <Link className="account-secondary-link" to="/collection">
+            Continuer
+          </Link>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+function CheckoutCanceledPage() {
+  return (
+    <section className="page-view form-view">
+      <header className="section-head">
+        <h1>Paiement annulé</h1>
+      </header>
+
+      <Reveal className="cgv-panel cart-page-panel">
+        <p className="account-feedback account-feedback--error">Paiement annulé</p>
+        <div className="account-actions">
+          <Link className="account-secondary-link" to="/panier">
+            Retour panier
+          </Link>
+          <Link className="account-secondary-link" to="/collection">
+            Continuer
+          </Link>
         </div>
       </Reveal>
     </section>
@@ -3526,11 +3860,14 @@ export function App() {
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [catalogData, setCatalogData] = useState(() =>
-    buildCatalogWithFallback(emptyPublicCatalog),
+    buildPublicCatalog(emptyPublicCatalog),
   );
   const [isCatalogLoading, setIsCatalogLoading] = useState(true);
   const [catalogError, setCatalogError] = useState(null);
+  const [checkoutError, setCheckoutError] = useState(null);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const catalogRequestRef = useRef(null);
+  const checkoutRequestRef = useRef(null);
   const location = useLocation();
   const hideFooter = location.pathname === "/login";
 
@@ -3558,7 +3895,7 @@ export function App() {
       if (catalogRequestRef.current !== controller) {
         return;
       }
-      setCatalogData(buildCatalogWithFallback(payload));
+      setCatalogData(buildPublicCatalog(payload));
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;
@@ -3567,7 +3904,7 @@ export function App() {
         return;
       }
       setCatalogError(error instanceof Error ? error.message : "Lecture catalogue impossible");
-      setCatalogData(buildCatalogWithFallback(emptyPublicCatalog));
+      setCatalogData(buildPublicCatalog(emptyPublicCatalog));
     } finally {
       if (catalogRequestRef.current === controller) {
         catalogRequestRef.current = null;
@@ -3599,6 +3936,12 @@ export function App() {
   }, [refreshPublicCatalog]);
 
   useEffect(() => {
+    return () => {
+      checkoutRequestRef.current?.abort();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!cartOpen) {
       document.body.style.removeProperty("overflow");
       return;
@@ -3613,9 +3956,14 @@ export function App() {
 
   useEffect(() => {
     setCartOpen(false);
+    setCheckoutError(null);
+    checkoutRequestRef.current?.abort();
+    checkoutRequestRef.current = null;
+    setIsCheckoutLoading(false);
   }, [location.pathname]);
 
   const handleAddToCart = (product) => {
+    setCheckoutError(null);
     setCartItems((current) => {
       const incomingCartItemId = getCartItemId(product);
       const existingItem = current.find(
@@ -3637,6 +3985,7 @@ export function App() {
   };
 
   const handleQuantityChange = (cartItemId, change) => {
+    setCheckoutError(null);
     setCartItems((current) =>
       current.flatMap((item) => {
         if (getCartItemId(item) !== cartItemId) {
@@ -3655,10 +4004,67 @@ export function App() {
   };
 
   const handleRemoveItem = (cartItemId) => {
+    setCheckoutError(null);
     setCartItems((current) =>
       current.filter((item) => getCartItemId(item) !== cartItemId)
     );
   };
+
+  const handleCheckout = useCallback(async () => {
+    if (checkoutRequestRef.current) {
+      return;
+    }
+
+    const checkoutItems = mapCartItemsToCheckoutLines(cartItems);
+    if (checkoutItems.length === 0) {
+      setCheckoutError("Panier vide");
+      return;
+    }
+
+    const controller = new AbortController();
+    checkoutRequestRef.current = controller;
+    setCheckoutError(null);
+    setIsCheckoutLoading(true);
+    const authSession = readStoredAuthSession();
+    const accessToken =
+      authSession &&
+      typeof authSession.access_token === "string" &&
+      authSession.access_token.trim().length > 0
+        ? authSession.access_token.trim()
+        : undefined;
+
+    try {
+      const payload = await createCheckoutSession({
+        items: checkoutItems,
+        idempotencyKey: createCheckoutIdempotencyKey(),
+        accessToken,
+        signal: controller.signal,
+      });
+      if (checkoutRequestRef.current !== controller) {
+        return;
+      }
+      window.location.assign(payload.checkout_url);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      if (checkoutRequestRef.current !== controller) {
+        return;
+      }
+      setCheckoutError(error instanceof Error ? error.message : "Paiement indisponible");
+    } finally {
+      if (checkoutRequestRef.current === controller) {
+        checkoutRequestRef.current = null;
+        setIsCheckoutLoading(false);
+      }
+    }
+  }, [cartItems]);
+
+  const handlePaymentConfirmed = useCallback(() => {
+    setCartItems([]);
+    setCartOpen(false);
+    setCheckoutError(null);
+  }, []);
 
   return (
     <main className="app-shell">
@@ -3698,6 +4104,7 @@ export function App() {
             element={
               <ProductDetailPage
                 products={catalogData.products}
+                isCatalogLoading={isCatalogLoading}
                 onAddToCart={handleAddToCart}
               />
             }
@@ -3715,9 +4122,17 @@ export function App() {
                 cartTotal={cartTotal}
                 onQuantityChange={handleQuantityChange}
                 onRemoveItem={handleRemoveItem}
+                onCheckout={handleCheckout}
+                isCheckoutLoading={isCheckoutLoading}
+                checkoutError={checkoutError}
               />
             }
           />
+          <Route
+            path="/commande/confirmation"
+            element={<CheckoutConfirmationPage onPaymentConfirmed={handlePaymentConfirmed} />}
+          />
+          <Route path="/commande/annulee" element={<CheckoutCanceledPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/compte" element={<AccountPage />} />
           <Route

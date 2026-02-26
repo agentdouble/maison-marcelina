@@ -2,6 +2,12 @@
 
 ## successes
 
+- Redirecting Stripe returns to dedicated confirmation/cancel routes and syncing by `session_id` server-side gives clear payment feedback while keeping order writes idempotent.
+- Adding an admin `Commandes en attente` tab with status updates closes the checkout-to-operations loop without exposing order writes to customer pages.
+- Showing the `Admin` header link only after a backend admin-access check avoids false positives from stale local sessions.
+- Verifying Stripe webhook signatures server-side before any write is mandatory to make payment confirmation trustworthy in production.
+- In cart side panels, adding a direct `Passer au paiement` CTA reduces friction versus forcing users to discover the checkout path manually.
+- Creating Stripe Checkout sessions from backend-validated product ids (instead of trusting client prices) keeps payment totals tamper-resistant.
 - Replacing storefront mocks with a single `/catalog/public` payload keeps home, collection, and product detail in sync without duplicate client fetch logic.
 - A dedicated `/catalog/admin` API plus focused admin tabs (`Ajouter/Modifier collection`, `Ajouter/Modifier produit`) keeps editing flows clearer and avoids long mixed forms.
 - Persisting per-size stock inside product size lines (`Taille: Quantite`) keeps admin inventory entry possible without breaking existing payload contracts (`size_guide` + `stock`).
@@ -134,6 +140,7 @@
 - On `/compte`, a flatter layout (separators and hierarchy) reads more premium than stacked framed cards.
 - Mapping Supabase `401/403` auth rejections to a clear account `401` response prevents ambiguous profile-save failures.
 - Clearing stale `mm_auth_session` and redirecting to `/login` on account auth rejection keeps buyer UX recoverable.
+- Keeping raw user/client identifiers out of customer-facing account screens reduces unnecessary data exposure.
 - On `/sur-mesure`, replacing manual email capture with a login gate keeps request identity tied to the authenticated account.
 - On `/sur-mesure`, keep the request action available for authenticated users while gating anonymous users to `/login`.
 - On `/sur-mesure`, capability-focused copy (`ce que l'on peut personnaliser`) is clearer than internal process wording.
@@ -141,10 +148,19 @@
 - On `/sur-mesure`, removing a redundant page title can keep focus on the compact value copy and request action.
 - On `/sur-mesure`, a frameless layout (without `form-panel`) avoids the `cadre dans cadre` effect and keeps the page cleaner.
 - On French-facing pages, accented UI copy improves readability and perceived quality.
+- French copy QA should always include an explicit accent pass before shipping any user-facing text.
 - On `/sur-mesure`, centering the value paragraph and adding one editorial image improves clarity without reintroducing card containers.
+- On cart interfaces, combining clear quantity steppers with per-line totals improves scanability and checkout confidence.
+- In cart drawer/footer, a high-contrast total block and amount-forward checkout CTA improve trust and reduce hesitation.
+- Keeping public catalog state mock-free on first paint avoids image flicker and ensures users only see fetched storefront media.
 
 ## errors to avoid
 
+- Do not rely only on webhook delivery timing for buyer-facing payment confirmation; provide a server-synced post-checkout confirmation flow.
+- Do not leave admin without a pending-orders workflow once checkout writes statuses, or operational processing stalls.
+- Do not show admin navigation from local auth presence alone; gate it on explicit backend admin authorization.
+- Do not mark a payment as confirmed from frontend query params alone; only Stripe webhook events should finalize server order state.
+- Do not trust cart line prices sent by the browser when creating Stripe sessions; always rebuild amounts from server-side catalog data.
 - Do not keep home/catalog content hardcoded once Supabase tables are the source of truth, or admin edits will never appear in production pages.
 - Do not model signature/best-sellers as scattered booleans updated in multiple requests when one persisted config row can prevent race-prone partial updates.
 - Do not allow image upload flows without strict file type/size validation, or storage and frontend rendering can break in production.
@@ -235,6 +251,8 @@
 - Do not keep write-capable order endpoints on customer account APIs when the UI is meant to be read-only; it creates trust and data integrity issues.
 - Do not nest framed containers in `/compte` (`cadres dans cadres`); keep one visual level and rely on spacing/lines.
 - Do not keep stale local sessions after backend auth rejection on `/account/*`; force re-auth to avoid endless `403` loops.
+- Do not expose internal customer identifiers (user/client ids) on buyer-facing account views.
+- Do not keep checkout totals as low-emphasis microtext in cart footers; make the amount primary and unmistakable.
 - Do not ship the catalog dashboard to a new Supabase project before applying tables, RLS policies, and storage policies; admin writes and image uploads will fail.
 - Do not grant admin access by guesswork (email assumptions); insert explicit `auth.users.id` records in `public.admin_users` and verify with a join.
 - Do not rely only on a global stock input when size-level inventory is required; capture a per-size breakdown and derive a consistent total.
@@ -254,3 +272,4 @@
 - Do not nest framed wrappers (`form-panel` + internal separated blocks) on `/sur-mesure`; keep one visual level.
 - Do not ship French interface text without accents when final copy is user-visible.
 - Do not add decorative image wrappers that create extra framing when the requested direction is frameless.
+- Do not render mock catalog images before the first public fetch resolves, or users will see a trust-breaking visual swap on refresh.

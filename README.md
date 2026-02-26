@@ -1,12 +1,56 @@
-# app-template
+# Maison Marcelina
 
-Production-ready app template with a Python backend and a React frontend.
+Application web Maison Marcelina avec backend FastAPI (`uv`) et frontend React/Vite.
 
 ## Stack
 
-- Backend: FastAPI (Python 3.11+) managed with `uv`
-- Frontend: React + Vite
-- Orchestration: `start.sh` (single entrypoint)
+- Backend: FastAPI (Python 3.11+), `uv`, `httpx`
+- Frontend: React + Vite + React Router
+- Auth: Supabase Auth (email/password + Google OAuth)
+- Data catalogue: Supabase Postgres + Supabase Storage
+- Paiement: Stripe Checkout
+- Démarrage local: `./start.sh` (backend + frontend)
+
+## Fonctionnel actuel
+
+- Home, histoire, collection, fiche produit, panier, contact, sur-mesure
+- Checkout Stripe depuis `/panier` (redirection Checkout + retour `/commande/confirmation` ou `/commande/annulee`)
+- Sur `/commande/confirmation`, synchronisation serveur de la session Stripe (`session_id`) pour confirmer l’enregistrement de la commande de façon idempotente
+- Panneau panier (clic icône panier) avec CTA `Passer au paiement` vers `/panier`
+- Authentification + compte client (`/compte`)
+- Header avec navigation principale, icônes profil/panier, menu mobile (fermeture outside click + `Escape`)
+- Lien `Admin` du header affiché uniquement après vérification backend des droits admin
+- Catalogue public 100% Supabase (sans fallback mock):
+  - collections homepage depuis DB
+  - hero home compatible avec 1 seule collection active (pas besoin de 2 images pour afficher le visuel)
+  - pièce signature / best-sellers depuis DB (fallback logique sur produits actifs si sélection absente)
+  - produits boutique depuis DB
+- Boutique `/collection` orientée marketplace avec filtres par collection, grille responsive et ouverture fiche produit par carte
+- Fiche produit `/collection/:productId` avec retour boutique en haut, taille obligatoire, et ajout panier par variante de taille
+- Sur-mesure avec login gate: formulaire disponible pour compte connecté, redirection vers `/login` sinon
+- Admin (`/admin`, alias `/dashboard`):
+  - onglet `Commandes en attente`:
+    - liste des commandes avec statut en attente/préparation
+    - mise à jour du statut (`En préparation`, `En attente`, `Expédiée`, `Livrée`, `Annulée`)
+  - onglet `Ajouter une collection`:
+    - ajout collection home (titre, description, image, ordre, visibilité)
+    - upload image direct vers bucket Supabase
+  - onglet `Modifier une collection`:
+    - édition collections home (titre, description, image, ordre, visibilité)
+    - définition pièce signature + best-sellers (sélection parmi produits actifs)
+    - upload image direct vers bucket Supabase
+  - onglet `Ajouter un produit`:
+    - ajout produit
+    - stock par taille via éditeur (lignes `Taille` + `Quantité`, total auto)
+    - stock total manuel conservé quand le stock par taille est vide
+    - bouton `Ajouter un fichier` modernisé pour l'upload image
+  - onglet `Modifier un produit`:
+    - modification produit (prix, description, tailles, stock, composition/entretien, images, visibilité)
+    - stock par taille via éditeur (lignes `Taille` + `Quantité`, total auto)
+    - stock total manuel conservé quand le stock par taille est vide
+    - bouton `Ajouter un fichier` modernisé pour l'upload image
+  - les slugs produits/collections sont gérés automatiquement côté backend
+- Footer thématique `Footer7` avec colonnes `Navigation`, `Assistance`, `Informations légales`
 
 ## Project layout
 
@@ -15,35 +59,46 @@ Production-ready app template with a Python backend and a React frontend.
 ├── backend/
 │   ├── pyproject.toml
 │   ├── src/app/
+│   │   ├── api/account.py
+│   │   ├── api/auth.py
+│   │   ├── api/catalog.py
+│   │   ├── api/checkout.py
 │   │   ├── api/health.py
 │   │   ├── core/config.py
 │   │   ├── core/logging.py
+│   │   ├── services/supabase_account.py
+│   │   ├── services/supabase_auth.py
+│   │   ├── services/supabase_catalog.py
+│   │   ├── services/stripe_checkout.py
 │   │   └── main.py
+│   ├── tests/test_account.py
+│   ├── tests/test_auth.py
+│   ├── tests/test_catalog.py
+│   ├── tests/test_checkout.py
 │   ├── tests/test_health.py
 │   └── uv.lock
 ├── frontend/
 │   ├── package.json
-│   ├── vite.config.js
-│   ├── index.html
-│   └── src/
-│       ├── App.jsx
-│       ├── main.jsx
-│       └── styles.css
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── lib/auth.ts
+│   │   ├── lib/catalog.ts
+│   │   ├── lib/checkout.ts
+│   │   └── styles.css
 ├── .env.example
-├── .gitignore
 ├── lesson.md
 └── start.sh
 ```
 
 ## Setup
 
-1. Copy env values:
+1. Copier l'env:
 
 ```bash
 cp .env.example .env
 ```
 
-2. Resolve backend dependencies:
+2. Installer backend:
 
 ```bash
 cd backend
@@ -51,7 +106,7 @@ uv lock
 cd ..
 ```
 
-3. Install frontend dependencies:
+3. Installer frontend:
 
 ```bash
 cd frontend
@@ -61,19 +116,43 @@ cd ..
 
 ## Run
 
-Always run the app from the repository root:
+Toujours lancer depuis la racine:
 
 ```bash
 ./start.sh
 ```
 
-- Backend URL: `http://localhost:$BACKEND_PORT`
-- Health endpoint: `http://localhost:$BACKEND_PORT/health`
-- Frontend URL: `http://localhost:$FRONTEND_PORT`
+- Backend: `http://localhost:$BACKEND_PORT`
+- Health: `http://localhost:$BACKEND_PORT/health`
+- Frontend: `http://localhost:$FRONTEND_PORT`
+
+## Frontend routes
+
+- `/` home
+- `/notre-histoire` page histoire
+- `/histoire` alias vers `/notre-histoire`
+- `/collection` boutique marketplace
+- `/collection/:productId` fiche produit
+- `/collections` alias vers `/collection`
+- `/marketplace` alias vers `/collection`
+- `/sur-mesure` formulaire sur-mesure (auth requise)
+- `/contact` page contact
+- `/boutique` redirection vers `/collection`
+- `/panier` page panier
+- `/commande/confirmation` page confirmation paiement
+- `/commande/annulee` page annulation paiement
+- `/login` page login
+- `/compte` espace compte (Vue d'ensemble, Commandes, Coordonnées, Sécurité)
+- `/admin` (alias `/dashboard`)
+- `/mentions-legales`
+- `/cgv`
+- `/politique-remboursement`
+- `/politique-cookies`
+- `/accessibilite`
 
 ## Environment variables
 
-Defined in `.env`:
+Définies dans `.env`:
 
 - `APP_ENV`
 - `APP_NAME`
@@ -83,12 +162,263 @@ Defined in `.env`:
 - `FRONTEND_PORT`
 - `CORS_ORIGINS`
 - `VITE_API_BASE_URL`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_STORAGE_BUCKET`
+- `SUPABASE_GOOGLE_REDIRECT_URL`
+- `AUTH_COOKIE_SECURE`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_CURRENCY`
+- `STRIPE_WEBHOOK_SECRET`
 
-If `CORS_ORIGINS` is empty, it is built dynamically from `FRONTEND_HOST` and `FRONTEND_PORT`.
+Notes:
 
-If `VITE_API_BASE_URL` is empty, `start.sh` sets it to `http://127.0.0.1:$BACKEND_PORT`.
+- si `CORS_ORIGINS` est vide, `start.sh` le construit depuis `FRONTEND_HOST/PORT`
+- si `VITE_API_BASE_URL` est vide, `start.sh` force `http://127.0.0.1:$BACKEND_PORT`
+- si `SUPABASE_GOOGLE_REDIRECT_URL` est vide: `http://localhost:$BACKEND_PORT/auth/google/callback`
+- `SUPABASE_STORAGE_BUCKET` doit être un bucket **public** pour les images storefront
+- `SUPABASE_SERVICE_ROLE_KEY` est requis pour que le webhook Stripe confirme les commandes dans `customer_orders` et pour la lecture/mise à jour admin des commandes
+- `STRIPE_SECRET_KEY` est requis pour créer une session checkout
+- `STRIPE_CURRENCY` est normalisée sur un code ISO 4217 sur 3 lettres (par défaut `eur`)
+- `STRIPE_WEBHOOK_SECRET` est requis pour vérifier la signature `Stripe-Signature`
 
-## Commands
+## Backend API
+
+### Auth
+
+- `POST /auth/login`
+- `POST /auth/signup`
+- `GET /auth/google/start`
+- `GET /auth/google/callback`
+
+### Account
+
+Tous les endpoints `/account/*` requièrent `Authorization: Bearer <access_token>`.
+
+- `GET /account/profile`
+- `PUT /account/profile`
+- `GET /account/orders`
+
+### Catalog
+
+Public:
+
+- `GET /catalog/public`
+  - retourne `collections`, `products`, `featured`
+
+Admin (requiert `Authorization: Bearer <access_token>` + user admin):
+
+- `GET /catalog/admin`
+- `GET /catalog/admin/access`
+- `GET /catalog/admin/orders` (`pending_only=true|false`, défaut `true`)
+- `PUT /catalog/admin/orders/{order_id}`
+- `POST /catalog/admin/collections`
+- `PUT /catalog/admin/collections/{collection_id}`
+- `POST /catalog/admin/products`
+- `PUT /catalog/admin/products/{product_id}`
+- `PUT /catalog/admin/featured`
+- `POST /catalog/admin/upload-image` (multipart: `scope`, `file`)
+
+### Checkout
+
+- `POST /checkout/session`
+  - body: `items[]` (`product_id`, `quantity`, `size?`)
+  - prix reconstruits côté backend a partir du catalogue actif
+  - redirection Stripe vers `/commande/confirmation?session_id={CHECKOUT_SESSION_ID}` ou `/commande/annulee`
+- `POST /checkout/session/{session_id}/sync`
+  - relit la session Stripe côté serveur après redirection
+  - upsert idempotent dans `customer_orders` si `payment_status=paid`
+- `POST /checkout/webhook/stripe`
+  - vérification de signature Stripe (`Stripe-Signature`)
+  - confirmation finale serveur sur `checkout.session.completed` / `checkout.session.async_payment_succeeded`
+  - upsert idempotent dans `customer_orders` (conflit sur `order_number`)
+
+### Stripe webhook local
+
+1. lancer l'app avec `./start.sh`
+2. dans un autre terminal, connecter Stripe CLI:
+
+```bash
+stripe listen --forward-to http://127.0.0.1:${BACKEND_PORT}/checkout/webhook/stripe
+```
+
+3. récupérer le secret `whsec_...` affiché par Stripe CLI et le mettre dans `STRIPE_WEBHOOK_SECRET`
+
+### Frontend auth behavior
+
+- `/login` utilise `src/components/ui/login-1.tsx`
+- email/password appelle `POST {VITE_API_BASE_URL}/auth/login`
+- création de compte appelle `POST {VITE_API_BASE_URL}/auth/signup`
+- Google OAuth redirige vers `{VITE_API_BASE_URL}/auth/google/start`
+- la session login est stockée dans `localStorage` (`mm_auth_session`)
+- l’icône profil pointe vers `/compte` si authentifié, sinon `/login`
+- en cas de `401/403` sur `/account/*`, la session locale est purgée et l’app redirige vers `/login`
+
+## Supabase setup (catalog + admin)
+
+### 1) Tables
+
+Exécuter dans SQL editor Supabase:
+
+```sql
+create extension if not exists pgcrypto;
+
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.home_collections (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  title text not null,
+  description text not null,
+  image_url text not null,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.catalog_products (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  name text not null,
+  collection_id uuid not null references public.home_collections(id) on delete restrict,
+  price numeric(10,2) not null check (price >= 0),
+  description text not null default '',
+  size_guide text[] not null default '{}',
+  stock integer not null default 0 check (stock >= 0),
+  composition_care text[] not null default '{}',
+  images text[] not null default '{}',
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.home_featured (
+  id integer primary key check (id = 1),
+  signature_product_id uuid references public.catalog_products(id) on delete set null,
+  best_seller_product_ids uuid[] not null default '{}',
+  updated_at timestamptz not null default now()
+);
+
+insert into public.home_featured (id)
+values (1)
+on conflict (id) do nothing;
+```
+
+### 2) RLS policies
+
+```sql
+alter table public.admin_users enable row level security;
+alter table public.home_collections enable row level security;
+alter table public.catalog_products enable row level security;
+alter table public.home_featured enable row level security;
+
+drop policy if exists admin_users_select_self on public.admin_users;
+create policy admin_users_select_self
+on public.admin_users
+for select to authenticated
+using (auth.uid() = user_id);
+
+drop policy if exists home_collections_public_read on public.home_collections;
+create policy home_collections_public_read
+on public.home_collections
+for select
+using (is_active = true);
+
+drop policy if exists catalog_products_public_read on public.catalog_products;
+create policy catalog_products_public_read
+on public.catalog_products
+for select
+using (is_active = true);
+
+drop policy if exists home_featured_public_read on public.home_featured;
+create policy home_featured_public_read
+on public.home_featured
+for select
+using (true);
+
+drop policy if exists home_collections_admin_all on public.home_collections;
+create policy home_collections_admin_all
+on public.home_collections
+for all to authenticated
+using (exists (select 1 from public.admin_users a where a.user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users a where a.user_id = auth.uid()));
+
+drop policy if exists catalog_products_admin_all on public.catalog_products;
+create policy catalog_products_admin_all
+on public.catalog_products
+for all to authenticated
+using (exists (select 1 from public.admin_users a where a.user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users a where a.user_id = auth.uid()));
+
+drop policy if exists home_featured_admin_all on public.home_featured;
+create policy home_featured_admin_all
+on public.home_featured
+for all to authenticated
+using (exists (select 1 from public.admin_users a where a.user_id = auth.uid()))
+with check (exists (select 1 from public.admin_users a where a.user_id = auth.uid()));
+```
+
+### 3) Bucket Storage
+
+Créer (ou mettre à jour) le bucket `SUPABASE_STORAGE_BUCKET` en **public**:
+
+```sql
+insert into storage.buckets (id, name, public)
+values ('maison-marcelina', 'maison-marcelina', true)
+on conflict (id) do update set public = true;
+```
+
+Policies `storage.objects`:
+
+```sql
+drop policy if exists catalog_bucket_public_read on storage.objects;
+create policy catalog_bucket_public_read
+on storage.objects
+for select
+using (bucket_id = 'maison-marcelina');
+
+drop policy if exists catalog_bucket_admin_insert on storage.objects;
+create policy catalog_bucket_admin_insert
+on storage.objects
+for insert to authenticated
+with check (
+  bucket_id = 'maison-marcelina'
+  and exists (select 1 from public.admin_users a where a.user_id = auth.uid())
+);
+
+drop policy if exists catalog_bucket_admin_update on storage.objects;
+create policy catalog_bucket_admin_update
+on storage.objects
+for update to authenticated
+using (
+  bucket_id = 'maison-marcelina'
+  and exists (select 1 from public.admin_users a where a.user_id = auth.uid())
+)
+with check (
+  bucket_id = 'maison-marcelina'
+  and exists (select 1 from public.admin_users a where a.user_id = auth.uid())
+);
+```
+
+Remplacer `'maison-marcelina'` par la valeur réelle de `SUPABASE_STORAGE_BUCKET` si nécessaire.
+
+Ajouter ensuite chaque admin dans `public.admin_users`.
+
+### 4) Webhook checkout idempotent
+
+Le webhook Stripe fait un upsert sur `customer_orders.order_number`.
+
+```sql
+create unique index if not exists customer_orders_order_number_uidx
+on public.customer_orders(order_number);
+```
+
+## Commandes utiles
 
 Backend tests:
 
@@ -97,7 +427,7 @@ cd backend
 uv run pytest
 ```
 
-Frontend production build:
+Frontend build:
 
 ```bash
 cd frontend

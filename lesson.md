@@ -2,15 +2,274 @@
 
 ## successes
 
+- Redirecting Stripe returns to dedicated confirmation/cancel routes and syncing by `session_id` server-side gives clear payment feedback while keeping order writes idempotent.
+- Adding an admin `Commandes en attente` tab with status updates closes the checkout-to-operations loop without exposing order writes to customer pages.
+- Showing the `Admin` header link only after a backend admin-access check avoids false positives from stale local sessions.
+- Verifying Stripe webhook signatures server-side before any write is mandatory to make payment confirmation trustworthy in production.
+- In cart side panels, adding a direct `Passer au paiement` CTA reduces friction versus forcing users to discover the checkout path manually.
+- Creating Stripe Checkout sessions from backend-validated product ids (instead of trusting client prices) keeps payment totals tamper-resistant.
+- Replacing storefront mocks with a single `/catalog/public` payload keeps home, collection, and product detail in sync without duplicate client fetch logic.
+- A dedicated `/catalog/admin` API plus focused admin tabs (`Ajouter/Modifier collection`, `Ajouter/Modifier produit`) keeps editing flows clearer and avoids long mixed forms.
+- Persisting per-size stock inside product size lines (`Taille: Quantite`) keeps admin inventory entry possible without breaking existing payload contracts (`size_guide` + `stock`).
+- For admin inventory UX, a structured `stock par taille` editor (rows + remove/add + auto total) is more reliable than free-form textarea input.
+- Replacing bare file inputs with a reusable upload button keeps admin actions cleaner and more consistent across collection/product forms.
+- Storing signature and best-sellers in a single `home_featured` row avoids multi-request flag races and keeps merchandising updates atomic.
+- Uploading media through backend `/catalog/admin/upload-image` lets admin workflows stay in-site while preserving centralized auth/error handling.
+- Converting multiline dashboard inputs into normalized arrays (`size_guide`, `composition_care`, `images`) keeps product detail rendering deterministic.
+- When French UI copy is touched, sweep the whole frontend (`App.jsx`, shared UI components, and auth fallback messages) in the same pass to keep accent usage consistent.
+- Header tab order should be driven from one `navItems` source so quick label-position requests (like moving `Notre Histoire` to the right of `Sur mesure`) stay low risk.
+- On product detail pages, placing `Retour boutique` as the first right-aligned element keeps navigation visible without competing with accordion rows.
+- When a request targets copy inside a page, keep route/nav structure and only remove the targeted text element.
+- Making the story view full-bleed at the view class level keeps the edge-to-edge behavior scoped and predictable.
+- For split story layouts, a straight full-height image panel (without blob radius/shadow) creates a cleaner edge against the text column.
+- Compacting line-height and vertical gaps on editorial content improves density without sacrificing readability.
+- On editorial blocks, separating lead, body, signature, and closing claim styles gives a more coherent reading flow.
+- On split editorial layouts, keeping the narrative column frameless avoids the "card inside card" effect.
+- On story pages, a split layout (image left, narrative right) improves hierarchy while staying mobile-safe by collapsing to one column.
+- Building `Notre Histoire` directly from `ressources/maison-marcelina.md` keeps editorial tone aligned without inventing new copy.
 - A single `start.sh` entrypoint keeps backend and frontend startup aligned.
 - Dynamic CORS from `.env` prevents hardcoded port regressions.
-- React frontend wired to backend health with request cancellation avoids stale state updates.
 - Keeping the frontend in Vite with a minimal file set preserves speed and readability.
 - Keeping a clean git flow (`main` as stable base, then `dev`, then feature branches) reduces integration risk.
+- Merging `dev` into a feature branch before opening the PR surfaces conflicts early and keeps review unblock.
+- Supabase Auth backend implementation is cleaner when wrapped in a dedicated service module instead of mixing SDK calls directly in routes.
+- Google OAuth PKCE is stable when `state` and `code_verifier` are validated in backend callback flow.
+- Rewriting the existing `App.jsx` and `styles.css` for the brand mock kept the codebase lean (no extra component sprawl).
+- Defining a reusable visual system (CSS variables + section patterns) speeds up future UI iterations.
+- Adding React Router directly in `main.jsx` + route mapping in `App.jsx` keeps navigation centralized and predictable.
+- Reusing one durable logo asset in `frontend/public/` avoids brittle cross-folder imports.
+- Building all requested pages without backend coupling keeps the front refactor safe to ship.
+- Building the header mobile-first first (logo row + horizontal tab scroll) prevents desktop-first regressions.
+- Showing collections directly below the hero reduces friction versus an extra swipe step.
+- Keeping legal/social footer global avoids duplicating links across pages.
+- Replacing ad-hoc footer links with a dedicated legal strip improves production readiness.
+- Prefer SVG logo assets in `public/` for cleaner scaling and lighter delivery.
+- Mobile hamburger + auto-close on route change keeps nav compact without losing access.
+- A liquid glass design can be shipped with pure CSS (no extra UI dependency) if variables stay centralized.
+- IntersectionObserver-based reveal animations keep scroll effects smooth without heavy animation libraries.
+- Full-width page sections avoid the boxed feeling in web-app mode.
+- Keep header actions ordered by priority so login stays at far right across breakpoints.
+- Creating an SVG wrapper from a PNG is a fast fallback when vector tracing tools are missing, and keeps delivery unblocked.
+- Using `magick -fuzz 5% -trim` before exporting a text visual gives a tight, reliable crop around lettering.
+- For reliable rendering in web apps, prefer self-contained SVG assets (embedded image data) over external `href` file references.
+- Keeping main nav labels centered while preserving action icons in a separate right-aligned group improves clarity without changing routing.
+- Replacing text-based utility actions (cart) with icon buttons works best when `aria-label` is explicit to preserve accessibility.
+- For premium nav styling, text links with subtle active underline read cleaner than bordered pill tabs.
+- On mobile, a framed dropdown container keeps minimalist text nav readable without reintroducing heavy tab styling.
+- Frameless utility icons (cart/login) can look cleaner than capsule buttons when the header is already visually rich.
+- For a premium home experience, an interactive list + featured visual can replace a static grid without adding new dependencies.
+- Home collection autoplay must pause on hover/focus and cleanup intervals on unmount to avoid race conditions and duplicate timers.
+- Isolating a complex WebGL/GSAP slider in `src/components/ui` keeps `App.jsx` focused on routing and page composition.
+- In a Vite React JS app, importing a `.tsx` component can work at build time, but true TypeScript safety still needs dedicated TS tooling/config.
+- For immersive hero sliders, removing card borders/radius and page padding creates a cleaner full-bleed effect.
+- Removing numeric counters from the hero slider can reduce visual clutter when title navigation is already visible.
+- Centering hero copy and bottom navigation creates stronger visual hierarchy on animation-first homepages.
+- Frameless bottom nav labels paired with centered progress lines improve readability without heavy UI chrome.
+- Keeping concise primary nav labels (e.g. `Sur mesure`) improves readability and mobile stability.
+- On phone headers, keeping `Login` inside hamburger while scaling logo/cart/menu icons improves clarity and tap comfort.
+- For small hamburger close states, two symmetric stroked diagonals produce a visually centered `X` more reliably than a filled custom path.
+- On mobile nav overlays, outside-click and `Escape` close behavior prevents sticky-open states.
+- In `Sur mesure`, removing redundant selectors keeps the form faster to scan and complete.
+- Enforcing one commit per atomic change keeps collaboration flow traceable and easier to review.
+- On homepages with a strong hero, placing `Piece signature` then `Best-sellers` then a compact trust band creates a clean conversion flow.
+- A hero slider should use full viewport height when it is the primary first impression block.
+- Keeping home collection buttons frameless (text + line) preserves the premium direction better than boxed controls.
+- Keeping post-hero home sections frameless preserves continuity with the immersive hero.
+- A liquid morph treatment works best on the image wrapper (not a card container) to keep the section frameless.
+- In split layouts, centering signature text vertically opposite the visual improves balance and readability.
+- For premium direction, `Decouvrir` works better as a frameless text CTA than as a pill button.
+- A shadcn-compatible setup can be added incrementally in a Vite JS app by enabling TS support and alias `@/*` without rewriting all pages.
+- Disabling Tailwind preflight avoids regressions when a mature handcrafted CSS theme already exists.
+- Moving best-sellers to an Embla-based carousel gives richer interaction than a static grid while keeping routing and data simple.
+- Replacing a minimal legal strip with a themed, data-driven footer component improves consistency while reusing existing route contracts.
+- Keeping footer copy concise preserves the brand tone and avoids explanatory text bloat.
+- Grouping legal links under one footer block (`Informations legales`) reduces visual noise on mobile.
+- Aligning `Informations legales` as a third footer column (same pattern as `Navigation`/`Assistance`) improves scanability.
+- Reducing footer vertical paddings and gaps keeps legal/navigation content visible without excess empty space.
+- On mobile, centering signature visual + copy improves balance before switching to split left/right layout on larger screens.
+- Centering carousel card copy (title/price) improves visual balance on portrait product crops.
+- Footer copyright rows should use tight `mt/py` and reset paragraph margins to avoid artificial empty space.
+- Increasing header logo, nav labels, and utility icon sizes together preserves visual balance better than scaling only one element.
+- For hero animated titles on mobile, split/animate by words (not characters) to prevent mid-word line breaks.
+- Header tuning works best by reducing logo size slightly while increasing nav/icon sizes for clearer hierarchy.
+- For separator styling, keep it configurable because direction can switch between liquid and straight cut quickly.
+- For a luxe marketplace page, keep product cards minimal (image/name/price) and move search/filter/tri controls into the hero + chips area.
+- For front-only catalog interactions, deriving visible products with `useMemo` keeps filtering/sorting predictable without side effects.
+- On dense collection pages, a persistent side filter rail can replace stacked top controls and keep scanability high.
+- When `/boutique` and `/collection` are unified, keep the lateral filter UX on `/collection` to preserve behavior expectations.
+- A reusable swipe media component per card keeps product galleries consistent inside the collections marketplace.
+- For front-only cart flows, functional `setState` updates (`current => ...`) keep quantity/add/remove operations race-safe.
+- Keeping collection hero frameless avoids the boxed look and aligns with the premium direction.
+- Consolidating `/boutique` into a redirect to `/collection` simplifies navigation without breaking existing inbound links.
+- When `/collection` is the canonical route, using `Boutique` as the visible label everywhere avoids navigation confusion.
+- Removing a redundant sidebar heading keeps hierarchy cleaner when the page title already gives context.
+- Removing a redundant page title can improve focus when the side filter rail already establishes context.
+- For the boutique sidebar, keeping only the `Collections` filter simplifies navigation and reduces unnecessary choices.
+- A boutique grid should use fluid columns (`auto-fit`/`minmax`) so product cards occupy the full available width.
+- Keeping boutique card width fixed on filtered and unfiltered views avoids visual jumps during navigation.
+- Card-to-detail navigation is safest when tap/click handling ignores buttons and drag gestures.
+- In product cards, keeping price and `Ajouter` on a single action row improves scan speed and click clarity.
+- For phone-first boutique UI, a flat 2-column product board reads better than elevated cards.
+- Mobile product visuals feel closer to fashion catalog patterns with simple overlay cues (label + heart).
+- For desktop webapp catalogs, moving from sidebar rails to a full-width product wall improves parity with luxury commerce patterns.
+- On wide screens, flat product tiles with minimal metadata strips often feel more premium than shadowed cards.
+- Keeping product names in the site's editorial font preserves brand consistency across catalog layouts.
+- Removing rounded corners from best-sellers visual cards helps match a sharper catalogue direction.
+- On boutique cards, showing only name + price in one horizontal row keeps scanning faster than mixing direct cart actions.
+- In catalog mode, preserve the global site background to avoid a disconnected white panel effect.
+- In webapp catalog mode, a fixed 5-column desktop grid gives a cleaner premium rhythm than auto-varying row density.
+- In dense product grids, disabling delayed reveal animations avoids "empty rows" perception and improves immediate readability.
+- Header navigation labels can be updated independently from route paths to keep UX wording flexible.
+- On product pages, size selection must be part of the add-to-cart payload so basket lines stay consistent per variant.
+- Product detail information works best as clean collapsible rows (description/size guide/composition/shipping-returns) instead of long static paragraphs.
+- A shadcn-style login block can be integrated into an existing handcrafted theme by adding only missing primitives (`input`) and preserving existing design tokens.
+- Frontend auth submit handlers should always abort in-flight requests on unmount and on resubmit to avoid duplicate login race conditions.
+- Redirecting to backend Google start endpoint from the UI keeps OAuth initiation simple while preserving PKCE state handling server-side.
+- For premium themes, a centered `max-w-sm` auth card can stay close to shadcn defaults while matching brand visuals through token-based gradients instead of extra layout complexity.
+- When Tailwind preflight is disabled, shadcn buttons should explicitly set `appearance` and border defaults, otherwise browser-native outlines can degrade premium UI.
+- Adding signup support is safest when frontend and backend share the same auth payload shape, so login/create-account flows can reuse one session contract.
+- In no-preflight setups, secondary text-action buttons inside auth cards need explicit `appearance: none` and transparent background, otherwise they render as default boxed controls.
+- Mapping all `supabase_auth` errors (not only `AuthApiError`) in FastAPI keeps upstream statuses like `422` for weak passwords instead of leaking `500`.
+- Signup success messages should stay concise and formal to keep a production-grade trust signal in auth flows.
+- A dedicated `/compte` route driven by the auth session keeps profile navigation stable and avoids mixing login and account responsibilities.
+- Grouping account data into explicit tabs (`Vue d'ensemble`, `Commandes`, `Coordonnees`, `Securite`) improves scanability without adding route complexity.
+- Persisting account tabs through backend `/account/*` endpoints + Supabase RLS tables removes fragile local-only state and keeps multi-device consistency.
+- A buyer-facing account page is more credible when order history is read-only and clearly separated from profile editing and security actions.
+- Using account summary metrics (`total commandes`, `total achats`, `en preparation`) improves scanability without adding extra backend endpoints.
+- Removing `POST /account/orders` from the public account surface prevents fake self-created orders and aligns with real boutique flows.
+- On `/compte`, a flatter layout (separators and hierarchy) reads more premium than stacked framed cards.
+- Mapping Supabase `401/403` auth rejections to a clear account `401` response prevents ambiguous profile-save failures.
+- Clearing stale `mm_auth_session` and redirecting to `/login` on account auth rejection keeps buyer UX recoverable.
+- Keeping raw user/client identifiers out of customer-facing account screens reduces unnecessary data exposure.
+- On `/sur-mesure`, replacing manual email capture with a login gate keeps request identity tied to the authenticated account.
+- On `/sur-mesure`, keep the request action available for authenticated users while gating anonymous users to `/login`.
+- On `/sur-mesure`, capability-focused copy (`ce que l'on peut personnaliser`) is clearer than internal process wording.
+- On `/sur-mesure`, a single compact paragraph explains possibilities faster than segmented step blocks.
+- On `/sur-mesure`, removing a redundant page title can keep focus on the compact value copy and request action.
+- On `/sur-mesure`, a frameless layout (without `form-panel`) avoids the `cadre dans cadre` effect and keeps the page cleaner.
+- On French-facing pages, accented UI copy improves readability and perceived quality.
+- French copy QA should always include an explicit accent pass before shipping any user-facing text.
+- On `/sur-mesure`, centering the value paragraph and adding one editorial image improves clarity without reintroducing card containers.
+- On cart interfaces, combining clear quantity steppers with per-line totals improves scanability and checkout confidence.
+- In cart drawer/footer, a high-contrast total block and amount-forward checkout CTA improve trust and reduce hesitation.
+- Keeping public catalog state mock-free on first paint avoids image flicker and ensures users only see fetched storefront media.
 
 ## errors to avoid
 
+- Do not rely only on webhook delivery timing for buyer-facing payment confirmation; provide a server-synced post-checkout confirmation flow.
+- Do not leave admin without a pending-orders workflow once checkout writes statuses, or operational processing stalls.
+- Do not show admin navigation from local auth presence alone; gate it on explicit backend admin authorization.
+- Do not mark a payment as confirmed from frontend query params alone; only Stripe webhook events should finalize server order state.
+- Do not trust cart line prices sent by the browser when creating Stripe sessions; always rebuild amounts from server-side catalog data.
+- Do not keep home/catalog content hardcoded once Supabase tables are the source of truth, or admin edits will never appear in production pages.
+- Do not model signature/best-sellers as scattered booleans updated in multiple requests when one persisted config row can prevent race-prone partial updates.
+- Do not allow image upload flows without strict file type/size validation, or storage and frontend rendering can break in production.
+- Do not expose admin write endpoints without an explicit admin membership check (`admin_users`), even if the user is authenticated.
+- Do not parse product arrays from free-form text without trimming/deduplication, or product detail accordions and media carousels become inconsistent.
+- Do not fix accents only on one page when equivalent labels/messages exist in shared components or account/auth flows.
+- Do not update footer navigation order when the request explicitly targets header tab placement.
+- Do not keep `Retour boutique` below the shipping/returns accordion when the requested UX is a top-right back action.
+- Do not interpret "remove text in a tab" as "delete the whole tab/page feature".
+- Do not keep organic liquid clipping on the story image when the requested direction is a straight full-height panel.
+- Do not over-space editorial paragraphs when a compact reading layout is requested.
+- Do not mix uppercase micro-typography with long narrative paragraphs on the same block; it breaks reading coherence.
+- Do not wrap a story text block in a card when it already sits beside a framed visual.
+- Do not keep story visuals and narrative in a single long column on desktop when the requested direction is image-left/text-right.
+- Do not invent brand-story wording when `ressources/maison-marcelina.md` already defines the source narrative.
 - Do not commit machine artifacts (`.DS_Store`, virtual env folders, `node_modules`, local `.env`).
 - Do not bypass `uv` for backend dependency management or execution.
+- Do not open a PR from a dirty branch or without syncing `dev` first (`pull --ff-only` + local merge), or integration risks rise.
 - Do not hardcode backend/frontend ports in app code.
 - Do not trigger frontend API requests without cancellation on unmount.
+- Do not rely on a shared in-memory OAuth verifier across requests; it creates race conditions during concurrent login attempts.
+- Do not ship placeholder UI copy unrelated to brand content.
+- Do not keep empty scratch files in git history.
+- Do not overload top navigation when only a few tabs are needed.
+- Do not keep decorative controls if swipe interaction already covers the use case.
+- Do not assume PNG-to-SVG vector tracing will work locally without `potrace`/equivalent tooling installed.
+- Do not use long navigation labels with forced `white-space: nowrap` on mobile dropdowns, or labels will overflow.
+- Do not mix centered nav layout with left-aligned tab text, or headers look visually misaligned.
+- Do not remove all visual separation on mobile overlays, or navigation can become hard to perceive.
+- Do not overdecorate utility icons with badges/background pills when a minimalist header is expected.
+- Do not run home autoplay timers without proper cleanup logic, or multiple intervals can desync active state and UI.
+- Do not assume shadcn/Tailwind/TypeScript conventions already exist in a plain React project; verify structure before integrating shared components.
+- Do not recreate slide arrays inside render for WebGL-heavy components, or effects can reinitialize unnecessarily.
+- Do not batch unrelated edits into a single commit; keep commits scoped to one clear change.
+- Do not place dense descriptive paragraphs under the hero; keep post-hero blocks short and action-oriented.
+- Do not subtract header height from a hero meant to feel fully immersive; it breaks the full-screen impact.
+- Do not style home collection buttons as boxed pills/cards when the visual direction is frameless.
+- Do not wrap the post-hero home modules in card containers when the requested direction is edge-to-edge.
+- Do not apply liquid styling through added outer frames; apply it directly on the media shape.
+- Do not reuse generic pill button styles for signature CTAs when frameless controls are required.
+- Do not use `@/components/ui/*` imports without configuring Vite alias `@`, or builds will fail.
+- Do not integrate shadcn snippets in JS projects without adding TS/Tailwind support first.
+- Do not duplicate legal route definitions in footer data; map from existing legal page source of truth.
+- Do not spread legal links across multiple footer zones when a single grouped legal block is requested.
+- Do not hide legal links behind a separate bottom interaction when the request is a visible column list.
+- Do not over-pad footer sections after adding multiple columns, or the page end feels disproportionately tall.
+- Do not keep desktop-left alignment rules on mobile for hero-adjacent split blocks; center first, then branch at tablet.
+- Do not leave carousel overlay copy left-aligned when the requested direction is centered emphasis.
+- Do not rely on default paragraph margins in compact footer rows; it creates unwanted bottom gap.
+- Do not enlarge header logo without scaling nav/icon sizes, or hierarchy becomes inconsistent.
+- Do not animate hero titles per character on narrow screens when readable word wrapping is required.
+- Do not upscale logo and nav/icons in the same direction blindly; tune them inversely for balance.
+- Do not force a liquid separator when the requested direction is a straight visual cut.
+- Do not keep obsolete collection components/styles after a page rewrite, or old selectors can create hard-to-debug UI regressions.
+- Do not expect `npm run build` to work on a fresh clone before `npm install`.
+- Do not keep filter/search controls permanently exposed in the hero when the requested direction is a cleaner, premium layout.
+- Do not stack framed filter containers under an already framed hero; it creates a heavy "cadre dans cadre" effect.
+- Do not style card internals with broad selectors like `.product-card div` when adding swipe wrappers; target explicit classes to avoid layout regressions.
+- Do not assume every product has multiple photos; swipe UI must gracefully fallback to a single static image.
+- Do not keep route-specific UI/styles after replacing a page with a redirect, or dead code will accumulate quickly.
+- Do not remove active filter affordances when merging two routes into one, or users lose the expected navigation model.
+- Do not mix `Les collections` and `Boutique` labels for the same destination, or UX becomes ambiguous.
+- Do not lock boutique grids to fixed 2/3 desktop columns, or large right-side empty space will appear on wide screens.
+- Do not bind raw card click navigation without guarding for swipe movement and nested button clicks, or users get accidental redirects.
+- Do not split price and add-to-cart into stacked micro-lines on dense cards; it slows comparison and action.
+- Do not reuse desktop luxury card treatments unchanged on mobile catalog views; they reduce scanability.
+- Do not keep fixed-width desktop product cards when the target direction is full-bleed webapp catalogs; it creates dead zones and weak rhythm.
+- Do not switch product name typography to utilitarian sans styles in catalog mode; it breaks visual continuity with the brand.
+- Do not reintroduce decorative color swatches on product media when the direction is minimal and content-led.
+- Do not overload boutique listing cards with secondary actions when the primary action is opening the product detail page.
+- Do not layer opaque local backgrounds over the boutique grid when the direction requires continuity with the site backdrop.
+- Do not leave desktop catalog column count ambiguous when a strict merchandising layout (e.g. 5-up) is requested.
+- Do not apply staggered reveal wrappers on every catalog card when users expect all rows visible on initial render.
+- Do not merge cart lines only by product id once sizes are selectable, or different variants will overwrite each other.
+- Do not keep a separate login icon visible on phone when auth is already in the hamburger menu; it clutters the header.
+- Do not use an asymmetric filled `X` glyph for hamburger close icons; it can look off-center inside circular buttons.
+- Do not rely only on route-change to close a mobile menu; outside-click dismissal is expected interaction.
+- Do not keep a `Point de contact` selector when `Email` is already required; it adds friction without value.
+- Do not fire concurrent login submits without cancellation/locking, or UI state can desync from backend auth responses.
+- Do not add demo-only component files in production routes when they are not used; keep login integration focused on the real route component.
+- Do not rely on browser default button rendering in a no-preflight setup; it can introduce thick native borders and inconsistent visuals across browsers.
+- Do not create separate ad-hoc auth response schemas per endpoint; inconsistent payloads make frontend auth mode switches brittle.
+- Do not handle only `AuthApiError` in auth routes; `CustomAuthError` variants (like weak password) otherwise become false `500 Internal Server Error`.
+- Do not keep profile icon hard-linked to `/login` after authentication; route it to account settings to prevent broken signed-in UX.
+- Do not stack all account information in one long block once sections grow; switch to tabs to keep the account page readable.
+- Do not store account orders only in browser localStorage once real account features exist; persist to Supabase with user-scoped RLS policies.
+- Do not expose manual order creation controls to buyer accounts in `/compte`; order records must come from checkout/backoffice flows.
+- Do not keep write-capable order endpoints on customer account APIs when the UI is meant to be read-only; it creates trust and data integrity issues.
+- Do not nest framed containers in `/compte` (`cadres dans cadres`); keep one visual level and rely on spacing/lines.
+- Do not keep stale local sessions after backend auth rejection on `/account/*`; force re-auth to avoid endless `403` loops.
+- Do not expose internal customer identifiers (user/client ids) on buyer-facing account views.
+- Do not keep checkout totals as low-emphasis microtext in cart footers; make the amount primary and unmistakable.
+- Do not ship the catalog dashboard to a new Supabase project before applying tables, RLS policies, and storage policies; admin writes and image uploads will fail.
+- Do not grant admin access by guesswork (email assumptions); insert explicit `auth.users.id` records in `public.admin_users` and verify with a join.
+- Do not rely only on a global stock input when size-level inventory is required; capture a per-size breakdown and derive a consistent total.
+- Do not keep free-form stock-by-size textareas once non-technical admin users need day-to-day inventory edits; use constrained row inputs.
+- Do not treat a non-empty catalog payload as "ready" when home images are missing; validate content quality (active images/products), not only array length.
+- Do not let storefront pages render empty while admin data is being seeded; keep a deterministic mock fallback for slides, featured block, and boutique products.
+- Do not rename an admin area in navigation without keeping a route alias for the previous path, or saved links/bookmarks will break.
+- Do not keep collection management edit-only once catalog is DB-driven; admin must be able to create a collection with title, description, and media directly in the admin UI.
+- Do not require at least 2 loaded hero textures before rendering; with one active collection image the home hero must still display.
+- Do not label critical admin actions with generic "Enregistrer" only; for merchandising controls (best-sellers), use explicit action text and a visible empty-state when no active products exist.
+- Do not expose slug fields in admin content forms when backend already generates and enforces unique slugs; it adds friction and invalid-input risk for non-technical users.
+- Do not ask for contact email on `/sur-mesure` when auth is available; gate with login and use account identity instead.
+- Do not remove the sur-mesure request form after adding auth gating, or logged-in users lose the main action.
+- Do not describe only atelier phases on `/sur-mesure` when users need to quickly understand customization options.
+- Do not fragment short value copy into multiple cards/steps when one compact text block communicates better.
+- Do not stack a redundant `Sur mesure` page heading above already explicit intro copy when the page should stay concise.
+- Do not nest framed wrappers (`form-panel` + internal separated blocks) on `/sur-mesure`; keep one visual level.
+- Do not ship French interface text without accents when final copy is user-visible.
+- Do not add decorative image wrappers that create extra framing when the requested direction is frameless.
+- Do not render mock catalog images before the first public fetch resolves, or users will see a trust-breaking visual swap on refresh.
